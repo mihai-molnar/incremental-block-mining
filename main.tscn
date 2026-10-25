@@ -1,0 +1,213 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/background.gd" id="1_bg"]
+[ext_resource type="Script" path="res://world/shake_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://world/work_area.gd" id="3_work"]
+[ext_resource type="Script" path="res://fx/fx.gd" id="4_fx"]
+[ext_resource type="Script" path="res://ui/hud.gd" id="5_hud"]
+[ext_resource type="Script" path="res://ui/sidebar.gd" id="6_sidebar"]
+[ext_resource type="Script" path="res://ui/item_list_page.gd" id="11_page"]
+[ext_resource type="Resource" path="res://upgrades/items/diamond_squares.tres" id="12_diamond"]
+[ext_resource type="Resource" path="res://shop/items/yellow_cube_item.tres" id="13_yellow_cube"]
+[ext_resource type="Resource" path="res://upgrades/items/sharp_pickaxe.tres" id="14_pickaxe"]
+[ext_resource type="Resource" path="res://shop/items/grey_cube_item.tres" id="15_grey_cube"]
+[ext_resource type="Resource" path="res://upgrades/items/big_pickaxe.tres" id="16_big_pickaxe"]
+[ext_resource type="Resource" path="res://shop/items/red_cube_item.tres" id="17_red_cube"]
+[ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
+[ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
+[ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
+[ext_resource type="PackedScene" path="res://ui/pause_menu.tscn" id="10_pause"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("1_bg")
+
+[node name="Camera" type="Camera2D" parent="."]
+anchor_mode = 0
+script = ExtResource("2_cam")
+
+[node name="WorkArea" type="Node2D" parent="." node_paths=PackedStringArray("fx")]
+script = ExtResource("3_work")
+fx = NodePath("../Fx")
+
+[node name="Fx" type="Node2D" parent="." node_paths=PackedStringArray("camera", "hud", "screen_layer", "screen_flash")]
+script = ExtResource("4_fx")
+camera = NodePath("../Camera")
+hud = NodePath("../Hud")
+screen_layer = NodePath("../ScreenFx")
+screen_flash = NodePath("../ScreenFx/Flash")
+
+[node name="Hud" type="CanvasLayer" parent="." node_paths=PackedStringArray("work_area")]
+script = ExtResource("5_hud")
+work_area = NodePath("../WorkArea")
+
+[node name="Root" type="Control" parent="Hud"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MoneyBox" type="HBoxContainer" parent="Hud/Root"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 120.0
+offset_bottom = 24.0
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="CoinIcon" type="TextureRect" parent="Hud/Root/MoneyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+stretch_mode = 3
+
+[node name="MoneyLabel" type="Label" parent="Hud/Root/MoneyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MoneyLabel"
+text = "30"
+
+[node name="ModeBar" type="HBoxContainer" parent="Hud/Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -6.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="BreakButton" type="Button" parent="Hud/Root/ModeBar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_pressed = true
+text = "[B] Break"
+
+[node name="MoveButton" type="Button" parent="Hud/Root/ModeBar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[M] Move"
+
+[node name="Sidebar" type="Control" parent="Hud/Root"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 240.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_sidebar")
+
+[node name="Panel" type="PanelContainer" parent="Hud/Root/Sidebar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Hud/Root/Sidebar/Panel/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TitleLabel"
+text = "Shop"
+
+[node name="CloseButton" type="Button" parent="Hud/Root/Sidebar/Panel/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "X"
+
+[node name="Separator" type="HSeparator" parent="Hud/Root/Sidebar/Panel/VBox"]
+layout_mode = 2
+
+[node name="Pages" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ShopPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/Pages" node_paths=PackedStringArray("tab_button")]
+layout_mode = 2
+theme_override_constants/separation = 4
+script = ExtResource("11_page")
+items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube")])
+title = "Shop"
+toggle_action = &"toggle_shop"
+tab_button = NodePath("../../../../Tabs/ShopTab")
+
+[node name="UpgradesPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/Pages" node_paths=PackedStringArray("tab_button")]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+script = ExtResource("11_page")
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe")])
+title = "Upgrades"
+toggle_action = &"toggle_upgrades"
+notify_when_affordable = true
+tab_button = NodePath("../../../../Tabs/UpgradesTab")
+
+[node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
+layout_mode = 0
+offset_left = -98.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 50.0
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="ShopTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[S] Shop"
+
+[node name="UpgradesTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[U] Upgrades"
+
+[node name="ScreenFx" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Flash" type="ColorRect" parent="ScreenFx"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
+
+[node name="CursorLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 100
+
+[node name="Cursor" type="Node2D" parent="CursorLayer" node_paths=PackedStringArray("work_area")]
+script = ExtResource("9_cursor")
+work_area = NodePath("../../WorkArea")

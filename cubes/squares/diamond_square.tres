@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"diamond"
+display_name = "Diamond"
+hp = 5
+hp_multiplier = 3.0
+value = 10
+value_multiplier = 5.0
+shimmer = true
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.141176, 0.47451, 0.701961, 1)
+base_color = Color(0.298039, 0.764706, 0.901961, 1)
+light_color = Color(0.658824, 0.941176, 0.984314, 1)
+shine_color = Color(1, 1, 1, 1)

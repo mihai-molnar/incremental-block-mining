@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ClickReductionUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/click_reduction_upgrade.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+title = "Sharp Pickaxe"
+price = 100
+max_level = 0

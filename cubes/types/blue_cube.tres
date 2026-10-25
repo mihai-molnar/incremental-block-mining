@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CubeType" format=3]
+
+[ext_resource type="Script" path="res://cubes/cube_type.gd" id="1_type"]
+[ext_resource type="Resource" path="res://cubes/squares/blue_square.tres" id="2_square"]
+
+[resource]
+script = ExtResource("1_type")
+id = &"blue"
+display_name = "Blue Cube"
+price = 20
+grid_size = Vector2i(4, 4)
+square_type = ExtResource("2_square")
