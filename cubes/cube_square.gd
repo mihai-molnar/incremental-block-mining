@@ -14,6 +14,11 @@ const DAMAGE_TINT := 0.45
 const SHINE_INTERVAL_MIN := 1.5
 const SHINE_INTERVAL_MAX := 4.0
 const SHINE_DURATION := 0.4
+## Explosive squares: where the bomb emblem's fuse ends (relative to the tile center) and
+## the colors its spark flickers through, one per frame.
+const FUSE_TIP := Vector2(3, -6)
+const FUSE_SPARK_COLORS: Array[Color] = [Color("ffcd75"), Color("f4f4f4"), Color("ef7d57"), Color("f4f4f4")]
+const FUSE_SPARK_FRAME := 0.07
 
 var square_type: SquareType
 ## The cube this square belongs to; some square types pay relative to it.
@@ -40,12 +45,13 @@ var _tween: Tween
 var _shine_wait := 0.0
 ## Progress (0..1) of the current glint, or negative when idle.
 var _shine_t := -1.0
+var _fuse_t := 0.0
 
 
 func _ready() -> void:
 	# Godot turns processing on when a node with _process enters the tree; only
-	# shimmering squares need it.
-	set_process(square_type.shimmer and not is_broken())
+	# shimmering and explosive squares need it.
+	set_process(_is_animated())
 	Game.upgrade_purchased.connect(_on_upgrade_purchased)
 
 
@@ -115,7 +121,11 @@ func flash_white() -> void:
 func _reset_shimmer() -> void:
 	_shine_t = -1.0
 	_shine_wait = randf_range(0.3, SHINE_INTERVAL_MAX)
-	set_process(square_type.shimmer and not is_broken())
+	set_process(_is_animated())
+
+
+func _is_animated() -> bool:
+	return not is_broken() and (square_type.shimmer or square_type.is_explosive())
 
 
 func _process(delta: float) -> void:
@@ -123,6 +133,20 @@ func _process(delta: float) -> void:
 		_shine_t = -1.0
 		set_process(false)
 		return
+	if square_type.is_explosive():
+		_update_fuse(delta)
+	if square_type.shimmer:
+		_update_shine(delta)
+
+
+func _update_fuse(delta: float) -> void:
+	var frame := floori(_fuse_t / FUSE_SPARK_FRAME)
+	_fuse_t += delta
+	if floori(_fuse_t / FUSE_SPARK_FRAME) != frame:
+		queue_redraw()
+
+
+func _update_shine(delta: float) -> void:
 	if _shine_t < 0.0:
 		_shine_wait -= delta
 		if _shine_wait <= 0.0:
@@ -154,6 +178,7 @@ func _draw() -> void:
 		_draw_ghost(rect)
 	else:
 		_draw_tile(rect)
+		_draw_emblem()
 		_draw_cracks()
 		if _shine_t >= 0.0:
 			_draw_shine(rect.grow(-1))
@@ -176,6 +201,26 @@ func _draw_tile(rect: Rect2) -> void:
 	draw_rect(Rect2(p + Vector2(s.x - 1, 0), Vector2(1, s.y)), t.shadow_color)
 	draw_rect(Rect2(p + Vector2(1, 1), Vector2(3, 1)), t.shine_color)
 	draw_rect(Rect2(p + Vector2(1, 2), Vector2(1, 1)), t.shine_color)
+
+
+func _draw_emblem() -> void:
+	if square_type.emblem.is_empty():
+		return
+	var texture := PixelSprites.get_texture(square_type.emblem)
+	draw_texture(texture, (-texture.get_size() / 2.0).floor())
+	if square_type.is_explosive():
+		_draw_fuse_spark()
+
+
+## A lit fuse: the tip cycles colors every frame and flares into a small cross every other one.
+func _draw_fuse_spark() -> void:
+	var frame := floori(_fuse_t / FUSE_SPARK_FRAME)
+	var color := FUSE_SPARK_COLORS[frame % FUSE_SPARK_COLORS.size()]
+	draw_rect(Rect2(FUSE_TIP, Vector2.ONE), color)
+	if frame % 2 == 0:
+		var flare := Color(color, 0.75)
+		draw_rect(Rect2(FUSE_TIP + Vector2(-1, 0), Vector2(3, 1)), flare)
+		draw_rect(Rect2(FUSE_TIP + Vector2(0, -1), Vector2(1, 3)), flare)
 
 
 ## A diagonal glint sweeping from the top-left to the bottom-right corner, then a

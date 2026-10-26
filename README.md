@@ -31,12 +31,19 @@ A red dot on the Upgrades tab means a new upgrade (or its next tier) has become 
 
 ### Cubes
 
-| Cube   | Price | Squares | Clicks per square | Pays per square |
-|--------|------:|--------:|------------------:|----------------:|
-| Blue   |    20 |     4x4 |                 2 |               2 |
-| Yellow |    30 |     4x4 |                 2 |               3 |
-| Grey   |    50 |     4x4 |                 5 |               5 |
-| Red    |   150 |     6x6 |                 8 |              10 |
+| Cube     | Price | Squares | Clicks per square | Pays per square |
+|----------|------:|--------:|------------------:|----------------:|
+| Blue     |    20 |     4x4 |                 1 |               2 |
+| Yellow   |    30 |     4x4 |                 2 |               3 |
+| Grey     |    50 |     4x4 |                 5 |               5 |
+| Red      |   150 |     6x6 |                 8 |              10 |
+| Jade     |   400 |     6x6 |                12 |              25 |
+| Obsidian |  1200 |     8x8 |                24 |              50 |
+| Gold Bar |  3000 |     8x3 |                20 |             300 |
+
+Every cube pays back between 1.6x and 2.7x its price. Jade fits a maxed Big Pickaxe in one
+hit, Obsidian is big and tough enough that explosives pay off most there, and the shimmering
+Gold Bar is the jackpot.
 
 ### Upgrades
 
@@ -45,6 +52,13 @@ A red dot on the Upgrades tab means a new upgrade (or its next tier) has become 
 | Diamond Squares | 60              | 15% of squares on any cube turn into diamonds, which pay 5x and take 3x the clicks |
 | Sharp Pickaxe   | 100 × tier      | Each tier makes squares take 1 click less (never below 1); no tier limit |
 | Big Pickaxe     | 250 × tier      | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
+| Explosive Squares | 75 × tier     | Each tier turns 1% more squares into explosives; no tier limit |
+| Blast Radius    | 300 × tier      | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
+
+An explosive square breaks in one click and blows up every square around it, paying for all
+of them, however many clicks they had left. Explosives caught in a blast go off a moment
+later, so they chain. Blasts also reach squares on other cubes that touch, so drag cubes
+together before you set one off.
 
 The shop won't sell you an upgrade if paying for it would leave you unable to afford the
 cheapest cube. Money still sitting in unbroken squares counts toward that.

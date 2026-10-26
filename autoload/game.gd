@@ -98,6 +98,16 @@ func get_pickaxe_size() -> int:
 	return maxi(size, 1)
 
 
+## How many squares out a square of this type blows up when it breaks (0 = it doesn't).
+func get_blast_radius(square_type: SquareType) -> int:
+	if not square_type.is_explosive():
+		return 0
+	var radius := square_type.blast_radius
+	for upgrade: Upgrade in _upgrade_levels:
+		radius = upgrade.modify_blast_radius(radius, _upgrade_levels[upgrade])
+	return maxi(radius, 1)
+
+
 ## Clicks needed to break a square of this type inside a cube of that type. Never less than 1.
 func get_square_hp(square_type: SquareType, cube_type: CubeType) -> int:
 	var hp := square_type.get_hp(cube_type)

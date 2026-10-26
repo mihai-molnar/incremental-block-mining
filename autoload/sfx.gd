@@ -23,6 +23,7 @@ func _ready() -> void:
 		&"break": _make_break(),
 		&"coin": _make_coin(),
 		&"explode": _make_explode(),
+		&"blast": _make_blast(),
 		&"buy": _make_buy(),
 		&"land": _make_land(),
 		&"pickup": _make_pickup(),
@@ -72,6 +73,15 @@ func _make_explode() -> AudioStreamWAV:
 	return _render(0.55, func(t: float, _p: float) -> float:
 		var thump := sin(TAU * _sweep(t, 150.0, 35.0, 0.55)) * 0.75 * exp(-t * 6.0)
 		return thump + noise.call() * 0.5 * exp(-t * 7.0))
+
+
+## An explosive square: a sharper crack on top of a quick low boom.
+func _make_blast() -> AudioStreamWAV:
+	var noise := _held_noise(3)
+	var rumble := _held_noise(9)
+	return _render(0.42, func(t: float, _p: float) -> float:
+		var boom := sin(TAU * _sweep(t, 120.0, 28.0, 0.42)) * 0.8 * exp(-t * 8.0)
+		return boom + noise.call() * 0.55 * exp(-t * 30.0) + rumble.call() * 0.35 * exp(-t * 9.0))
 
 
 func _make_buy() -> AudioStreamWAV:

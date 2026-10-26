@@ -8,7 +8,7 @@ extends Resource
 ## Clicks needed to break the square.
 @export var hp := 2
 ## When above 0, the square takes this multiple of its cube's default square's clicks
-## instead of `hp` (e.g. 3 makes a diamond take 6 clicks in a blue cube, 24 in a red one).
+## instead of `hp` (e.g. 3 makes a diamond take 3 clicks in a blue cube, 24 in a red one).
 @export var hp_multiplier := 0.0
 ## Money earned when the square breaks.
 @export var value := 2
@@ -17,6 +17,11 @@ extends Resource
 @export var value_multiplier := 0.0
 ## Precious squares (diamonds...) glint every few seconds with a light sweep and a twinkle.
 @export var shimmer := false
+## When above 0, breaking the square sets off an explosion that breaks every square within
+## this many squares of it (1 = the 8 around it). Upgrades can widen it.
+@export var blast_radius := 0
+## PixelSprites sprite drawn in the middle of the tile (e.g. a bomb on explosive squares).
+@export var emblem: StringName = &""
 
 @export_group("Palette")
 @export var outline_color := Color("0f1020")
@@ -38,6 +43,10 @@ func get_value(cube_type: CubeType) -> int:
 	if value_multiplier > 0.0 and cube_type:
 		return roundi(cube_type.square_type.value * value_multiplier)
 	return value
+
+
+func is_explosive() -> bool:
+	return blast_radius > 0
 
 
 ## Colors used for debris particles.

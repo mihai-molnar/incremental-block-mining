@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BlastRadiusUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/blast_radius_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://upgrades/items/explosive_squares.tres" id="2_requires"]
+
+[resource]
+script = ExtResource("1_upgrade")
+title = "Blast Radius"
+price = 300
+max_level = 3
+requires = ExtResource("2_requires")

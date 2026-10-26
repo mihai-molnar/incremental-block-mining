@@ -15,6 +15,20 @@ const SPAWN_STEP := 8.0
 ## Delay before upgraded squares start converting after a cube lands, and between each.
 const CONVERT_DELAY := 0.15
 const CONVERT_STAGGER := 0.08
+## Pause between the links of a chain reaction, so each wave of explosions reads on its own.
+const CHAIN_DELAY := 0.12
+
+
+## An explosive square that broke and is going off. Keeps its own copy of where, since by
+## the time a chain reaction reaches it, its cube may be gone.
+class Blast:
+	var at: Vector2
+	var radius: int
+
+	func _init(center: Vector2, reach: int) -> void:
+		at = center
+		radius = reach
+
 
 @export var fx: Fx
 ## Region where cubes can be placed.
@@ -35,6 +49,8 @@ var _hovered_squares: Array[CubeSquare] = []
 var _resolving_click := false
 var _clicked_hits: Array[CubeSquare] = []
 var _clicked_breaks: Array[CubeSquare] = []
+## Explosive squares broken since the last blast went off; the next wave of the chain.
+var _pending_blasts: Array[Blast] = []
 
 
 func _ready() -> void:
@@ -104,6 +120,21 @@ func get_squares_in_reach(point: Vector2) -> Array[CubeSquare]:
 	return result
 
 
+## Unbroken squares a blast at the point takes out: every square whose center is within
+## `radius` and a half squares of it, across cubes. Radius 1 is the full ring of 8 around
+## the explosive; bigger ones round off the corners.
+func get_squares_in_blast(center: Vector2, radius: int) -> Array[CubeSquare]:
+	var result: Array[CubeSquare] = []
+	var reach := (radius + 0.5) * CubeSquare.SIZE
+	for cube in get_cubes():
+		if cube.is_complete():
+			continue
+		for square in cube.get_squares():
+			if not square.is_broken() and square.global_position.distance_to(center) <= reach:
+				result.append(square)
+	return result
+
+
 ## Topmost cube under the point that can still be interacted with.
 func get_cube_at(global_point: Vector2) -> Cube:
 	for i in range(get_child_count() - 1, -1, -1):
@@ -156,14 +187,40 @@ func _process(delta: float) -> void:
 	_update_hover(point)
 
 
+## Hits everything in reach. Explosives the click breaks go off as part of the same click,
+## so its payout includes what they blew up.
 func _break_at(point: Vector2) -> void:
 	var targets := get_squares_in_reach(point)
 	_resolving_click = true
 	for square in targets:
 		(square.get_parent() as Cube).hit_square(square)
+	_detonate(_take_pending_blasts())
 	_resolving_click = false
 	_resolve_click()
 	tool_used.emit(not targets.is_empty())
+
+
+## One link of a chain reaction: explosives caught in the previous blasts go off and pay
+## out together. Any explosives they catch are the next link.
+func _chain_blasts(blasts: Array[Blast]) -> void:
+	_resolving_click = true
+	_detonate(blasts)
+	_resolving_click = false
+	_resolve_click()
+
+
+## Breaks every square each blast reaches, whatever clicks it had left.
+func _detonate(blasts: Array[Blast]) -> void:
+	for blast in blasts:
+		fx.explosion(blast.at, blast.radius)
+		for square in get_squares_in_blast(blast.at, blast.radius):
+			(square.get_parent() as Cube).hit_square(square, square.hp)
+
+
+func _take_pending_blasts() -> Array[Blast]:
+	var blasts := _pending_blasts
+	_pending_blasts = []
+	return blasts
 
 
 func _start_drag(point: Vector2) -> void:
@@ -248,12 +305,19 @@ func _on_square_hit(_cube: Cube, square: CubeSquare) -> void:
 
 func _on_square_broken(_cube: Cube, square: CubeSquare) -> void:
 	_clicked_breaks.append(square)
+	var radius := Game.get_blast_radius(square.square_type)
+	if radius > 0:
+		_pending_blasts.append(Blast.new(square.global_position, radius))
 	if not _resolving_click:
 		_resolve_click()
 
 
-## Pays out and plays the effects for everything the last click hit and broke.
+## Pays out and plays the effects for everything the last click hit and broke, then
+## lines up any explosives it broke as the next link of a chain reaction.
 func _resolve_click() -> void:
+	if not _pending_blasts.is_empty():
+		var timer := get_tree().create_timer(CHAIN_DELAY, false)
+		timer.timeout.connect(_chain_blasts.bind(_take_pending_blasts()))
 	if not _clicked_hits.is_empty():
 		fx.squares_hit(_clicked_hits)
 	if not _clicked_breaks.is_empty():

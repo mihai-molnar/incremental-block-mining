@@ -10,6 +10,8 @@ extends ShopItem
 @export var price := 0
 ## How many times it can be bought. 0 means no limit.
 @export_range(0, 99) var max_level := 1
+## Stays out of the shop until this upgrade is owned.
+@export var requires: Upgrade
 
 
 func get_level() -> int:
@@ -36,6 +38,10 @@ func get_description() -> String:
 ## Price of the next level (or of the last one, once maxed).
 func get_price() -> int:
 	return price * (get_level() if is_maxed() else get_level() + 1)
+
+
+func is_available() -> bool:
+	return requires == null or Game.has_upgrade(requires)
 
 
 func is_owned() -> bool:
@@ -76,3 +82,8 @@ func modify_square_hp(_square_type: SquareType, hp: int, _level: int) -> int:
 ## Side, in squares, of the area one click hits.
 func modify_pickaxe_size(size: int, _level: int) -> int:
 	return size
+
+
+## How many squares out an explosive square's blast reaches.
+func modify_blast_radius(radius: int, _level: int) -> int:
+	return radius

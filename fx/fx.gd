@@ -7,6 +7,7 @@ const POPUP_FONT := preload("res://assets/fonts/Silkscreen-Bold.ttf")
 const POPUP_COLOR := Color("ffcd75")
 const SPARK_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75")]
 const DUST_COLORS: Array[Color] = [Color("566c86"), Color("94b0c2"), Color("333c57")]
+const FIRE_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75"), Color("ffcd75"), Color("ef7d57"), Color("b13e53")]
 
 @export var camera: ShakeCamera
 @export var hud: Hud
@@ -16,6 +17,8 @@ const DUST_COLORS: Array[Color] = [Color("566c86"), Color("94b0c2"), Color("333c
 
 var _popup_settings: LabelSettings
 var _hitstop_depth := 0
+## Frame of the last explosion boom, so explosions going off together share one.
+var _last_boom_frame := -1
 
 
 func _ready() -> void:
@@ -118,6 +121,57 @@ func cube_exploded(cube: Cube) -> void:
 	add_child(wave)
 	flash_screen(0.12)
 	shake(0.7)
+
+
+## An explosive square going off, reaching `radius` squares out: a white-hot core that
+## opens into a ring the size of the blast, fire, smoke and a kick of shake. Explosions
+## in the same frame (one link of a chain reaction) share a single boom and flash.
+func explosion(at: Vector2, radius: int) -> void:
+	var reach := (radius + 0.5) * CubeSquare.SIZE
+	var core := SquareShockwave.new()
+	core.position = at
+	core.start_half_size = 5.0
+	core.end_half_size = reach * 0.6
+	core.thickness = 10.0
+	core.duration = 0.2
+	core.color = Color("f4f4f4")
+	add_child(core)
+	var ring := SquareShockwave.new()
+	ring.position = at
+	ring.start_half_size = 8.0
+	ring.end_half_size = reach + 6.0
+	ring.thickness = 3.0
+	ring.duration = 0.32
+	ring.color = Color("ffcd75")
+	add_child(ring)
+	var fire := _burst(at, FIRE_COLORS, 12 + 8 * radius)
+	fire.speed_min = 40.0
+	fire.speed_max = reach * 6.0
+	fire.gravity = -40.0
+	fire.damping = 5.0
+	fire.lifetime_min = 0.2
+	fire.lifetime_max = 0.45
+	fire.size_min = 2
+	fire.size_max = 4
+	fire.emit_extents = Vector2(3, 3)
+	fire.start()
+	var smoke := _burst(at, DUST_COLORS, 6 + 4 * radius)
+	smoke.speed_min = 10.0
+	smoke.speed_max = reach * 2.0
+	smoke.gravity = -60.0
+	smoke.damping = 3.0
+	smoke.lifetime_min = 0.45
+	smoke.lifetime_max = 0.9
+	smoke.size_min = 2
+	smoke.size_max = 4
+	smoke.emit_extents = Vector2(reach, reach) * 0.4
+	smoke.start()
+	shake(0.3 + 0.08 * radius)
+	var frame := Engine.get_process_frames()
+	if frame != _last_boom_frame:
+		_last_boom_frame = frame
+		flash_screen(0.1)
+		Sfx.play(&"blast", 0.1)
 
 
 ## A square turning into another type (e.g. from an upgrade).

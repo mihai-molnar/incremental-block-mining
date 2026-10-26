@@ -29,6 +29,8 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 - Inject keys with `Input.parse_input_event`. Mouse events need `root.get_final_transform() * pos`.
 - For screenshots, drop `--headless`, `await RenderingServer.frame_post_draw`, and save `root.get_texture().get_image()`.
 - ObjectDB leak warnings on a forced harness quit come from the harness's pending coroutines or audio, not from game code.
+- Autoloads aren't global identifiers in a `-s` script: fetch `root.get_node("Game")`, and keep the harness untyped. A member typed as a game class compiles game scripts before `Game` exists and floods the output with "Identifier not found: Game".
+- Headless runs don't print GDScript warnings. To check for them, copy the project to a temp folder, set `debug/gdscript/warnings/<name>=2` there to make them errors, and run the smoke test on the copy.
 
 ## Architecture
 
@@ -41,15 +43,16 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 | `ShopItem` subclasses | `shop/items/`, `upgrades/items/` | what can be bought |
 
 - A `SquareType` can set `hp_multiplier` or `value_multiplier` above 0. It then scales off the containing cube's default square, which is how diamonds give 5x value and 3x clicks on any cube.
-- Shop contents live in `main.tscn`, in the `items` arrays of the `ItemListPage` nodes under `Hud/Root/Sidebar/Panel/VBox/Pages`. A new cube or upgrade needs a `.tres` file plus an entry there.
+- A `SquareType` with `blast_radius` above 0 is explosive, and its `emblem` names a `PixelSprites` sprite drawn on the tile.
+- Shop contents live in `main.tscn`, in the `items` arrays of the `ItemListPage` nodes under `Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages`. A new cube or upgrade needs a `.tres` file plus an entry there.
 
 **`Game` autoload (`autoload/game.gd`) is the rules engine.**
 - It holds money, owned upgrade levels and `field_value`, the money still left in unbroken squares.
-- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type` or `Game.get_pickaxe_size`.
-- Each of those folds over every owned `Upgrade`, calling its hook: `modify_square_hp`, `modify_square_type` or `modify_pickaxe_size`.
+- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type`, `Game.get_pickaxe_size` or `Game.get_blast_radius`.
+- Each of those folds over every owned `Upgrade`, calling its hook: `modify_square_hp`, `modify_square_type`, `modify_pickaxe_size` or `modify_blast_radius`.
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
-**Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × (level + 1)`. Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter.
+**Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × (level + 1)`. Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
 
 **Soft-lock guard.** `Game.would_soft_lock(cost)` returns true when `money - cost + field_value` would be below the cheapest cube's price. `Upgrade.can_purchase` refuses those purchases, and the shop row shows "Keep N for a cube". Cubes register themselves for this check via `CubeShopItem.on_listed`.
 
@@ -59,10 +62,11 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 3. `WorkArea.spawn_cube` spawns the cube.
 4. When `Cube.landed` fires, `WorkArea` converts squares through `Game.roll_square_type`, staggered so each conversion pops.
 5. In break mode, `WorkArea._break_at` hits every square that `get_squares_in_reach` returns, while `_resolving_click` is set.
-6. Hits and breaks are collected and resolved once per click: one `Game.earn`, one `Fx.squares_hit`/`squares_broken`, one sound. A Big Pickaxe click that breaks 36 squares produces one payout popup, not 36.
-7. The last square emits `Cube.completed`, which triggers the explosion fx, a short hitstop, and `queue_free`.
+6. Explosives the click broke go off in the same click (`WorkArea._detonate`), breaking every square `get_squares_in_blast` returns, across cubes. Explosives caught in a blast are the next link of the chain, set off `CHAIN_DELAY` later and resolved like a click of their own.
+7. Hits and breaks are collected and resolved once per click: one `Game.earn`, one `Fx.squares_hit`/`squares_broken`, one sound. A Big Pickaxe click that breaks 36 squares produces one payout popup, not 36.
+8. The last square emits `Cube.completed`, which triggers the explosion fx, a short hitstop, and `queue_free`.
 
-**Fx (`fx/fx.gd`).** All "juice" goes through this node as named recipes (`squares_broken`, `cube_exploded`, ...): particles, debris chunks, shockwave, camera trauma shake, hitstop via `Engine.time_scale`, and flying coins. The HUD money counter only catches up as coins arrive, through `Hud.on_coin_arrived`.
+**Fx (`fx/fx.gd`).** All "juice" goes through this node as named recipes (`squares_broken`, `cube_exploded`, `explosion`, ...): particles, debris chunks, shockwave, camera trauma shake, hitstop via `Engine.time_scale`, and flying coins. The HUD money counter only catches up as coins arrive, through `Hud.on_coin_arrived`.
 
 **Sidebar UI.** `Sidebar` holds `SidebarPage` children. Each page names its `tab_button` and `toggle_action`.
 - `ItemListPage` builds a `ShopItemRow` for each item.

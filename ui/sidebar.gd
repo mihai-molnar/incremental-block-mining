@@ -19,6 +19,7 @@ var _tween: Tween
 @onready var _title: Label = %Title
 @onready var _close_button: Button = %CloseButton
 @onready var _page_container: Control = %Pages
+@onready var _page_scroll: ScrollContainer = %PageScroll
 
 
 func _ready() -> void:
@@ -63,6 +64,8 @@ func close() -> void:
 
 
 func _set_page(page: SidebarPage) -> void:
+	if page != current_page:
+		_page_scroll.scroll_vertical = 0
 	current_page = page
 	_title.text = page.title
 	for p in _pages:

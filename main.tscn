@@ -13,6 +13,11 @@
 [ext_resource type="Resource" path="res://shop/items/grey_cube_item.tres" id="15_grey_cube"]
 [ext_resource type="Resource" path="res://upgrades/items/big_pickaxe.tres" id="16_big_pickaxe"]
 [ext_resource type="Resource" path="res://shop/items/red_cube_item.tres" id="17_red_cube"]
+[ext_resource type="Resource" path="res://shop/items/jade_cube_item.tres" id="18_jade_cube"]
+[ext_resource type="Resource" path="res://shop/items/obsidian_cube_item.tres" id="19_obsidian_cube"]
+[ext_resource type="Resource" path="res://shop/items/gold_bar_item.tres" id="20_gold_bar"]
+[ext_resource type="Resource" path="res://upgrades/items/explosive_squares.tres" id="21_explosive"]
+[ext_resource type="Resource" path="res://upgrades/items/blast_radius.tres" id="22_blast_radius"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -145,29 +150,36 @@ text = "X"
 [node name="Separator" type="HSeparator" parent="Hud/Root/Sidebar/Panel/VBox"]
 layout_mode = 2
 
-[node name="Pages" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox"]
+[node name="PageScroll" type="ScrollContainer" parent="Hud/Root/Sidebar/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="ShopPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/Pages" node_paths=PackedStringArray("tab_button")]
+[node name="Pages" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShopPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("tab_button")]
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube"), ExtResource("18_jade_cube"), ExtResource("19_obsidian_cube"), ExtResource("20_gold_bar")])
 title = "Shop"
 toggle_action = &"toggle_shop"
-tab_button = NodePath("../../../../Tabs/ShopTab")
+tab_button = NodePath("../../../../../Tabs/ShopTab")
 
-[node name="UpgradesPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/Pages" node_paths=PackedStringArray("tab_button")]
+[node name="UpgradesPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("tab_button")]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
-tab_button = NodePath("../../../../Tabs/UpgradesTab")
+tab_button = NodePath("../../../../../Tabs/UpgradesTab")
 
 [node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
 layout_mode = 0
