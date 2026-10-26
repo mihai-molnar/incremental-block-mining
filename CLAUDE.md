@@ -24,6 +24,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 ```
 
 - macOS has no `timeout`, so `perl alarm` stops a hung harness.
+- In debug builds the `=` key (`dev_add_money`, handled in `Hud`) adds 100K money, for playtesting expensive content.
 - A harness calls `change_scene_to_file("res://main.tscn")`, waits a few `process_frame`s, drives
   the scene through `Game`, `WorkArea.spawn_cube` or `Cube.hit_at`, prints results, then calls `quit()`.
 - Inject keys with `Input.parse_input_event`. Mouse events need `root.get_final_transform() * pos`.
@@ -81,6 +82,8 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 - Sprites (cursor, coins, badge) are ASCII grids in `ui/pixel_sprites.gd`.
 - Tiles, icons and effects are drawn in `_draw()`. There are no image assets.
 - Colors come from the Sweetie 16 palette.
+
+**Money text.** Show every money amount through `Currency.format` (`ui/currency.gd`). It shortens 10,000 and up to one decimal (10.3K, 2.5M), rounded down.
 
 **Input:**
 - Read the mouse position from input events (`WorkArea._mouse_screen`, `get_mouse_world_position`), not from `get_global_mouse_position()`. That function reads the OS mouse, so it misses injected events.

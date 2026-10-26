@@ -56,7 +56,7 @@ func _refresh() -> void:
 		_buy_button.text = item.get_owned_label()
 		_buy_button.icon = null
 	else:
-		_buy_button.text = str(item.get_price())
+		_buy_button.text = Currency.format(item.get_price())
 		_buy_button.icon = PixelSprites.get_texture(&"coin_small")
 	_buy_button.disabled = not item.can_purchase()
 	_reason_label.text = item.get_block_reason()

@@ -2,6 +2,10 @@ class_name Hud
 extends CanvasLayer
 ## Screen-space UI: money counter, tool mode buttons and the shop sidebar.
 
+## Debug builds only: the dev_add_money key (=) adds this much, for trying things out
+## without earning for them. Release exports ignore the key.
+const DEV_MONEY := 100_000
+
 @export var work_area: WorkArea
 
 var _shown_money := 0
@@ -42,6 +46,17 @@ func on_coin_arrived(value: int) -> void:
 	_bump(1.35)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if OS.is_debug_build() and event.is_action_pressed("dev_add_money"):
+		Game.earn(DEV_MONEY)
+		# No coins fly for this, so show it right away.
+		_shown_money = Game.money
+		_refresh_money()
+		_bump(1.35)
+		Sfx.play(&"coin")
+		get_viewport().set_input_as_handled()
+
+
 func _process(delta: float) -> void:
 	# Safety net: if coins never arrive, the counter still catches up.
 	if _shown_money != Game.money:
@@ -61,7 +76,7 @@ func _on_money_changed(money: int, delta: int) -> void:
 
 
 func _refresh_money() -> void:
-	_money_label.text = str(_shown_money)
+	_money_label.text = Currency.format(_shown_money)
 
 
 func _bump(from_scale: float) -> void:

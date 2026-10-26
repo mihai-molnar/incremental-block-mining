@@ -11,4 +11,4 @@ chance_per_tier = 0.01
 preview_cube = ExtResource("3_preview")
 title = "Explosive Squares"
 price = 75
-max_level = 0
+max_level = 10

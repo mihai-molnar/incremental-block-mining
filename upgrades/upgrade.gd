@@ -60,7 +60,7 @@ func can_purchase() -> bool:
 func get_block_reason() -> String:
 	if is_maxed() or not Game.can_afford(get_price()) or not Game.would_soft_lock(get_price()):
 		return ""
-	return "Keep %d for a cube" % Game.get_cheapest_cube_price()
+	return "Keep %s for a cube" % Currency.format(Game.get_cheapest_cube_price())
 
 
 func _apply() -> void:

@@ -39,7 +39,7 @@ func get_description() -> String:
 func _describe_square() -> String:
 	var parts: Array[String] = []
 	if square_type.value_multiplier <= 0.0:
-		parts.append("pays %d" % square_type.value)
+		parts.append("pays " + Currency.format(square_type.value))
 	elif not is_equal_approx(square_type.value_multiplier, 1.0):
 		parts.append("%sx value" % _format_multiplier(square_type.value_multiplier))
 	if square_type.hp_multiplier > 0.0:

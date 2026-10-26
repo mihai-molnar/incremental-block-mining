@@ -74,7 +74,7 @@ func squares_broken(squares: Array[CubeSquare]) -> void:
 		sparks.size_max = 1
 		sparks.start()
 	center /= squares.size()
-	popup_text(center + Vector2(0, -10), "+%d" % total)
+	popup_text(center + Vector2(0, -10), "+" + Currency.format(total))
 	coins(center, total)
 	shake(minf(0.2 + 0.04 * (squares.size() - 1), 0.5))
 	Sfx.play(&"break", 0.1, minf(squares.size() - 1, 4.0))

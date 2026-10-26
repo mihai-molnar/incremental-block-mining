@@ -14,8 +14,8 @@ func get_description() -> String:
 	var count := cube_type.get_square_count()
 	var clicks := Game.get_square_hp(cube_type.square_type, cube_type)
 	var each := cube_type.square_type.get_value(cube_type)
-	return "%d squares\n%d click%s each\nPays %d each (%d total)" % [
-		count, clicks, "" if clicks == 1 else "s", each, each * count]
+	return "%d squares\n%d click%s each\nPays %s each (%s total)" % [
+		count, clicks, "" if clicks == 1 else "s", Currency.format(each), Currency.format(each * count)]
 
 
 func get_price() -> int:

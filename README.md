@@ -26,8 +26,11 @@ behind as faint outlines until the whole cube is gone.
 | S     | Open or close the shop                          |
 | U     | Open or close upgrades                          |
 | Esc   | Pause menu                                      |
+| =     | Dev cheat: +100K money (debug builds only)      |
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
+
+Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5M.
 
 ### Cubes
 
@@ -52,7 +55,7 @@ Gold Bar is the jackpot.
 | Diamond Squares | 60              | 15% of squares on any cube turn into diamonds, which pay 5x and take 3x the clicks |
 | Sharp Pickaxe   | 100 × tier      | Each tier makes squares take 1 click less (never below 1); no tier limit |
 | Big Pickaxe     | 250 × tier      | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
-| Explosive Squares | 75 × tier     | Each tier turns 1% more squares into explosives; no tier limit |
+| Explosive Squares | 75 × tier     | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
 | Blast Radius    | 300 × tier      | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
 
 An explosive square breaks in one click and blows up every square around it, paying for all
