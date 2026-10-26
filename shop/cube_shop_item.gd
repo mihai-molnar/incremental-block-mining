@@ -28,6 +28,22 @@ func create_icon() -> Control:
 	return icon
 
 
+func can_auto_buy() -> bool:
+	return Game.get_auto_buy_slots() > 0
+
+
+func is_auto_buying() -> bool:
+	return Game.auto_buy_cube == cube_type
+
+
+## Only one cube can be picked, so picking this one replaces the last pick.
+func set_auto_buying(on: bool) -> void:
+	if on:
+		Game.set_auto_buy_cube(cube_type)
+	elif is_auto_buying():
+		Game.set_auto_buy_cube(null)
+
+
 func on_listed() -> void:
 	Game.register_cube_for_sale(cube_type)
 

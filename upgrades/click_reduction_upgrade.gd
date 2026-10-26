@@ -16,12 +16,7 @@ func get_description() -> String:
 
 
 func create_icon() -> Control:
-	var icon := TextureRect.new()
-	icon.texture = PixelSprites.get_texture(&"pickaxe")
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-	icon.custom_minimum_size = Vector2(26, 26)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return icon
+	return create_sprite_icon(&"pickaxe")
 
 
 func modify_square_hp(_square_type: SquareType, hp: int, level: int) -> int:

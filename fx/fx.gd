@@ -34,22 +34,28 @@ func _ready() -> void:
 # --- Recipes -----------------------------------------------------------------
 
 ## Squares damaged (but not broken) by one click: chips from each, one sound and shake.
-func squares_hit(squares: Array[CubeSquare]) -> void:
+## Soft hits (from drones) chip less, don't shake and tick quietly, so a swarm of them
+## doesn't drown out the player's own clicks.
+func squares_hit(squares: Array[CubeSquare], soft := false) -> void:
 	for square in squares:
-		var chips := _burst(square.global_position, square.square_type.get_debris_colors(), 4)
+		var chips := _burst(square.global_position, square.square_type.get_debris_colors(), 2 if soft else 4)
 		chips.speed_min = 30.0
 		chips.speed_max = 80.0
 		chips.lifetime_min = 0.15
 		chips.lifetime_max = 0.3
 		chips.size_max = 2
 		chips.start()
-	shake(0.12)
-	Sfx.play(&"hit", 0.12)
+	if soft:
+		Sfx.play(&"hit", 0.12, -14.0, 1.5)
+	else:
+		shake(0.12)
+		Sfx.play(&"hit", 0.12)
 
 
 ## Squares broken by one click: each shatters, and the payout shows once, as a total
-## popup with coins from the middle of the broken squares.
-func squares_broken(squares: Array[CubeSquare]) -> void:
+## popup with coins from the middle of the broken squares. Soft breaks (from drones)
+## don't shake, sound quieter and send fewer coins.
+func squares_broken(squares: Array[CubeSquare], soft := false) -> void:
 	var total := 0
 	var center := Vector2.ZERO
 	for square in squares:
@@ -75,6 +81,10 @@ func squares_broken(squares: Array[CubeSquare]) -> void:
 		sparks.start()
 	center /= squares.size()
 	popup_text(center + Vector2(0, -10), "+" + Currency.format(total))
+	if soft:
+		coins(center, total, 3)
+		Sfx.play(&"break", 0.1, -8.0)
+		return
 	coins(center, total)
 	shake(minf(0.2 + 0.04 * (squares.size() - 1), 0.5))
 	Sfx.play(&"break", 0.1, minf(squares.size() - 1, 4.0))
@@ -252,11 +262,12 @@ func popup_text(at: Vector2, text: String) -> void:
 	tween.tween_callback(label.queue_free)
 
 
-## Sends coins flying from a world position to the HUD money counter.
-func coins(world_at: Vector2, value: int) -> void:
+## Sends coins flying from a world position to the HUD money counter, up to `max_count`
+## of them, splitting the value between them.
+func coins(world_at: Vector2, value: int, max_count := 8) -> void:
 	if hud == null or screen_layer == null:
 		return
-	var count := clampi(value, 1, 8)
+	var count := clampi(value, 1, max_count)
 	var from := get_viewport().get_canvas_transform() * world_at
 	var target := hud.get_coin_target()
 	var remaining := value

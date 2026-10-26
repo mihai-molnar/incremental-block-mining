@@ -55,6 +55,8 @@ var _pending_blasts: Array[Blast] = []
 
 func _ready() -> void:
 	Game.cube_purchased.connect(spawn_cube)
+	Game.saving.connect(_on_saving)
+	_restore_cubes(Game.take_saved("cubes", []))
 
 
 func set_mode(new_mode: Mode) -> void:
@@ -70,6 +72,11 @@ func is_dragging() -> bool:
 	return _dragged != null
 
 
+## The cube being dragged, or null.
+func get_held_cube() -> Cube:
+	return _dragged
+
+
 func get_cubes() -> Array[Cube]:
 	var cubes: Array[Cube] = []
 	for child in get_children():
@@ -82,14 +89,15 @@ func spawn_cube(type: CubeType) -> Cube:
 	var cube := Cube.new()
 	cube.setup(type)
 	cube.position = _find_spawn_position(cube.get_size())
-	add_child(cube)
-	cube.square_hit.connect(_on_square_hit)
-	cube.square_broken.connect(_on_square_broken)
-	cube.completed.connect(_on_cube_completed)
-	cube.landed.connect(_on_cube_landed)
+	_add_cube(cube)
 	cube.play_spawn()
 	_update_field_value()
 	return cube
+
+
+## A mining drone's hit on one square. Resolved like a click, with softer effects.
+func drone_hit(square: CubeSquare) -> void:
+	_hit_squares([square], true)
 
 
 ## Mouse position in world space, taken from the latest mouse event.
@@ -187,17 +195,21 @@ func _process(delta: float) -> void:
 	_update_hover(point)
 
 
-## Hits everything in reach. Explosives the click breaks go off as part of the same click,
-## so its payout includes what they blew up.
 func _break_at(point: Vector2) -> void:
 	var targets := get_squares_in_reach(point)
+	_hit_squares(targets, false)
+	tool_used.emit(not targets.is_empty())
+
+
+## Hits the squares as one click. Explosives the click breaks go off as part of the same
+## click, so its payout includes what they blew up. Soft clicks (drones) play quieter effects.
+func _hit_squares(targets: Array[CubeSquare], soft: bool) -> void:
 	_resolving_click = true
 	for square in targets:
 		(square.get_parent() as Cube).hit_square(square)
 	_detonate(_take_pending_blasts())
 	_resolving_click = false
-	_resolve_click()
-	tool_used.emit(not targets.is_empty())
+	_resolve_click(soft)
 
 
 ## One link of a chain reaction: explosives caught in the previous blasts go off and pay
@@ -314,19 +326,19 @@ func _on_square_broken(_cube: Cube, square: CubeSquare) -> void:
 
 ## Pays out and plays the effects for everything the last click hit and broke, then
 ## lines up any explosives it broke as the next link of a chain reaction.
-func _resolve_click() -> void:
+func _resolve_click(soft := false) -> void:
 	if not _pending_blasts.is_empty():
 		var timer := get_tree().create_timer(CHAIN_DELAY, false)
 		timer.timeout.connect(_chain_blasts.bind(_take_pending_blasts()))
 	if not _clicked_hits.is_empty():
-		fx.squares_hit(_clicked_hits)
+		fx.squares_hit(_clicked_hits, soft)
 	if not _clicked_breaks.is_empty():
 		var total := 0
 		for square in _clicked_breaks:
 			total += square.value
 		_update_field_value()
 		Game.earn(total)
-		fx.squares_broken(_clicked_breaks)
+		fx.squares_broken(_clicked_breaks, soft)
 	_clicked_hits = []
 	_clicked_breaks = []
 
@@ -350,6 +362,52 @@ func _update_field_value() -> void:
 			if not square.is_broken():
 				total += square.value
 	Game.set_field_value(total)
+
+
+# --- Saving -------------------------------------------------------------------------
+
+func _on_saving(data: Dictionary) -> void:
+	var cubes: Array[Dictionary] = []
+	for cube in get_cubes():
+		if not cube.is_complete():
+			cubes.append({
+				"type": cube.cube_type.resource_path,
+				"x": cube.position.x,
+				"y": cube.position.y,
+				"squares": cube.get_save_data(),
+			})
+	data["cubes"] = cubes
+
+
+## Puts back the cubes that were on the field when the game was saved, as they were.
+func _restore_cubes(saved: Variant) -> void:
+	if not saved is Array:
+		return
+	for entry: Variant in saved:
+		if not entry is Dictionary:
+			continue
+		var type := Game.load_saved_resource(entry.get("type")) as CubeType
+		if type == null:
+			continue
+		var cube := Cube.new()
+		cube.setup(type)
+		var squares: Variant = entry.get("squares")
+		if squares is Array:
+			cube.load_save_data(squares)
+		cube.position = Vector2(float(entry.get("x", 0.0)), float(entry.get("y", 0.0)))
+		if cube.is_complete():
+			cube.free()
+		else:
+			_add_cube(cube)
+	_update_field_value()
+
+
+func _add_cube(cube: Cube) -> void:
+	add_child(cube)
+	cube.square_hit.connect(_on_square_hit)
+	cube.square_broken.connect(_on_square_broken)
+	cube.completed.connect(_on_cube_completed)
+	cube.landed.connect(_on_cube_landed)
 
 
 # --- Placement -------------------------------------------------------------------

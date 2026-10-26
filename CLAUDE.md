@@ -13,20 +13,26 @@ The Godot binary is not on PATH:
 G="/Users/mihai/Godot games/Godot.app/Contents/MacOS/Godot"
 "$G" --path .                                    # run the game
 "$G" --headless --import --path .                # refresh the class cache (needed after adding a class_name)
-"$G" --headless --path . --quit-after 30         # smoke test: loads main.tscn, prints script errors
+"$G" --headless --path . --quit-after 30 -- --save=user://smoke.json   # smoke test: loads main.tscn, prints script errors
 ```
+
+The game saves to `user://save.json` (`~/Library/Application Support/Godot/app_userdata/Incremental Miner/`),
+which holds the user's playtest progress. Every run that isn't the user's own passes
+`-- --save=<path>` so it reads and writes another file instead.
 
 There's no test suite, lint config or CI. Behavior was checked with throwaway harness scripts
 (`extends SceneTree`) kept outside the repo, run with `-s`:
 
 ```sh
-perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
+perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- --save=/path/to/test_save.json
 ```
 
 - macOS has no `timeout`, so `perl alarm` stops a hung harness.
 - In debug builds the `=` key (`dev_add_money`, handled in `Hud`) adds 100K money, for playtesting expensive content.
 - A harness calls `change_scene_to_file("res://main.tscn")`, waits a few `process_frame`s, drives
   the scene through `Game`, `WorkArea.spawn_cube` or `Cube.hit_at`, prints results, then calls `quit()`.
+- To test loading, write a save file first (edit `saved_at` back in time to test offline
+  earnings), then run the harness with `--save` pointing at it. `Game` loads it in `_ready`, before the scene.
 - Inject keys with `Input.parse_input_event`. Mouse events need `root.get_final_transform() * pos`.
 - For screenshots, drop `--headless`, `await RenderingServer.frame_post_draw`, and save `root.get_texture().get_image()`.
 - ObjectDB leak warnings on a forced harness quit come from the harness's pending coroutines or audio, not from game code.
@@ -49,16 +55,30 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd
 
 **`Game` autoload (`autoload/game.gd`) is the rules engine.**
 - It holds money, owned upgrade levels and `field_value`, the money still left in unbroken squares.
-- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type`, `Game.get_pickaxe_size` or `Game.get_blast_radius`.
-- Each of those folds over every owned `Upgrade`, calling its hook: `modify_square_hp`, `modify_square_type`, `modify_pickaxe_size` or `modify_blast_radius`.
+- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type`, `Game.get_pickaxe_size`, `Game.get_blast_radius`, `Game.get_drone_count`, `Game.get_drone_hit_rate` or `Game.get_auto_buy_slots`.
+- Each of those folds over every owned `Upgrade`, calling its hook: `modify_square_hp`, `modify_square_type`, `modify_pickaxe_size`, `modify_blast_radius`, `modify_drone_count`, `modify_drone_hit_rate` or `modify_auto_buy_slots`.
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
-**Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × (level + 1)`. Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
+**Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × price_growth^level`, rounded to two significant digits from 100 up (`Upgrade._round_price`). Each `.tres` sets its own `price_growth` (default 1.5). Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
 
 **Soft-lock guard.** `Game.would_soft_lock(cost)` returns true when `money - cost + field_value` would be below the cheapest cube's price. `Upgrade.can_purchase` refuses those purchases, and the shop row shows "Keep N for a cube". Cubes register themselves for this check via `CubeShopItem.on_listed`.
 
+**Saving (`Game.save_game`, `user://save.json`).**
+- JSON with money, upgrade levels, the auto-buyer's cube, `saved_at` and the field's cubes. Resources are stored by `resource_path`, so renaming a `.tres` drops it from old saves (loading skips paths that no longer exist).
+- Saves on a 30s timer, on `NOTIFICATION_WM_CLOSE_REQUEST` and `NOTIFICATION_APPLICATION_FOCUS_OUT`, and from the pause menu's Quit.
+- `Game` saves its own state, then emits `saving(data)` so other nodes add theirs. `WorkArea` adds the cubes (`Cube.get_save_data`: each square's clicks left and its type when it isn't the cube's default).
+- On load, a node takes its part back once with `Game.take_saved(key)`. `WorkArea._restore_cubes` rebuilds cubes with `Cube.load_save_data`, which marks them landed so their squares don't convert again.
+- Offline earnings are worked out at load (`Game._estimate_offline_earnings`): drone hits over the time away at `OFFLINE_EFFICIENCY`, capped at `OFFLINE_CAP`, turned into whole auto-buyer cubes times each cube's profit. `WelcomeBack` shows them and pays out on Collect. Uncollected earnings are saved into money.
+- `Game.reset_progress` deletes the file and clears state; the pause menu then reloads the scene.
+
+**Drones and the auto-buyer.**
+- `DroneSwarm` (under `Main`, drawn above `WorkArea`) keeps `Game.get_drone_count()` `Drone`s alive. Each drone takes the nearest unbroken square no other drone has (`find_target`), skipping the held cube.
+- A drone hit goes through `WorkArea.drone_hit`, which resolves it like a click with `soft` effects: no shake, quieter sound, fewer coins. The cursor doesn't swing for it.
+- `AutoBuyer` checks every 0.5s and buys `Game.auto_buy_cube` (spend plus `deliver_cube`) while fewer unfinished cubes than `Game.get_auto_buy_slots()` are on the field.
+- The shop row shows an Auto toggle when `ShopItem.can_auto_buy()` is true; `CubeShopItem` sets `Game.auto_buy_cube`, which allows only one pick.
+
 **Purchase to payout flow:**
-1. `ShopItem.purchase()` spends the money.
+1. `ShopItem.purchase()` spends the money (the `AutoBuyer` spends directly).
 2. `CubeShopItem` calls `Game.deliver_cube`, which emits `cube_purchased`.
 3. `WorkArea.spawn_cube` spawns the cube.
 4. When `Cube.landed` fires, `WorkArea` converts squares through `Game.roll_square_type`, staggered so each conversion pops.

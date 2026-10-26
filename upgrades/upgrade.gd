@@ -6,8 +6,10 @@ extends ShopItem
 @export var title := "Upgrade"
 ## Leave empty to let the subclass describe itself.
 @export_multiline var description := ""
-## Price of level 1. Level N costs price × N (100, 200, 300...).
+## Price of level 1. Each level after it costs `price_growth` times the one before
+## (100, 150, 230... with 1.5), rounded to two significant digits.
 @export var price := 0
+@export_range(1.0, 10.0, 0.05) var price_growth := 1.5
 ## How many times it can be bought. 0 means no limit.
 @export_range(0, 99) var max_level := 1
 ## Stays out of the shop until this upgrade is owned.
@@ -37,7 +39,8 @@ func get_description() -> String:
 
 ## Price of the next level (or of the last one, once maxed).
 func get_price() -> int:
-	return price * (get_level() if is_maxed() else get_level() + 1)
+	var bought := get_level() - 1 if is_maxed() else get_level()
+	return _round_price(price * pow(price_growth, bought))
 
 
 func is_available() -> bool:
@@ -67,6 +70,24 @@ func _apply() -> void:
 	Game.add_upgrade_level(self)
 
 
+## Shop icon showing one PixelSprites sprite at its own size.
+static func create_sprite_icon(sprite: StringName) -> Control:
+	var icon := TextureRect.new()
+	icon.texture = PixelSprites.get_texture(sprite)
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	icon.custom_minimum_size = Vector2(26, 26)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return icon
+
+
+## Keeps prices readable: two significant digits from 100 up (1139 -> 1100).
+static func _round_price(value: float) -> int:
+	if value < 100.0:
+		return roundi(value)
+	var step := pow(10.0, floorf(log(value) / log(10.0)) - 1.0)
+	return roundi(roundf(value / step) * step)
+
+
 # --- Hooks (level is this upgrade's owned level, at least 1) ----------------------
 
 ## Called for every square of a newly landed cube. Returns the type the square should be.
@@ -87,3 +108,18 @@ func modify_pickaxe_size(size: int, _level: int) -> int:
 ## How many squares out an explosive square's blast reaches.
 func modify_blast_radius(radius: int, _level: int) -> int:
 	return radius
+
+
+## How many mining drones fly around the field.
+func modify_drone_count(count: int, _level: int) -> int:
+	return count
+
+
+## Hits per second each drone makes.
+func modify_drone_hit_rate(rate: float, _level: int) -> float:
+	return rate
+
+
+## How many cubes the auto-buyer keeps on the field (0 = there's no auto-buyer).
+func modify_auto_buy_slots(slots: int, _level: int) -> int:
+	return slots

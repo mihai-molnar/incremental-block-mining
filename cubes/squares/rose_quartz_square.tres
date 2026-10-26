@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"rose_quartz"
+display_name = "Rose Quartz"
+hp = 70
+value = 1450000
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.694118, 0.243137, 0.32549, 1)
+base_color = Color(0.909804, 0.454902, 0.603922, 1)
+light_color = Color(0.968627, 0.709804, 0.784314, 1)
+shine_color = Color(0.956863, 0.956863, 0.956863, 1)

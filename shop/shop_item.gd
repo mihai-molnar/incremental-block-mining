@@ -41,6 +41,19 @@ func get_block_reason() -> String:
 	return ""
 
 
+## Whether the item's row shows an Auto toggle, which has the auto-buyer buy it.
+func can_auto_buy() -> bool:
+	return false
+
+
+func is_auto_buying() -> bool:
+	return false
+
+
+func set_auto_buying(_on: bool) -> void:
+	pass
+
+
 ## Called once when a shop page lists this item.
 func on_listed() -> void:
 	pass

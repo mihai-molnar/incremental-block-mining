@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CubeShopItem" format=3]
+
+[ext_resource type="Script" path="res://shop/cube_shop_item.gd" id="1_item"]
+[ext_resource type="Resource" path="res://cubes/types/magma_cube.tres" id="2_cube"]
+
+[resource]
+script = ExtResource("1_item")
+cube_type = ExtResource("2_cube")

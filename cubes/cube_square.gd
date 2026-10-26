@@ -66,6 +66,16 @@ func setup(type: SquareType, grid_cell: Vector2i, in_cube: CubeType) -> void:
 	_reset_shimmer()
 
 
+## Puts back a saved square: its type and the clicks it had left (0 = broken).
+func restore(type: SquareType, hp_left: int) -> void:
+	square_type = type
+	value = type.get_value(cube_type)
+	max_hp = Game.get_square_hp(type, cube_type)
+	hp = clampi(hp_left, 1, max_hp) if hp_left > 0 else 0
+	_reset_shimmer()
+	queue_redraw()
+
+
 ## Turns the square into another type, keeping any damage it already took.
 func convert_to(type: SquareType) -> void:
 	if is_broken():

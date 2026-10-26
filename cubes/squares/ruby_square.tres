@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"ruby"
+display_name = "Ruby"
+hp = 40
+value = 140000
+shimmer = true
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.364706, 0.152941, 0.364706, 1)
+base_color = Color(0.894118, 0.231373, 0.266667, 1)
+light_color = Color(1, 0.541176, 0.541176, 1)
+shine_color = Color(0.956863, 0.956863, 0.956863, 1)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"amethyst"
+display_name = "Amethyst"
+hp = 36
+value = 3000
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.364706, 0.152941, 0.364706, 1)
+base_color = Color(0.545098, 0.290196, 0.611765, 1)
+light_color = Color(0.768627, 0.545098, 0.839216, 1)
+shine_color = Color(0.956863, 0.956863, 0.956863, 1)

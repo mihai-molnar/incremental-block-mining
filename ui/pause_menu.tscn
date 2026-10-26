@@ -40,6 +40,13 @@ theme_type_variation = &"TitleLabel"
 text = "Paused"
 horizontal_alignment = 1
 
+[node name="ResetButton" type="Button" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+focus_mode = 0
+text = "Reset progress"
+
 [node name="QuitButton" type="Button" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 0)
@@ -50,5 +57,6 @@ text = "Quit"
 [node name="Hint" type="Label" parent="Center/Panel/VBox"]
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
-text = "Esc to resume"
+text = "Esc to resume
+Progress saves on its own"
 horizontal_alignment = 1

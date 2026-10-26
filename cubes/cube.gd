@@ -74,6 +74,31 @@ func get_squares() -> Array[CubeSquare]:
 	return _squares
 
 
+## Each square's clicks left (0 = broken) and, when it isn't the cube's default, its type.
+## In grid order, for the save file.
+func get_save_data() -> Array[Dictionary]:
+	var squares: Array[Dictionary] = []
+	for square in _squares:
+		var entry := {"hp": square.hp}
+		if square.square_type != cube_type.square_type:
+			entry["type"] = square.square_type.resource_path
+		squares.append(entry)
+	return squares
+
+
+## Puts back squares saved by get_save_data(). Call after setup(), before adding the cube
+## to the tree. The cube counts as already landed, so its squares don't convert again.
+func load_save_data(squares: Array) -> void:
+	for i in mini(squares.size(), _squares.size()):
+		var entry: Variant = squares[i]
+		if not entry is Dictionary:
+			continue
+		var type := Game.load_saved_resource(entry.get("type")) as SquareType
+		_squares[i].restore(type if type else cube_type.square_type, int(entry.get("hp", 1)))
+	_remaining = _squares.filter(func(square: CubeSquare) -> bool: return not square.is_broken()).size()
+	_has_landed = true
+
+
 ## Hits one of this cube's squares. Returns false if it couldn't be hit.
 func hit_square(square: CubeSquare, damage := 1) -> bool:
 	if is_complete() or square.is_broken():

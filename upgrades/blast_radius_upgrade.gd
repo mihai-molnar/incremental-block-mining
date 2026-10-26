@@ -16,12 +16,7 @@ func get_description() -> String:
 
 
 func create_icon() -> Control:
-	var icon := TextureRect.new()
-	icon.texture = PixelSprites.get_texture(&"blast")
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-	icon.custom_minimum_size = Vector2(26, 26)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return icon
+	return create_sprite_icon(&"blast")
 
 
 func modify_blast_radius(radius: int, level: int) -> int:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"meteorite"
+display_name = "Meteorite"
+hp = 60
+value = 220000
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.239216, 0.168627, 0.180392, 1)
+base_color = Color(0.478431, 0.27451, 0.188235, 1)
+light_color = Color(0.752941, 0.505882, 0.305882, 1)
+shine_color = Color(1, 0.803922, 0.458824, 1)

@@ -7,5 +7,6 @@
 script = ExtResource("1_upgrade")
 title = "Blast Radius"
 price = 300
+price_growth = 3.0
 max_level = 3
 requires = ExtResource("2_requires")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DroneCountUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/drone_count_upgrade.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+title = "Mining Drone"
+price = 400
+price_growth = 1.8
+max_level = 10

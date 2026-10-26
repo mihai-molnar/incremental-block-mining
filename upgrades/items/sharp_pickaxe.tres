@@ -6,4 +6,5 @@
 script = ExtResource("1_upgrade")
 title = "Sharp Pickaxe"
 price = 100
+price_growth = 1.5
 max_level = 0

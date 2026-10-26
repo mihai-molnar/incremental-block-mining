@@ -18,6 +18,20 @@
 [ext_resource type="Resource" path="res://shop/items/gold_bar_item.tres" id="20_gold_bar"]
 [ext_resource type="Resource" path="res://upgrades/items/explosive_squares.tres" id="21_explosive"]
 [ext_resource type="Resource" path="res://upgrades/items/blast_radius.tres" id="22_blast_radius"]
+[ext_resource type="Resource" path="res://shop/items/silver_cube_item.tres" id="30_silver_cube"]
+[ext_resource type="Resource" path="res://shop/items/amethyst_cube_item.tres" id="31_amethyst_cube"]
+[ext_resource type="Resource" path="res://shop/items/emerald_cube_item.tres" id="32_emerald_cube"]
+[ext_resource type="Resource" path="res://shop/items/ruby_bar_item.tres" id="33_ruby_bar"]
+[ext_resource type="Resource" path="res://shop/items/meteorite_item.tres" id="34_meteorite"]
+[ext_resource type="Resource" path="res://shop/items/rose_quartz_cube_item.tres" id="35_rose_quartz_cube"]
+[ext_resource type="Resource" path="res://shop/items/magma_cube_item.tres" id="36_magma_cube"]
+[ext_resource type="Resource" path="res://shop/items/void_cube_item.tres" id="37_void_cube"]
+[ext_resource type="Resource" path="res://upgrades/items/mining_drone.tres" id="40_drone"]
+[ext_resource type="Resource" path="res://upgrades/items/drone_overclock.tres" id="41_overclock"]
+[ext_resource type="Resource" path="res://upgrades/items/auto_buyer.tres" id="42_auto_buyer"]
+[ext_resource type="Script" path="res://world/drone_swarm.gd" id="43_swarm"]
+[ext_resource type="Script" path="res://world/auto_buyer.gd" id="44_auto_buyer"]
+[ext_resource type="PackedScene" path="res://ui/welcome_back.tscn" id="45_welcome"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -35,6 +49,14 @@ script = ExtResource("2_cam")
 [node name="WorkArea" type="Node2D" parent="." node_paths=PackedStringArray("fx")]
 script = ExtResource("3_work")
 fx = NodePath("../Fx")
+
+[node name="Drones" type="Node2D" parent="." node_paths=PackedStringArray("work_area")]
+script = ExtResource("43_swarm")
+work_area = NodePath("../WorkArea")
+
+[node name="AutoBuyer" type="Node" parent="." node_paths=PackedStringArray("work_area")]
+script = ExtResource("44_auto_buyer")
+work_area = NodePath("../WorkArea")
 
 [node name="Fx" type="Node2D" parent="." node_paths=PackedStringArray("camera", "hud", "screen_layer", "screen_flash")]
 script = ExtResource("4_fx")
@@ -165,7 +187,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube"), ExtResource("18_jade_cube"), ExtResource("19_obsidian_cube"), ExtResource("20_gold_bar")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube"), ExtResource("18_jade_cube"), ExtResource("19_obsidian_cube"), ExtResource("20_gold_bar"), ExtResource("30_silver_cube"), ExtResource("31_amethyst_cube"), ExtResource("32_emerald_cube"), ExtResource("33_ruby_bar"), ExtResource("34_meteorite"), ExtResource("35_rose_quartz_cube"), ExtResource("36_magma_cube"), ExtResource("37_void_cube")])
 title = "Shop"
 toggle_action = &"toggle_shop"
 tab_button = NodePath("../../../../../Tabs/ShopTab")
@@ -175,7 +197,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
@@ -215,6 +237,9 @@ mouse_filter = 2
 color = Color(1, 1, 1, 0)
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
+
+[node name="WelcomeBack" parent="." node_paths=PackedStringArray("fx") instance=ExtResource("45_welcome")]
+fx = NodePath("../Fx")
 
 [node name="CursorLayer" type="CanvasLayer" parent="."]
 process_mode = 3
