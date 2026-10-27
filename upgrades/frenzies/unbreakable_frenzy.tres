@@ -5,6 +5,5 @@
 [resource]
 script = ExtResource("1_frenzy")
 color = Color(0.45098, 0.937255, 0.968627, 1)
-free_clicks = true
+shield_clicks = 60
 title = "Unbreakable"
-description = "Clicks cost the pickaxe no HP"

@@ -129,10 +129,15 @@ offset_bottom = 24.0
 mouse_filter = 2
 theme_override_constants/separation = 5
 
-[node name="CoinIcon" type="TextureRect" parent="Hud/Root/MoneyBox"]
-unique_name_in_owner = true
+[node name="CoinMargin" type="MarginContainer" parent="Hud/Root/MoneyBox"]
 layout_mode = 2
 size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/margin_top = 4
+
+[node name="CoinIcon" type="TextureRect" parent="Hud/Root/MoneyBox/CoinMargin"]
+unique_name_in_owner = true
+layout_mode = 2
 mouse_filter = 2
 stretch_mode = 3
 
@@ -146,8 +151,8 @@ text = "30"
 layout_mode = 0
 offset_left = 8.0
 offset_top = 28.0
-offset_right = 120.0
-offset_bottom = 50.0
+offset_right = 150.0
+offset_bottom = 51.0
 mouse_filter = 2
 script = ExtResource("76_run_meter")
 

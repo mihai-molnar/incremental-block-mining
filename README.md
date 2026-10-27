@@ -69,8 +69,8 @@ later tiers climb steeply, so upgrades stay worth saving for all the way down th
 - **Combo:** each click that hits something adds x0.1 to what your clicks pay, up to x2. It
   drops back to x1 when a second passes without a hit. The meter under the money counter
   shows the multiplier and the time left. Drone hits don't count toward it and don't get it.
-- **Crits:** 2% of your hits break the square outright, whatever clicks it had left, with a
-  gold flash and "CRIT!". Only squares more than one click from breaking can crit, and
+- **Crits:** each of your hits has a 2% chance to break the square outright, whatever clicks
+  it had left, with a gold flash and "CRIT!". Only squares more than one click from breaking can crit, and
   drones never do.
 - **Clear bonus:** finishing a cube pays a quarter of its squares' value on top (x1.25),
   shown as a "CLEAR!" banner. Cubes the drones finish get it too.
@@ -79,18 +79,21 @@ later tiers climb steeply, so upgrades stay worth saving for all the way down th
 
 After every 60 to 120 squares you break (a random number each time), a golden Lucky Cube
 drifts across the field with a chime, taking about 14 seconds to cross. Squares your clicks
-break count, explosions and lightning included; drones' don't, so you can't wait one out. Click it before it leaves to start a 30-second frenzy, picked at random:
+break count, explosions and lightning included; drones' don't, so you can't wait one out.
+Click it before it leaves to start a frenzy, picked at random. Most last 30 seconds;
+Unbreakable is counted in clicks instead:
 
 | Frenzy          | Effect                                                     |
 |-----------------|------------------------------------------------------------|
 | Money x7        | Every square pays 7x, drones' hits and the clear bonus too |
 | Diamond Rush    | Every cube that lands is solid diamond (explosives stay)   |
 | Drone Overdrive | Drones hit 3x as fast (only picked while drones are out)   |
-| Unbreakable     | Clicks cost the pickaxe no HP                              |
+| Unbreakable     | A shield on the pickaxe: your next 60 clicks on squares cost no HP |
 
-The running frenzy and its time left show under the combo meter. Squares broken while a
-frenzy runs don't count toward the next Lucky Cube, and frenzies aren't saved: quitting ends
-one.
+A running frenzy and its time left show under the combo meter; Unbreakable's shield shows as
+a bar on top of the HP bar, shrinking with each click. Squares broken while a frenzy runs or
+the shield is up don't count toward the next Lucky Cube. Timed frenzies aren't saved
+(quitting ends one), but the shield is.
 
 ### Runs: the pickaxe's HP
 
@@ -103,7 +106,8 @@ When the HP runs out, the pickaxe breaks and the run is over: the field collapse
 run-end screen takes over. (The pause menu's **End run** breaks it early.) It shows the run's
 time, clicks, cubes cleared and money earned, marking new records, and pays **Shards**: the
 cube root of (money earned in the run ÷ 50), rounded down, so 50 pays 1, 400 pays 2, 50K
-pays 10 and 50M pays 100. The bar under the HP bar fills toward the run's next Shard.
+pays 10 and 50M pays 100. The bar under the HP bar fills toward the run's next Shard, and
+the number next to it, your Shards plus the run's so far, goes up each time it fills.
 
 - Money, upgrades, the cubes on the field, drones and the Auto-Buyer's pick reset.
 - Shards, perks, unlocked cubes and upgrades, and lifetime stats stay.
@@ -154,7 +158,7 @@ Qa (quadrillions) and Qi (quintillions).
 | Magma    |  150M |    10x6 |                85 |            9.6M |
 | Void     |    1B |     8x8 |               100 |             64M |
 
-From Silver on, about 8% of each cube's squares are rock, except in the two Bars. Rocks
+From Silver on, each square has an 8% chance to be rock, except in the two Bars. Rocks
 take twice the clicks and pay nothing, but the cube is done without them: they crumble when
 its last other square breaks, and drones leave them alone. Prospector turns them into ore
 worth 3x a square.
@@ -173,21 +177,21 @@ significant digits.
 
 | Upgrade         | Price                     | Effect                                                         |
 |-----------------|---------------------------|----------------------------------------------------------------|
-| Diamond Squares | 60                        | 15% of squares on any cube turn into diamonds, which pay 5x and take 3x the clicks |
+| Diamond Squares | 60                        | Each square has a 15% chance to turn into a diamond, which pays 5x and takes 3x the clicks |
 | Sharp Pickaxe   | 100, ×1.6 per tier        | Each tier makes squares take 1 click less (never below 1); no tier limit |
 | Lucky Strike    | 300, ×2.5 per tier        | Each tier adds 2% crit chance, up to 20% (9 tiers)             |
 | Big Pickaxe     | 250 / 2,500 / 25,000      | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
-| Explosive Squares | 75, ×2.5 per tier       | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
+| Explosive Squares | 75, ×2.5 per tier       | Each square has a 1% chance per tier to turn explosive, up to 10% (10 tiers) |
 | Blast Radius    | 500 / 3,000 / 18,000      | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
-| Coin Pouches    | 5,000, ×3.5 per tier      | Each tier turns 2% more squares into coin pouches, up to 10% (5 tiers) |
-| Lightning Squares | 3,000, ×4 per tier      | Each tier turns 1% more squares into lightning, up to 5% (5 tiers) |
-| Multiplier Squares | 80,000, ×6 per tier    | Each tier turns 1% more squares into multipliers, up to 3% (3 tiers) |
+| Coin Pouches    | 5,000, ×3.5 per tier      | Each square has a 2% chance per tier to turn into a coin pouch, up to 10% (5 tiers) |
+| Lightning Squares | 3,000, ×4 per tier      | Each square has a 1% chance per tier to turn into lightning, up to 5% (5 tiers) |
+| Multiplier Squares | 80,000, ×6 per tier    | Each square has a 1% chance per tier to turn into a multiplier, up to 3% (3 tiers) |
 | Prospector      | 25,000                    | Rocks in new cubes turn into ore, worth 3x a square            |
 | Clean Sweep     | 1,000, ×3.5 per tier      | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
 | Steady Hands    | 1,500, ×5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
 | Hot Streak      | 20,000, ×6 per tier       | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
 | Lucky Charm     | 100,000, ×5 per tier      | Lucky Cubes come 15% sooner (fewer squares) per tier, up to 60% (4 tiers) |
-| Gold Fever      | 300,000, ×6 per tier      | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
+| Gold Fever      | 300,000, ×6 per tier      | Frenzies last 5s longer per tier, up to 50s, and Unbreakable holds 10 more clicks, up to 100 (4 tiers) |
 | Whetstone       | 40, ×4 per repair         | Repairs 25 of the pickaxe's HP; the price resets each run      |
 | Mining Drone    | 150, ×1.3 per drone       | A drone that flies to squares and hits them 1.5 times a second, then breaks after 60 hits. Up to 10 at once; the price resets each run |
 | Drone Overclock | 2,000, ×3 per tier        | Drones hit 25% faster per tier (10 tiers); listed once you've bought a Mining Drone |

@@ -19,7 +19,8 @@ func get_description() -> String:
 	var total := Currency.format(each * count)
 	var mixed := cube_type.mixed_square_type
 	if mixed and cube_type.mixed_chance > 0.0:
-		squares += " (%d%% %s)" % [roundi(cube_type.mixed_chance * 100.0), mixed.display_name.to_lower()]
+		# Each square rolls on its own, so the share is only roughly this.
+		squares += " (~%d%% %s)" % [roundi(cube_type.mixed_chance * 100.0), mixed.display_name.to_lower()]
 		total = "~" + Currency.format(roundi(each * count * (1.0 - cube_type.mixed_chance)))
 	return "%s\n%d click%s each\nPays %s each (%s total)" % [
 		squares, clicks, "" if clicks == 1 else "s", Currency.format(each), total]

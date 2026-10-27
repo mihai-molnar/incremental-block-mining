@@ -3,8 +3,8 @@ extends Node2D
 ## Sends a Lucky Cube drifting across the field once the player has broken
 ## Game.roll_lucky_interval() squares, with clicks and the chain reactions they set off.
 ## Drones' squares don't count, so it can't be waited out. Clicking it starts one of
-## `frenzies` at random for Game.get_frenzy_duration(). The count waits while a Lucky
-## Cube is out or a frenzy is running, and stops when the pickaxe breaks.
+## `frenzies` at random (Frenzy.start). The count waits while a Lucky Cube is out, a
+## frenzy is running or the pickaxe is shielded, and stops when the pickaxe breaks.
 ## It comes after the work area in the tree, so it sees clicks first.
 
 @export var fx: Fx
@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _on_squares_broken(count: int, soft: bool) -> void:
-	if soft or _cube or Game.has_timed_effects() or not Game.is_run_active():
+	if soft or _cube or Game.has_timed_effects() or Game.pickaxe_shield > 0 or not Game.is_run_active():
 		return
 	_squares_left -= count
 	if _squares_left <= 0:
@@ -63,7 +63,7 @@ func _catch() -> void:
 	var frenzy := _pick_frenzy()
 	if frenzy == null:
 		return
-	Game.add_timed_effect(frenzy, Game.get_frenzy_duration())
+	frenzy.start()
 	fx.lucky_caught(at, frenzy)
 
 

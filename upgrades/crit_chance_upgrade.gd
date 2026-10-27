@@ -11,9 +11,9 @@ func get_description() -> String:
 		return description
 	var level := get_level()
 	if level == 0:
-		return "%s of hits crit instead of %s. A crit breaks a square in one hit" % [
+		return "Each hit has a %s chance to crit instead of %s. A crit breaks a square in one hit" % [
 			_format_chance(1), _format_chance(0)]
-	var now := "Tier %d: %s of hits crit" % [level, _format_chance(level)]
+	var now := "Tier %d: each hit has a %s chance to crit" % [level, _format_chance(level)]
 	if is_maxed():
 		return now + " (max)"
 	return "%s\nNext tier: %s" % [now, _format_chance(level + 1)]

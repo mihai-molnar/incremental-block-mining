@@ -17,6 +17,7 @@ signal stats_changed
 ## Shop items whose unlock goals were just met.
 signal items_unlocked(items: Array[ShopItem])
 signal shards_changed(shards: int)
+## The pickaxe's HP or its shield changed.
 signal pickaxe_changed(hp: int)
 ## The pickaxe ran out of HP. The run ends (end_run) once the field has collapsed.
 signal pickaxe_broken
@@ -40,8 +41,8 @@ const STAT_SQUARES_BROKEN := &"squares_broken"
 const STAT_CUBES_CLEARED := &"cubes_cleared"
 const STAT_MONEY_EARNED := &"money_earned"
 const STAT_RUNS := &"runs"
-## The pickaxe's HP before perks. Every click that hits a square costs get_click_cost()
-## of it, and the run ends when it's gone.
+## The pickaxe's HP before perks. Every click that hits a square costs 1 of it (or of its
+## shield, while it has one), and the run ends when it's gone.
 const PICKAXE_HP := 100
 ## Hits a mining drone makes before it breaks, before perks, and how many fly at once.
 const DRONE_HP := 60
@@ -81,6 +82,10 @@ var shards := 0
 var total_shards := 0
 ## The pickaxe's HP left this run.
 var pickaxe_hp := PICKAXE_HP
+## Clicks on squares the pickaxe takes for free before its HP (an Unbreakable frenzy), and
+## what the shield started at, for its bar.
+var pickaxe_shield := 0
+var pickaxe_shield_max := 0
 ## True from a run ending until the next one starts, while the run-end screen is up.
 var run_over := false
 ## This run so far: money earned (which sets the Shards it pays), clicks that hit,
@@ -191,15 +196,17 @@ func is_run_active() -> bool:
 	return not run_over and pickaxe_hp > 0
 
 
-## Called for every click that hits a square: wears the pickaxe down, and breaks it at 0.
+## Called for every click that hits a square: takes 1 off the shield if there is one,
+## otherwise off the HP, and breaks the pickaxe at 0.
 func use_pickaxe() -> void:
 	if not is_run_active():
 		return
 	run_clicks += 1
-	var cost := get_click_cost()
-	if cost <= 0:
+	if pickaxe_shield > 0:
+		pickaxe_shield -= 1
+		pickaxe_changed.emit(pickaxe_hp)
 		return
-	pickaxe_hp = maxi(pickaxe_hp - cost, 0)
+	pickaxe_hp -= 1
 	pickaxe_changed.emit(pickaxe_hp)
 	if pickaxe_hp == 0:
 		pickaxe_broken.emit()
@@ -211,11 +218,20 @@ func repair_pickaxe(amount: int) -> void:
 	pickaxe_changed.emit(pickaxe_hp)
 
 
+## Shields the pickaxe for `clicks` more clicks on squares. A new shield on top of one
+## that's left adds up, and its bar starts full again.
+func add_pickaxe_shield(clicks: int) -> void:
+	pickaxe_shield += clicks
+	pickaxe_shield_max = pickaxe_shield
+	pickaxe_changed.emit(pickaxe_hp)
+
+
 ## Breaks the pickaxe on the spot, ending the run early (the pause menu's End run).
 func break_pickaxe() -> void:
 	if not is_run_active():
 		return
 	pickaxe_hp = 0
+	pickaxe_shield = 0
 	pickaxe_changed.emit(pickaxe_hp)
 	pickaxe_broken.emit()
 
@@ -285,6 +301,8 @@ func start_run() -> void:
 	save_game()
 	run_over = false
 	pickaxe_hp = get_max_pickaxe_hp()
+	pickaxe_shield = 0
+	pickaxe_shield_max = 0
 	_set_money(get_starting_money())
 	var drones: Array[int] = []
 	for i in get_starting_drones():
@@ -479,14 +497,6 @@ func get_max_pickaxe_hp() -> int:
 	return maxi(hp, 1)
 
 
-## Pickaxe HP one click that hits costs.
-func get_click_cost() -> int:
-	var cost := 1
-	for modifier: Upgrade in _modifiers:
-		cost = modifier.modify_click_cost(cost, _modifiers[modifier])
-	return maxi(cost, 0)
-
-
 ## Hits a new mining drone makes before it breaks.
 func get_drone_hp() -> int:
 	var hp := DRONE_HP
@@ -633,6 +643,7 @@ func save_game() -> void:
 	data["shards"] = shards
 	data["total_shards"] = total_shards
 	data["pickaxe_hp"] = pickaxe_hp
+	data["pickaxe_shield"] = [pickaxe_shield, pickaxe_shield_max]
 	data["run_over"] = run_over
 	data["run"] = {"earned": run_earned, "clicks": run_clicks, "seconds": run_time, "cubes": run_cubes}
 	data["last_run"] = last_run
@@ -668,6 +679,8 @@ func reset_progress() -> void:
 	shards = 0
 	total_shards = 0
 	pickaxe_hp = PICKAXE_HP
+	pickaxe_shield = 0
+	pickaxe_shield_max = 0
 	run_over = false
 	run_earned = 0
 	run_clicks = 0
@@ -724,6 +737,9 @@ func _load_game() -> void:
 			_unlocked[str(path)] = true
 	# Perks are in by now, so a save without the pickaxe starts it at full HP.
 	pickaxe_hp = int(data.get("pickaxe_hp", get_max_pickaxe_hp()))
+	if data.get("pickaxe_shield") is Array and data.pickaxe_shield.size() == 2:
+		pickaxe_shield = int(data.pickaxe_shield[0])
+		pickaxe_shield_max = int(data.pickaxe_shield[1])
 	_loaded_save = data
 
 

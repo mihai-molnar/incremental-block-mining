@@ -152,11 +152,6 @@ func modify_max_pickaxe_hp(hp: int, _level: int) -> int:
 	return hp
 
 
-## Pickaxe HP one click that hits costs.
-func modify_click_cost(cost: int, _level: int) -> int:
-	return cost
-
-
 ## Hits a new mining drone makes before it breaks.
 func modify_drone_hp(hp: int, _level: int) -> int:
 	return hp

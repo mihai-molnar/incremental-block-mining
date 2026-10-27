@@ -26,15 +26,16 @@ func get_description() -> String:
 	if not description.is_empty():
 		return description
 	var level := get_level()
+	# Each square of a landing cube rolls on its own, so it's a chance, not a share.
 	if chance_per_tier > 0.0 and level > 0:
-		var now := "Tier %d: %s of squares turn %s" % [
+		var now := "Tier %d: each square has a %s chance to turn %s" % [
 			level, _format_percent(get_chance(level)), square_type.display_name]
 		if is_maxed():
 			return now + " (max)"
 		return "%s\nNext tier: %s" % [now, _format_percent(get_chance(level + 1))]
 	var where := cube_type.display_name if cube_type else "any cube"
-	return "%s of squares on %s turn %s (%s)" % [
-		_format_percent(get_chance(level)), where, square_type.display_name, _describe_square()]
+	return "Each square on %s has a %s chance to turn %s (%s)" % [
+		where, _format_percent(get_chance(level)), square_type.display_name, _describe_square()]
 
 
 ## What sets the square apart: "5x value, 3x clicks" for a diamond,
