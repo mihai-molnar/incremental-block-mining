@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="ClickReductionUpgrade" format=3]
+[gd_resource type="Resource" script_class="FreeTiersUpgrade" format=3]
 
-[ext_resource type="Script" path="res://upgrades/click_reduction_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://upgrades/free_tiers_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://upgrades/items/sharp_pickaxe.tres" id="2_target"]
 
 [resource]
 script = ExtResource("1_upgrade")
+target = ExtResource("2_target")
 title = "Diamond Tips"
 price = 2
 price_growth = 2.0

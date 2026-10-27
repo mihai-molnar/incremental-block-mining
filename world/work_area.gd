@@ -375,8 +375,13 @@ func _on_cube_landed(cube: Cube) -> void:
 			delay += CONVERT_STAGGER
 
 
-func _convert_square(square: CubeSquare, type: SquareType) -> void:
-	if not is_instance_valid(square) or square.is_broken() or (square.get_parent() as Cube).is_complete():
+## `target` is a Variant because the square may be freed by the time the timer fires, and
+## Godot refuses to pass a freed object to an Object-typed parameter, before this check runs.
+func _convert_square(target: Variant, type: SquareType) -> void:
+	if not is_instance_valid(target):
+		return
+	var square := target as CubeSquare
+	if square.is_broken() or (square.get_parent() as Cube).is_complete():
 		return
 	square.convert_to(type)
 	# A rock turned into ore is one more square the cube needs broken.

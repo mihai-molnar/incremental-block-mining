@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="DroneCountUpgrade" format=3]
+[gd_resource type="Resource" script_class="FreeTiersUpgrade" format=3]
 
-[ext_resource type="Script" path="res://upgrades/drone_count_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://upgrades/free_tiers_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://upgrades/items/mining_drone.tres" id="2_target"]
 
 [resource]
 script = ExtResource("1_upgrade")
+target = ExtResource("2_target")
 title = "Drone Bay"
 price = 3
 price_growth = 2.5

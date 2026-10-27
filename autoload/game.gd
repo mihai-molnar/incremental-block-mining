@@ -72,11 +72,14 @@ var save_path := SAVE_PATH
 
 ## Cubes the shop sells; the cheapest one is the floor that spending must not drop below.
 var _cubes_for_sale: Array[CubeType] = []
-## Owned upgrades and their level (Upgrade -> int).
+## Owned upgrades and their bought level (Upgrade -> int).
 var _upgrade_levels := {}
+## Tiers perks hand out for free (Upgrade -> int), rebuilt with `_modifiers`.
+var _free_tiers := {}
 ## Running timed effects and their seconds left (Upgrade -> float). Not saved.
 var _timed_effects := {}
-## What the rules fold over: owned upgrades, then running timed effects at level 1.
+## What the rules fold over: owned upgrades (free tiers included), then running timed
+## effects at level 1.
 var _modifiers := {}
 ## Lifetime stats (StringName -> int).
 var _stats := {}
@@ -278,7 +281,13 @@ func would_soft_lock(cost: int) -> bool:
 	return money - cost + field_value < get_cheapest_cube_price()
 
 
+## Owned tiers: the bought ones plus free ones from perks.
 func get_upgrade_level(upgrade: Upgrade) -> int:
+	return get_bought_level(upgrade) + _free_tiers.get(upgrade, 0)
+
+
+## Tiers paid for. Prices and caps follow these.
+func get_bought_level(upgrade: Upgrade) -> int:
 	return _upgrade_levels.get(upgrade, 0)
 
 
@@ -287,7 +296,7 @@ func has_upgrade(upgrade: Upgrade) -> bool:
 
 
 func add_upgrade_level(upgrade: Upgrade) -> void:
-	_upgrade_levels[upgrade] = get_upgrade_level(upgrade) + 1
+	_upgrade_levels[upgrade] = get_bought_level(upgrade) + 1
 	_refresh_modifiers()
 	upgrade_purchased.emit(upgrade)
 
@@ -468,7 +477,14 @@ func get_starting_money() -> int:
 
 
 func _refresh_modifiers() -> void:
+	_free_tiers.clear()
+	for upgrade: Upgrade in _upgrade_levels:
+		var target := upgrade.get_free_tiers_target()
+		if target:
+			_free_tiers[target] = _free_tiers.get(target, 0) + _upgrade_levels[upgrade]
 	_modifiers = _upgrade_levels.duplicate()
+	for upgrade: Upgrade in _free_tiers:
+		_modifiers[upgrade] = get_upgrade_level(upgrade)
 	for effect: Upgrade in _timed_effects:
 		_modifiers[effect] = 1
 

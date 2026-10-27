@@ -104,10 +104,10 @@ Shards buy perks, which are kept forever:
 | Perk             | Price (Shards)     | Effect                                                    |
 |------------------|--------------------|-----------------------------------------------------------|
 | Head Start       | 1, ×3 per tier     | Runs start with 500, then 5K, 50K, 500K money (4 tiers)  |
-| Diamond Tips     | 2, ×2 per tier     | Squares take 1 click less per tier, on top of Sharp Pickaxe (5 tiers) |
-| Drone Bay        | 3, ×2.5 per tier   | A drone per tier in every run, on top of Mining Drones (3 tiers) |
+| Diamond Tips     | 2, ×2 per tier     | Runs start with a free Sharp Pickaxe tier per tier (5 tiers) |
+| Drone Bay        | 3, ×2.5 per tier   | Runs start with a free Mining Drone tier per tier (3 tiers) |
 | Four-Leaf Clover | 4, ×3 per tier     | Lucky Cubes come 10% sooner per tier, on top of Lucky Charm (3 tiers) |
-| Standing Order   | 8                  | An Auto-Buyer slot in every run, on top of the Auto-Buyer |
+| Standing Order   | 8                  | Runs start with a free Auto-Buyer tier |
 | Shard Resonance  | 5, ×2.2 per tier   | Each Shard adds 2% more, up to 30% per Shard (10 tiers, the last costs 6,000) |
 
 ### Saving

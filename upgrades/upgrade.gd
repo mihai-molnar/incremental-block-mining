@@ -19,12 +19,14 @@ extends ShopItem
 @export var costs_shards := false
 
 
+## Owned tiers, counting free ones from perks.
 func get_level() -> int:
 	return Game.get_upgrade_level(self)
 
 
+## Free tiers don't count toward the cap, so a perk adds tiers past it.
 func is_maxed() -> bool:
-	return max_level > 0 and get_level() >= max_level
+	return max_level > 0 and Game.get_bought_level(self) >= max_level
 
 
 ## Whether it can be bought more than once.
@@ -40,9 +42,11 @@ func get_description() -> String:
 	return description
 
 
-## Price of the next level (or of the last one, once maxed).
+## Price of the next level (or of the last one, once maxed). Free tiers don't raise it.
 func get_price() -> int:
-	var bought := get_level() - 1 if is_maxed() else get_level()
+	var bought := Game.get_bought_level(self)
+	if is_maxed():
+		bought -= 1
 	return _round_price(price * pow(price_growth, bought))
 
 
@@ -116,6 +120,12 @@ static func _round_price(value: float) -> int:
 
 
 # --- Hooks (level is this upgrade's owned level, at least 1) ----------------------
+
+## The upgrade this one hands a free tier of per level, or null. Game counts those tiers
+## into that upgrade's level (see FreeTiersUpgrade).
+func get_free_tiers_target() -> Upgrade:
+	return null
+
 
 ## Called for every square of a newly landed cube. Returns the type the square should be.
 func modify_square_type(_cube_type: CubeType, current: SquareType, _level: int) -> SquareType:

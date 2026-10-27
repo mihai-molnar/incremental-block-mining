@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="AutoBuyUpgrade" format=3]
+[gd_resource type="Resource" script_class="FreeTiersUpgrade" format=3]
 
-[ext_resource type="Script" path="res://upgrades/auto_buy_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://upgrades/free_tiers_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://upgrades/items/auto_buyer.tres" id="2_target"]
 
 [resource]
 script = ExtResource("1_upgrade")
+target = ExtResource("2_target")
 title = "Standing Order"
-description = "An Auto-Buyer slot in every run, on top of the Auto-Buyer upgrade"
+description = "Runs start with a free Auto-Buyer tier"
 price = 8
 costs_shards = true
