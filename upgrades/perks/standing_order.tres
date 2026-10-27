@@ -6,5 +6,5 @@
 script = ExtResource("1_upgrade")
 title = "Standing Order"
 description = "An Auto-Buyer slot in every run, on top of the Auto-Buyer upgrade"
-price = 5
+price = 8
 costs_shards = true

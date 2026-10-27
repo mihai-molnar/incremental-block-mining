@@ -34,34 +34,35 @@ A red dot on the Upgrades tab means a new upgrade (or its next tier) has become 
 
 ### Unlocking cubes and upgrades
 
-You start with only the Blue Cube. Every other cube and most upgrades unlock by reaching a
-goal: clearing cubes (of one kind or any), breaking squares, or earning money in total. Each
-list shows its cheapest locked item dimmed, with its goal and your progress ("Clear 2 Blue
-Cubes (1/2)"). When a goal is met, an "UNLOCKED!" toast names what's new and its tab gets a
-red dot. Both lists are sorted by the price of the next tier, cheapest first, with maxed
-upgrades at the bottom; they re-sort when you open them, so rows don't move while you buy.
+You start with only the Blue Cube. Every other cube and most upgrades unlock as you clear
+cubes, one step at a time down the ladder, so new things arrive one or two at once instead of
+in a flood. Each list shows its cheapest locked item dimmed, with its goal and your progress
+("Clear 2 Blue Cubes (1/2)"). When a goal is met, an "UNLOCKED!" toast names what's new and
+its tab gets a red dot. Both lists are sorted by the price of the next tier, cheapest first,
+with maxed upgrades at the bottom; they re-sort when you open them, so rows don't move while
+you buy.
 
-| Cube        | Unlocks after               | Upgrade            | Unlocks after          |
-|-------------|-----------------------------|--------------------|------------------------|
-| Yellow      | Clear 2 Blue Cubes          | Diamond Squares    | Clear 2 cubes          |
-| Grey        | Clear 3 Yellow Cubes        | Explosive Squares  | Clear 1 Grey Cube      |
-| Red         | Clear 4 Grey Cubes          | Sharp Pickaxe      | Clear 1 Yellow Cube    |
-| Jade        | Earn 1,500 in total         | Lucky Strike       | Break 250 squares      |
-| Obsidian    | Clear 5 Jade Cubes          | Mining Drone       | Earn 500 in total      |
-| Gold Bar    | Clear 3 Obsidian Cubes      | Big Pickaxe        | Clear 1 Red Cube       |
-| Silver      | Earn 20K in total           | Clean Sweep        | Clear 10 cubes         |
-| Amethyst    | Clear 3 Silver Cubes        | Steady Hands       | Break 500 squares      |
-| Emerald     | Break 3,000 squares         | Coin Pouches       | Earn 2,000 in total    |
-| Ruby Bar    | Clear 5 Emerald Cubes       | Hot Streak         | Break 1,000 squares    |
-| Meteorite   | Earn 10M in total           | Lucky Charm        | Earn 3,000 in total    |
-| Rose Quartz | Clear 5 Meteorites          | Gold Fever         | Earn 6,000 in total    |
-| Magma       | Break 15K squares           | Lightning Squares  | Clear 1 Obsidian Cube  |
-| Void        | Earn 1B in total            | Multiplier Squares | Clear 1 Gold Bar       |
-|             |                             | Auto-Buyer         | Clear 25 cubes (and own a Mining Drone) |
-|             |                             | Prospector         | Clear 1 Silver Cube    |
+| Clearing your... | 1st                | 2nd                | 3rd              |
+|------------------|--------------------|--------------------|------------------|
+| Blue Cubes       |                    | Yellow Cube        | Diamond Squares  |
+| Yellow Cubes     | Sharp Pickaxe      |                    | Grey Cube        |
+| Grey Cubes       | Explosive Squares  | Mining Drone       | Red Cube         |
+| Red Cubes        | Big Pickaxe        | Lucky Strike       | Jade Cube        |
+| Jade Cubes       | Steady Hands       | Clean Sweep        | Obsidian Cube    |
+| Obsidian Cubes   | Lightning Squares  | Gold Bar           |                  |
+| Gold Bars        | Coin Pouches       | Silver Cube        |                  |
+| Silver Cubes     | Prospector         | Hot Streak         | Amethyst Cube    |
+| Amethyst Cubes   | Multiplier Squares | Lucky Charm        | Emerald Cube     |
+| Emerald Cubes    | Gold Fever         | Auto-Buyer         | Ruby Bar         |
+| Ruby Bars        |                    | Meteorite          |                  |
+| Meteorites       |                    |                    | Rose Quartz Cube |
+| Rose Quartz Cubes |                   |                    | Magma Cube       |
+| Magma Cubes      |                    |                    | Void Cube        |
 
 Blast Radius and Drone Overclock need no goal: they show up once you own Explosive Squares
-and a Mining Drone. Upgrades you already own always stay listed.
+and a Mining Drone (which the Auto-Buyer needs too). Upgrades you already own always stay
+listed. Each upgrade's first tier costs about one or two of the cubes that unlock it, and
+later tiers climb steeply, so upgrades stay worth saving for all the way down the ladder.
 
 ### Combos, crits and clearing cubes
 
@@ -90,22 +91,24 @@ a frenzy is running, and frenzies aren't saved: quitting ends one.
 
 ### Prestige: collapsing the mine
 
-Once you've earned 1M in total, a Prestige tab appears. Collapsing the mine (click the
+Once you've earned 100M in total, a Prestige tab appears. Collapsing the mine (click the
 button twice) shatters the field and starts a new run, paying **Shards**:
-floor(√(money earned this run ÷ 1M)), so 1M pays 1, 4M pays 2, 9M pays 3, 100M pays 10.
+floor(√(money earned this run ÷ 1B)), so 1B pays 1, 4B pays 2, 9B pays 3, 100B pays 10.
 
 - Money, upgrades, the cubes on the field and the Auto-Buyer's pick reset.
 - Shards, perks, unlocked cubes and upgrades, and lifetime stats stay.
-- Every Shard you've ever earned adds 5% to all earnings, spent or not.
+- Every Shard you've ever earned adds 10% to all earnings, spent or not.
 
 Shards buy perks, which are kept forever:
 
-| Perk            | Price (Shards)     | Effect                                                    |
-|-----------------|--------------------|-----------------------------------------------------------|
-| Head Start      | 1, ×3 per tier     | Runs start with 500, then 5K, 50K, 500K money (4 tiers)  |
-| Drone Bay       | 2, ×2.5 per tier   | A drone per tier in every run, on top of Mining Drones (3 tiers) |
-| Standing Order  | 5                  | An Auto-Buyer slot in every run, on top of the Auto-Buyer |
-| Shard Resonance | 3, ×2 per tier     | Each Shard adds 1% more, up to 10% per Shard (5 tiers)    |
+| Perk             | Price (Shards)     | Effect                                                    |
+|------------------|--------------------|-----------------------------------------------------------|
+| Head Start       | 1, ×3 per tier     | Runs start with 500, then 5K, 50K, 500K money (4 tiers)  |
+| Diamond Tips     | 2, ×2 per tier     | Squares take 1 click less per tier, on top of Sharp Pickaxe (5 tiers) |
+| Drone Bay        | 3, ×2.5 per tier   | A drone per tier in every run, on top of Mining Drones (3 tiers) |
+| Four-Leaf Clover | 4, ×3 per tier     | Lucky Cubes come 10% sooner per tier, on top of Lucky Charm (3 tiers) |
+| Standing Order   | 8                  | An Auto-Buyer slot in every run, on top of the Auto-Buyer |
+| Shard Resonance  | 5, ×2.2 per tier   | Each Shard adds 2% more, up to 30% per Shard (10 tiers, the last costs 6,000) |
 
 ### Saving
 
@@ -157,23 +160,23 @@ significant digits.
 | Upgrade         | Price                     | Effect                                                         |
 |-----------------|---------------------------|----------------------------------------------------------------|
 | Diamond Squares | 60                        | 15% of squares on any cube turn into diamonds, which pay 5x and take 3x the clicks |
-| Sharp Pickaxe   | 100, ×1.5 per tier        | Each tier makes squares take 1 click less (never below 1); no tier limit |
-| Lucky Strike    | 150, ×1.8 per tier        | Each tier adds 2% crit chance, up to 20% (9 tiers)             |
-| Big Pickaxe     | 250 / 500 / 1,000         | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
-| Explosive Squares | 75, ×1.6 per tier       | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
-| Blast Radius    | 300 / 900 / 2,700         | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
-| Coin Pouches    | 500, ×1.7 per tier        | Each tier turns 2% more squares into coin pouches, up to 10% (5 tiers) |
-| Lightning Squares | 2,000, ×2 per tier      | Each tier turns 1% more squares into lightning, up to 5% (5 tiers) |
-| Multiplier Squares | 3,000, ×2.5 per tier   | Each tier turns 1% more squares into multipliers, up to 3% (3 tiers) |
-| Prospector      | 20,000                    | Rocks in new cubes turn into ore, worth 3x a square            |
-| Clean Sweep     | 300, ×3 per tier          | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
-| Steady Hands    | 350, ×2.5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
-| Hot Streak      | 600, ×3 per tier          | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
-| Lucky Charm     | 1,200, ×3 per tier        | Lucky Cubes come 15% sooner per tier, up to 60% (4 tiers)      |
-| Gold Fever      | 1,500, ×3 per tier        | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
+| Sharp Pickaxe   | 100, ×1.6 per tier        | Each tier makes squares take 1 click less (never below 1); no tier limit |
+| Lucky Strike    | 300, ×2.5 per tier        | Each tier adds 2% crit chance, up to 20% (9 tiers)             |
+| Big Pickaxe     | 250 / 2,500 / 25,000      | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
+| Explosive Squares | 75, ×2.5 per tier       | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
+| Blast Radius    | 500 / 3,000 / 18,000      | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
+| Coin Pouches    | 5,000, ×3.5 per tier      | Each tier turns 2% more squares into coin pouches, up to 10% (5 tiers) |
+| Lightning Squares | 3,000, ×4 per tier      | Each tier turns 1% more squares into lightning, up to 5% (5 tiers) |
+| Multiplier Squares | 80,000, ×6 per tier    | Each tier turns 1% more squares into multipliers, up to 3% (3 tiers) |
+| Prospector      | 25,000                    | Rocks in new cubes turn into ore, worth 3x a square            |
+| Clean Sweep     | 1,000, ×3.5 per tier      | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
+| Steady Hands    | 1,500, ×5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
+| Hot Streak      | 20,000, ×6 per tier       | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
+| Lucky Charm     | 100,000, ×5 per tier      | Lucky Cubes come 15% sooner per tier, up to 60% (4 tiers)      |
+| Gold Fever      | 300,000, ×6 per tier      | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
 | Mining Drone    | 150, ×3.5 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
 | Drone Overclock | 2,000, ×3 per tier        | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
-| Auto-Buyer      | 5,000 / 25,000 / 130,000  | Keeps 1, then 2, then 3 cubes of your pick on the field; listed once you own a Mining Drone |
+| Auto-Buyer      | 400K / 2M / 10M           | Keeps 1, then 2, then 3 cubes of your pick on the field; needs a Mining Drone |
 
 A diamond always takes 3x the clicks of the cube's other squares, counted after Sharp
 Pickaxe: when Grey squares drop from 5 clicks to 1, Grey diamonds drop from 15 to 3.

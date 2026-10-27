@@ -63,14 +63,15 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - Timed effects: `Game.add_timed_effect(effect, seconds)` folds any `Upgrade` into the rules for a while. `Game._process` counts them down (pausing with the tree) and emits `timed_effect_started`/`timed_effect_ended`. They aren't saved.
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
-**Unlock goals.** A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the item's `.tres`) stays unlisted until its goal is met: `Goal.Stat` is `SQUARES_BROKEN`, `CUBES_CLEARED` (optionally of one `cube_type`) or `MONEY_EARNED`.
+**Unlock goals.** Pacing rule: every goal is "clear N of one cube type", staggered so each clear unlocks at most one thing, and an upgrade's first tier costs about one or two of the cube that unlocks it. Money and squares goals cross in bursts once income takes off, so they're kept for achievements, not unlocks.
+A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the item's `.tres`) stays unlisted until its goal is met: `Goal.Stat` is `SQUARES_BROKEN`, `CUBES_CLEARED` (optionally of one `cube_type`) or `MONEY_EARNED`.
 - `Game` keeps lifetime stats (`add_stat`, `record_cube_cleared`, `get_stat`; `earn` counts money) and saves them with the resource paths of unlocked items. `WorkArea` counts squares broken in `_resolve_click` and cubes cleared in `_on_cube_completed`.
 - Pages call `on_listed`, which registers the item with `Game.register_unlockable`. Goals already met (and upgrades already owned) unlock quietly; later ones emit `items_unlocked`, which `UnlockToast` shows.
 - `ShopItem.is_available()` is `is_unlocked() and meets_requirements()` (`Upgrade.requires` is a requirement). Owned upgrades are always available.
 - `ItemListPage` sorts rows by `get_price()` (owned items last) in `on_shown`, which the `Sidebar` calls on switching pages, never while a page is open. It shows the cheapest locked item that meets its requirements as a teaser row (`ShopItemRow.set_teaser`). Newly unlocked items badge the page's tab.
 
 **Prestige.** `Game.collapse()` pays `get_collapse_shards()` (floor of √(`run_earned` ÷ `SHARD_EARNINGS`)), removes every upgrade that isn't a perk, clears timed effects and the auto-buyer's pick, sets money to `get_starting_money()` and saves. The caller then reloads the main scene, like after `reset_progress`.
-- Perks are `Upgrade`s with `costs_shards`: `_pay` spends `Game.shards`, they skip the soft-lock guard, they show a shard next to the price, and `collapse` keeps their levels. They live on `PrestigePage` (an `ItemListPage` with a header), whose tab shows once `Game.is_prestige_unlocked()` (1M earned in total).
+- Perks are `Upgrade`s with `costs_shards`: `_pay` spends `Game.shards`, they skip the soft-lock guard, they show a shard next to the price, and `collapse` keeps their levels. They live on `PrestigePage` (an `ItemListPage` with a header), whose tab shows once `Game.is_prestige_unlocked()` (`PRESTIGE_UNLOCK` earned in total).
 - `PrestigePage._collapse` plays `Fx.mine_collapsed`, empties the field with `WorkArea.clear_field`, waits, collapses and reloads. The new scene's page shows `Fx.shards_gained` from `Game.take_collapse_reward()`.
 - `get_payout_multiplier` starts from `1 + get_shard_boost()` (every Shard ever earned times `get_shard_bonus()`), so the boost reaches clicks, drones and the clear bonus.
 

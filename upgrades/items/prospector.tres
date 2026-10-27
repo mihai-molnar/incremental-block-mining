@@ -20,5 +20,5 @@ chance = 1.0
 description = "Rocks in new cubes turn into ore worth 3x a square"
 preview_cube = ExtResource("3_preview")
 title = "Prospector"
-price = 20000
+price = 25000
 unlock = SubResource("Resource_unlock")

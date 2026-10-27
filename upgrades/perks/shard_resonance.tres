@@ -5,7 +5,8 @@
 [resource]
 script = ExtResource("1_upgrade")
 title = "Shard Resonance"
-price = 3
-price_growth = 2.0
-max_level = 5
+price = 5
+price_growth = 2.2
+max_level = 10
 costs_shards = true
+bonus_per_tier = 0.02

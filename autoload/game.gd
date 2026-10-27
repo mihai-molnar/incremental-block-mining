@@ -33,9 +33,9 @@ const STAT_COLLAPSES := &"collapses"
 ## Collapsing the mine pays floor(sqrt(money earned this run / SHARD_EARNINGS)) Shards.
 ## Every Shard ever earned adds SHARD_BONUS to all earnings, spent or not. The Prestige
 ## page opens once PRESTIGE_UNLOCK has been earned in total.
-const SHARD_EARNINGS := 1_000_000.0
-const SHARD_BONUS := 0.05
-const PRESTIGE_UNLOCK := 1_000_000
+const SHARD_EARNINGS := 1_000_000_000.0
+const SHARD_BONUS := 0.1
+const PRESTIGE_UNLOCK := 100_000_000
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
 const AUTOSAVE_INTERVAL := 30.0

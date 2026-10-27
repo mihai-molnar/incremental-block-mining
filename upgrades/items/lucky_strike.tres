@@ -2,16 +2,17 @@
 
 [ext_resource type="Script" path="res://upgrades/crit_chance_upgrade.gd" id="1_upgrade"]
 [ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/red_cube.tres" id="goal_cube"]
 
 [sub_resource type="Resource" id="Resource_unlock"]
 script = ExtResource("goal_script")
-stat = 0
-amount = 250
+amount = 2
+cube_type = ExtResource("goal_cube")
 
 [resource]
 script = ExtResource("1_upgrade")
 title = "Lucky Strike"
-price = 150
-price_growth = 1.8
+price = 300
+price_growth = 2.5
 max_level = 9
 unlock = SubResource("Resource_unlock")

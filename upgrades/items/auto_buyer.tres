@@ -3,15 +3,17 @@
 [ext_resource type="Script" path="res://upgrades/auto_buy_upgrade.gd" id="1_upgrade"]
 [ext_resource type="Resource" path="res://upgrades/items/mining_drone.tres" id="2_requires"]
 [ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/emerald_cube.tres" id="goal_cube"]
 
 [sub_resource type="Resource" id="Resource_unlock"]
 script = ExtResource("goal_script")
-amount = 25
+amount = 2
+cube_type = ExtResource("goal_cube")
 
 [resource]
 script = ExtResource("1_upgrade")
 title = "Auto-Buyer"
-price = 5000
+price = 400000
 price_growth = 5.0
 max_level = 3
 requires = ExtResource("2_requires")

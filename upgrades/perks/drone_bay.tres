@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_upgrade")
 title = "Drone Bay"
-price = 2
+price = 3
 price_growth = 2.5
 max_level = 3
 costs_shards = true

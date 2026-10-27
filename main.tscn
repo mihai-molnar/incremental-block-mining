@@ -55,6 +55,8 @@
 [ext_resource type="Resource" path="res://upgrades/perks/drone_bay.tres" id="67_drone_bay"]
 [ext_resource type="Resource" path="res://upgrades/perks/standing_order.tres" id="68_standing_order"]
 [ext_resource type="Resource" path="res://upgrades/perks/shard_resonance.tres" id="69_shard_resonance"]
+[ext_resource type="Resource" path="res://upgrades/perks/diamond_tips.tres" id="70_diamond_tips"]
+[ext_resource type="Resource" path="res://upgrades/perks/four_leaf.tres" id="71_four_leaf"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -274,7 +276,7 @@ theme_override_constants/separation = 4
 script = ExtResource("65_prestige_page")
 fx = NodePath("../../../../../../../../Fx")
 work_area = NodePath("../../../../../../../../WorkArea")
-items = Array[ExtResource("7_shop_item")]([ExtResource("66_head_start"), ExtResource("67_drone_bay"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("66_head_start"), ExtResource("67_drone_bay"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance"), ExtResource("70_diamond_tips"), ExtResource("71_four_leaf")])
 title = "Prestige"
 toggle_action = &"toggle_prestige"
 notify_when_affordable = true

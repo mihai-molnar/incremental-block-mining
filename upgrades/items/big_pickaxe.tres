@@ -13,6 +13,6 @@ cube_type = ExtResource("goal_cube")
 script = ExtResource("1_upgrade")
 title = "Big Pickaxe"
 price = 250
-price_growth = 2.0
+price_growth = 10.0
 max_level = 3
 unlock = SubResource("Resource_unlock")

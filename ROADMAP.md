@@ -24,8 +24,8 @@ Unpredictable rewards are the strongest hook in the genre.
 ## Phase 3: long-term goals
 
 ### Prestige ("Collapse the mine") (done)
-- Unlocks at 1M earned in total. Collapsing pays floor(√(run earnings ÷ 1M)) Shards and resets money, upgrades and cubes; Shards, perks, unlocks and stats stay.
-- Every Shard ever earned adds 5% to all earnings. Shards buy perks kept forever: Head Start, Drone Bay, Standing Order, Shard Resonance.
+- The tab unlocks at 100M earned in total. Collapsing pays floor(√(run earnings ÷ 1B)) Shards and resets money, upgrades and cubes; Shards, perks, unlocks and stats stay. (It was ÷ 1M at first, which paid ~400 Shards for a 160B run.)
+- Every Shard ever earned adds 10% to all earnings. Shards buy perks kept forever: Head Start, Diamond Tips, Drone Bay, Four-Leaf Clover, Standing Order, and Shard Resonance as the long-term sink.
 - Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, Lucky Cubes sooner.
 
 ### Achievements
