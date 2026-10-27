@@ -406,6 +406,7 @@ func _resolve_click(soft := false) -> void:
 		var total := roundi(_clicked_value * Game.get_payout_multiplier())
 		var payout := total if soft else combo.multiply(total)
 		_update_field_value()
+		Game.add_stat(Game.STAT_SQUARES_BROKEN, _clicked_breaks.size())
 		Game.earn(payout)
 		fx.squares_broken(_clicked_breaks, payout, soft)
 	_clicked_hits = []
@@ -421,6 +422,7 @@ func _on_cube_completed(cube: Cube) -> void:
 	_set_hovered(null, [])
 	var multiplier := Game.get_clear_bonus()
 	var bonus := Game.get_clear_payout(cube.get_total_value())
+	Game.record_cube_cleared(cube.cube_type)
 	Game.earn(bonus)
 	cube.flash_white()
 	Sfx.play(&"explode", 0.05)

@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_upgrade")
 title = "Drone Overclock"
-price = 1000
-price_growth = 2.2
+price = 2000
+price_growth = 3.0
 max_level = 10
 requires = ExtResource("2_requires")

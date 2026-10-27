@@ -2,7 +2,14 @@
 
 [ext_resource type="Script" path="res://shop/cube_shop_item.gd" id="1_item"]
 [ext_resource type="Resource" path="res://cubes/types/jade_cube.tres" id="2_cube"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+stat = 2
+amount = 1500
 
 [resource]
 script = ExtResource("1_item")
 cube_type = ExtResource("2_cube")
+unlock = SubResource("Resource_unlock")

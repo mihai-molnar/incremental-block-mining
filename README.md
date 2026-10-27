@@ -31,6 +31,37 @@ behind as faint outlines until the whole cube is gone.
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
 
+### Unlocking cubes and upgrades
+
+You start with only the Blue Cube. Every other cube and most upgrades unlock by reaching a
+goal: clearing cubes (of one kind or any), breaking squares, or earning money in total. Each
+list shows its cheapest locked item dimmed, with its goal and your progress ("Clear 2 Blue
+Cubes (1/2)"). When a goal is met, an "UNLOCKED!" toast names what's new and its tab gets a
+red dot. Both lists are sorted by the price of the next tier, cheapest first, with maxed
+upgrades at the bottom; they re-sort when you open them, so rows don't move while you buy.
+
+| Cube        | Unlocks after               | Upgrade            | Unlocks after          |
+|-------------|-----------------------------|--------------------|------------------------|
+| Yellow      | Clear 2 Blue Cubes          | Diamond Squares    | Clear 2 cubes          |
+| Grey        | Clear 3 Yellow Cubes        | Explosive Squares  | Clear 1 Grey Cube      |
+| Red         | Clear 4 Grey Cubes          | Sharp Pickaxe      | Clear 1 Yellow Cube    |
+| Jade        | Earn 1,500 in total         | Lucky Strike       | Break 250 squares      |
+| Obsidian    | Clear 5 Jade Cubes          | Mining Drone       | Earn 500 in total      |
+| Gold Bar    | Clear 3 Obsidian Cubes      | Big Pickaxe        | Clear 1 Red Cube       |
+| Silver      | Earn 20K in total           | Clean Sweep        | Clear 10 cubes         |
+| Amethyst    | Clear 3 Silver Cubes        | Steady Hands       | Break 500 squares      |
+| Emerald     | Break 3,000 squares         | Coin Pouches       | Earn 2,000 in total    |
+| Ruby Bar    | Clear 5 Emerald Cubes       | Hot Streak         | Break 1,000 squares    |
+| Meteorite   | Earn 10M in total           | Lucky Charm        | Earn 3,000 in total    |
+| Rose Quartz | Clear 5 Meteorites          | Gold Fever         | Earn 6,000 in total    |
+| Magma       | Break 15K squares           | Lightning Squares  | Clear 1 Obsidian Cube  |
+| Void        | Earn 1B in total            | Multiplier Squares | Clear 1 Gold Bar       |
+|             |                             | Auto-Buyer         | Clear 25 cubes (and own a Mining Drone) |
+|             |                             | Prospector         | Clear 1 Silver Cube    |
+
+Blast Radius and Drone Overclock need no goal: they show up once you own Explosive Squares
+and a Mining Drone. Upgrades you already own always stay listed.
+
 ### Combos, crits and clearing cubes
 
 - **Combo:** each click that hits something adds x0.1 to what your clicks pay, up to x2. It
@@ -120,9 +151,9 @@ significant digits.
 | Hot Streak      | 600, ×3 per tier          | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
 | Lucky Charm     | 1,200, ×3 per tier        | Lucky Cubes come 15% sooner per tier, up to 60% (4 tiers)      |
 | Gold Fever      | 1,500, ×3 per tier        | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
-| Mining Drone    | 400, ×1.8 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
-| Drone Overclock | 1,000, ×2.2 per tier      | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
-| Auto-Buyer      | 1,500 / 6,000 / 24,000    | Keeps 1, then 2, then 3 cubes of your pick on the field; listed once you own a Mining Drone |
+| Mining Drone    | 150, ×3.5 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
+| Drone Overclock | 2,000, ×3 per tier        | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
+| Auto-Buyer      | 5,000 / 25,000 / 130,000  | Keeps 1, then 2, then 3 cubes of your pick on the field; listed once you own a Mining Drone |
 
 A diamond always takes 3x the clicks of the cube's other squares, counted after Sharp
 Pickaxe: when Grey squares drop from 5 clicks to 1, Grey diamonds drop from 15 to 3.

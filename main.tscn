@@ -49,6 +49,7 @@
 [ext_resource type="Resource" path="res://upgrades/items/lightning_squares.tres" id="61_lightning"]
 [ext_resource type="Resource" path="res://upgrades/items/multiplier_squares.tres" id="62_multiplier"]
 [ext_resource type="Resource" path="res://upgrades/items/prospector.tres" id="63_prospector"]
+[ext_resource type="Script" path="res://ui/unlock_toast.gd" id="64_unlock_toast"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -145,6 +146,19 @@ offset_right = 160.0
 offset_bottom = 108.0
 mouse_filter = 2
 script = ExtResource("57_frenzy_meter")
+
+[node name="UnlockToast" type="Control" parent="Hud/Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 176.0
+offset_top = -76.0
+offset_right = 396.0
+offset_bottom = -36.0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("64_unlock_toast")
 
 [node name="ModeBar" type="HBoxContainer" parent="Hud/Root"]
 layout_mode = 1

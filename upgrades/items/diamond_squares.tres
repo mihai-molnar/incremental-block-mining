@@ -3,6 +3,11 @@
 [ext_resource type="Script" path="res://upgrades/square_chance_upgrade.gd" id="1_upgrade"]
 [ext_resource type="Resource" path="res://cubes/squares/diamond_square.tres" id="2_square"]
 [ext_resource type="Resource" path="res://cubes/types/blue_cube.tres" id="3_preview"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 2
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -11,3 +16,4 @@ chance = 0.15
 preview_cube = ExtResource("3_preview")
 title = "Diamond Squares"
 price = 60
+unlock = SubResource("Resource_unlock")

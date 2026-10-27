@@ -1,6 +1,11 @@
 [gd_resource type="Resource" script_class="ClearBonusUpgrade" format=3]
 
 [ext_resource type="Script" path="res://upgrades/clear_bonus_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 10
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -8,3 +13,4 @@ title = "Clean Sweep"
 price = 300
 price_growth = 3.0
 max_level = 8
+unlock = SubResource("Resource_unlock")

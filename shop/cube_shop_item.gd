@@ -52,6 +52,7 @@ func set_auto_buying(on: bool) -> void:
 
 
 func on_listed() -> void:
+	super()
 	Game.register_cube_for_sale(cube_type)
 
 

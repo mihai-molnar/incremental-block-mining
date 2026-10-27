@@ -63,6 +63,12 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - Timed effects: `Game.add_timed_effect(effect, seconds)` folds any `Upgrade` into the rules for a while. `Game._process` counts them down (pausing with the tree) and emits `timed_effect_started`/`timed_effect_ended`. They aren't saved.
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
+**Unlock goals.** A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the item's `.tres`) stays unlisted until its goal is met: `Goal.Stat` is `SQUARES_BROKEN`, `CUBES_CLEARED` (optionally of one `cube_type`) or `MONEY_EARNED`.
+- `Game` keeps lifetime stats (`add_stat`, `record_cube_cleared`, `get_stat`; `earn` counts money) and saves them with the resource paths of unlocked items. `WorkArea` counts squares broken in `_resolve_click` and cubes cleared in `_on_cube_completed`.
+- Pages call `on_listed`, which registers the item with `Game.register_unlockable`. Goals already met (and upgrades already owned) unlock quietly; later ones emit `items_unlocked`, which `UnlockToast` shows.
+- `ShopItem.is_available()` is `is_unlocked() and meets_requirements()` (`Upgrade.requires` is a requirement). Owned upgrades are always available.
+- `ItemListPage` sorts rows by `get_price()` (owned items last) in `on_shown`, which the `Sidebar` calls on switching pages, never while a page is open. It shows the cheapest locked item that meets its requirements as a teaser row (`ShopItemRow.set_teaser`). Newly unlocked items badge the page's tab.
+
 **Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × price_growth^level`, rounded to two significant digits from 100 up (`Upgrade._round_price`). Each `.tres` sets its own `price_growth` (default 1.5). Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
 
 **Soft-lock guard.** `Game.would_soft_lock(cost)` returns true when `money - cost + field_value` would be below the cheapest cube's price. `Upgrade.can_purchase` refuses those purchases, and the shop row shows "Keep N for a cube". Cubes register themselves for this check via `CubeShopItem.on_listed`.

@@ -320,6 +320,20 @@ const SPRITES := {
 		"KYYYOOKYYYOOK",
 		"KKKKKKKKKKKKK",
 	],
+	# Shown instead of the buy button on a locked shop item.
+	&"lock": [
+		"..KKKKK..",
+		".KLWWWLK.",
+		".KL...LK.",
+		".KL...LK.",
+		"KKKKKKKKK",
+		"KYWYYYYOK",
+		"KYYYKYYOK",
+		"KYYKKKYOK",
+		"KYYYKYYOK",
+		"KOOOOOOOK",
+		"KKKKKKKKK",
+	],
 	# Emblems for special squares, drawn in the middle of the tile.
 	&"lightning": [
 		".....KKKK",

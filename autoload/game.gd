@@ -11,11 +11,20 @@ signal auto_buy_changed(cube_type: CubeType)
 ## A timed effect (a frenzy) started or ran out.
 signal timed_effect_started(effect: Upgrade)
 signal timed_effect_ended(effect: Upgrade)
+## A lifetime stat went up.
+signal stats_changed
+## Shop items whose unlock goals were just met.
+signal items_unlocked(items: Array[ShopItem])
 ## Emitted while saving, so nodes that keep their own state (the work area's cubes) can
 ## add it to `data`. They get it back through take_saved().
 signal saving(data: Dictionary)
 
 const STARTING_MONEY := 20
+## Lifetime stats that unlock goals count. Cubes cleared of one type are kept under
+## get_cleared_stat(cube_type).
+const STAT_SQUARES_BROKEN := &"squares_broken"
+const STAT_CUBES_CLEARED := &"cubes_cleared"
+const STAT_MONEY_EARNED := &"money_earned"
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
 const AUTOSAVE_INTERVAL := 30.0
@@ -53,6 +62,12 @@ var _upgrade_levels := {}
 var _timed_effects := {}
 ## What the rules fold over: owned upgrades, then running timed effects at level 1.
 var _modifiers := {}
+## Lifetime stats (StringName -> int).
+var _stats := {}
+## Shop items with an unlock goal, and the resource paths of those unlocked so far.
+## Saves from before goals start counting from zero; owned upgrades stay listed anyway.
+var _unlockables: Array[ShopItem] = []
+var _unlocked := {}
 ## The save file as loaded. Nodes take their own part of it with take_saved().
 var _loaded_save := {}
 
@@ -105,6 +120,54 @@ func earn(amount: int) -> void:
 	if amount <= 0:
 		return
 	_set_money(money + amount)
+	add_stat(STAT_MONEY_EARNED, amount)
+
+
+func get_stat(key: StringName) -> int:
+	return _stats.get(key, 0)
+
+
+func add_stat(key: StringName, amount: int) -> void:
+	if amount <= 0:
+		return
+	_stats[key] = get_stat(key) + amount
+	stats_changed.emit()
+	_check_unlocks()
+
+
+## Counts a finished cube, in total and for its type.
+func record_cube_cleared(cube_type: CubeType) -> void:
+	_stats[get_cleared_stat(cube_type)] = get_stat(get_cleared_stat(cube_type)) + 1
+	add_stat(STAT_CUBES_CLEARED, 1)
+
+
+## Stat key for cubes cleared of one type, or of every type when null.
+func get_cleared_stat(cube_type: CubeType) -> StringName:
+	return StringName("cleared:" + cube_type.id) if cube_type else STAT_CUBES_CLEARED
+
+
+## Called by shop pages for items with an unlock goal. Goals already met, and upgrades
+## already owned, unlock quietly.
+func register_unlockable(item: ShopItem) -> void:
+	if item in _unlockables:
+		return
+	_unlockables.append(item)
+	if item.unlock.is_met() or (item is Upgrade and get_upgrade_level(item) > 0):
+		_unlocked[item.resource_path] = true
+
+
+func is_unlocked(item: ShopItem) -> bool:
+	return _unlocked.has(item.resource_path)
+
+
+func _check_unlocks() -> void:
+	var fresh: Array[ShopItem] = []
+	for item in _unlockables:
+		if not is_unlocked(item) and item.unlock.is_met():
+			_unlocked[item.resource_path] = true
+			fresh.append(item)
+	if not fresh.is_empty():
+		items_unlocked.emit(fresh)
 
 
 ## Called by the shop when a cube is bought; the work area listens and spawns it.
@@ -326,6 +389,8 @@ func save_game() -> void:
 	data["money"] = money
 	data["upgrades"] = levels
 	data["auto_buy"] = auto_buy_cube.resource_path if auto_buy_cube else ""
+	data["stats"] = _stats
+	data["unlocked"] = _unlocked.keys()
 	saving.emit(data)
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
@@ -356,6 +421,8 @@ func reset_progress() -> void:
 	field_value = 0
 	auto_buy_cube = null
 	_upgrade_levels.clear()
+	_stats.clear()
+	_unlocked.clear()
 	_timed_effects.clear()
 	_refresh_modifiers()
 	set_process(false)
@@ -379,6 +446,13 @@ func _load_game() -> void:
 				_upgrade_levels[upgrade] = int(levels[path])
 		_refresh_modifiers()
 	auto_buy_cube = load_saved_resource(data.get("auto_buy")) as CubeType
+	if data.get("stats") is Dictionary:
+		var stats: Dictionary = data.stats
+		for key: Variant in stats:
+			_stats[StringName(str(key))] = int(stats[key])
+	if data.get("unlocked") is Array:
+		for path: Variant in data.unlocked:
+			_unlocked[str(path)] = true
 	_loaded_save = data
 
 

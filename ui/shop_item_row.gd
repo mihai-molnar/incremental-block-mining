@@ -1,10 +1,17 @@
 class_name ShopItemRow
 extends PanelContainer
 ## One entry in the shop: icon, name, description and a buy button showing the price.
-## Items the auto-buyer can buy get an Auto toggle under the buy button.
+## Items the auto-buyer can buy get an Auto toggle under the buy button. As its page's
+## teaser, a locked item shows dimmed, with its unlock goal and a lock instead.
+
+## Shade over a locked item's icon.
+const LOCKED_TINT := Color(0.25, 0.27, 0.38)
 
 var item: ShopItem
 
+var _teaser := false
+var _icon: Control
+var _lock_icon: TextureRect
 var _title_label: Label
 var _description_label: Label
 var _buy_button: Button
@@ -18,7 +25,8 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	add_child(row)
-	row.add_child(item.create_icon())
+	_icon = item.create_icon()
+	row.add_child(_icon)
 
 	var text_box := VBoxContainer.new()
 	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -52,17 +60,45 @@ func _ready() -> void:
 	_auto_button.focus_mode = Control.FOCUS_NONE
 	_auto_button.toggled.connect(_on_auto_toggled)
 	buttons.add_child(_auto_button)
+	_lock_icon = TextureRect.new()
+	_lock_icon.texture = PixelSprites.get_texture(&"lock")
+	_lock_icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	_lock_icon.custom_minimum_size = Vector2(24, 16)
+	_lock_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	buttons.add_child(_lock_icon)
 
 	Game.money_changed.connect(_on_money_changed)
 	Game.field_value_changed.connect(_on_field_value_changed)
 	Game.upgrade_purchased.connect(_on_upgrade_purchased)
 	Game.auto_buy_changed.connect(_on_auto_buy_changed)
+	Game.items_unlocked.connect(func(_items: Array[ShopItem]) -> void: _refresh())
+	Game.stats_changed.connect(_on_stats_changed)
 	_refresh()
 
 
+## Shows it as its page's teaser while it's locked.
+func set_teaser(on: bool) -> void:
+	_teaser = on
+	if is_node_ready():
+		_refresh()
+
+
+func _is_locked_teaser() -> bool:
+	return _teaser and not item.is_available()
+
+
 func _refresh() -> void:
-	visible = item.is_available()
+	var locked := _is_locked_teaser()
+	visible = item.is_available() or locked
 	_title_label.text = item.get_title()
+	_icon.modulate = LOCKED_TINT if locked else Color.WHITE
+	_lock_icon.visible = locked
+	_buy_button.visible = not locked
+	if locked:
+		_description_label.text = "%s (%s)" % [item.unlock.get_description(), item.unlock.get_progress_text()]
+		_reason_label.visible = false
+		_auto_button.visible = false
+		return
 	_description_label.text = item.get_description()
 	if item.is_owned():
 		_buy_button.text = item.get_owned_label()
@@ -79,6 +115,12 @@ func _refresh() -> void:
 
 func _on_money_changed(_money: int, _delta: int) -> void:
 	_refresh()
+
+
+## Keeps a teaser's goal progress current.
+func _on_stats_changed() -> void:
+	if _is_locked_teaser():
+		_refresh()
 
 
 func _on_field_value_changed(_value: int) -> void:

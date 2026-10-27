@@ -1,6 +1,12 @@
 [gd_resource type="Resource" script_class="ComboWindowUpgrade" format=3]
 
 [ext_resource type="Script" path="res://upgrades/combo_window_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+stat = 0
+amount = 500
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -8,3 +14,4 @@ title = "Steady Hands"
 price = 350
 price_growth = 2.5
 max_level = 4
+unlock = SubResource("Resource_unlock")

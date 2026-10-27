@@ -3,6 +3,13 @@
 [ext_resource type="Script" path="res://upgrades/square_chance_upgrade.gd" id="1_upgrade"]
 [ext_resource type="Resource" path="res://cubes/squares/lightning_square.tres" id="2_square"]
 [ext_resource type="Resource" path="res://cubes/types/red_cube.tres" id="3_preview"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/obsidian_cube.tres" id="goal_cube"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 1
+cube_type = ExtResource("goal_cube")
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -13,3 +20,4 @@ title = "Lightning Squares"
 price = 2000
 price_growth = 2.0
 max_level = 5
+unlock = SubResource("Resource_unlock")

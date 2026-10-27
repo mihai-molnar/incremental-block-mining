@@ -4,6 +4,13 @@
 [ext_resource type="Resource" path="res://cubes/squares/ore_square.tres" id="2_square"]
 [ext_resource type="Resource" path="res://cubes/types/meteorite.tres" id="3_preview"]
 [ext_resource type="Resource" path="res://cubes/squares/rock_square.tres" id="4_rock"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/silver_cube.tres" id="goal_cube"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 1
+cube_type = ExtResource("goal_cube")
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -14,3 +21,4 @@ description = "Rocks in new cubes turn into ore worth 3x a square"
 preview_cube = ExtResource("3_preview")
 title = "Prospector"
 price = 20000
+unlock = SubResource("Resource_unlock")

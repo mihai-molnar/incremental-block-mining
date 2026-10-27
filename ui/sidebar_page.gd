@@ -15,3 +15,8 @@ func has_news() -> bool:
 ## Called while the page is on screen, so what's on it no longer counts as news.
 func mark_seen() -> void:
 	pass
+
+
+## Called when the sidebar switches to this page.
+func on_shown() -> void:
+	pass

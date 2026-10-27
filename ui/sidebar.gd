@@ -33,6 +33,7 @@ func _ready() -> void:
 	Game.money_changed.connect(func(_money: int, _delta: int) -> void: _update_badges())
 	Game.field_value_changed.connect(func(_value: int) -> void: _update_badges())
 	Game.upgrade_purchased.connect(func(_upgrade: Upgrade) -> void: _update_badges())
+	Game.items_unlocked.connect(func(_items: Array[ShopItem]) -> void: _update_badges())
 	if not _pages.is_empty():
 		_set_page(_pages[0])
 	_apply_slide(0.0)
@@ -67,6 +68,7 @@ func _set_page(page: SidebarPage) -> void:
 	if page != current_page:
 		_page_scroll.scroll_vertical = 0
 	current_page = page
+	page.on_shown()
 	_title.text = page.title
 	for p in _pages:
 		p.visible = p == page

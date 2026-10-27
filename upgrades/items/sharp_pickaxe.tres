@@ -1,6 +1,13 @@
 [gd_resource type="Resource" script_class="ClickReductionUpgrade" format=3]
 
 [ext_resource type="Script" path="res://upgrades/click_reduction_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/yellow_cube.tres" id="goal_cube"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 1
+cube_type = ExtResource("goal_cube")
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -8,3 +15,4 @@ title = "Sharp Pickaxe"
 price = 100
 price_growth = 1.5
 max_level = 0
+unlock = SubResource("Resource_unlock")

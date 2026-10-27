@@ -35,6 +35,7 @@ func _ready() -> void:
 		&"lucky": _make_lucky(),
 		&"frenzy": _make_frenzy(),
 		&"zap": _make_zap(),
+		&"unlock": _make_unlock(),
 	}
 
 
@@ -174,6 +175,16 @@ func _make_zap() -> AudioStreamWAV:
 		var buzz := _square(_sweep(t, 1600.0, 180.0, 0.32)) * 0.22 * exp(-t * 8.0)
 		var stutter := 1.0 if fmod(t * 45.0, 1.0) < 0.5 else 0.35
 		return buzz + noise.call() * 0.45 * stutter * exp(-t * 12.0))
+
+
+## Something new in the shop: two bright rising chimes.
+func _make_unlock() -> AudioStreamWAV:
+	return _render(0.45, func(t: float, _p: float) -> float:
+		var second := t >= 0.12
+		var freq := 1567.98 if second else 1174.66
+		var local_t := t - 0.12 if second else t
+		var tone := _pulse(t * freq, 0.5) * 0.14 + _pulse(t * freq * 2.0, 0.25) * 0.04
+		return tone * exp(-local_t * (7.0 if second else 16.0)))
 
 
 func _make_click() -> AudioStreamWAV:

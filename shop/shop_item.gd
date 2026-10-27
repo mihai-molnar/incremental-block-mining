@@ -3,6 +3,10 @@ extends Resource
 ## Base class for anything the shop sells. Subclasses define what it is, what it costs
 ## and what buying it does (cubes now; upgrades and other things later).
 
+## Stays out of the shop until this goal is met (Game keeps track). Empty means it's
+## listed from the start.
+@export var unlock: Goal
+
 
 func get_title() -> String:
 	return ""
@@ -16,8 +20,18 @@ func get_price() -> int:
 	return 0
 
 
-## Whether the item is currently listed at all (e.g. false until something unlocks it).
+## Whether the item is currently listed at all: unlocked, and anything else it needs.
 func is_available() -> bool:
+	return is_unlocked() and meets_requirements()
+
+
+## Whether its unlock goal has been met (always, without one).
+func is_unlocked() -> bool:
+	return unlock == null or Game.is_unlocked(self)
+
+
+## Anything besides the unlock goal it needs before it's listed (upgrades: `requires`).
+func meets_requirements() -> bool:
 	return true
 
 
@@ -56,7 +70,8 @@ func set_auto_buying(_on: bool) -> void:
 
 ## Called once when a shop page lists this item.
 func on_listed() -> void:
-	pass
+	if unlock:
+		Game.register_unlockable(self)
 
 
 ## Spends the money and applies the item. Returns true if the purchase went through.

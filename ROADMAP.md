@@ -45,7 +45,7 @@ Unpredictable rewards are the strongest hook in the genre.
 
 ## Phase 4: always show the next goal
 
-- **Locked silhouettes:** list only the next unaffordable cube or upgrade, as "??? - 8K". This needs an `is_revealed()` on `ShopItem`, based on lifetime earnings.
+- **Locked silhouettes (done as unlock goals):** cubes and upgrades unlock through goals (clear cubes, break squares, earn money), and each list teases its cheapest locked item with the goal and progress.
 - **Progress bar:** under the money counter, filling toward the next unlock.
 - **Income per minute:** shown in the HUD, averaged over the last minute of `money_changed` deltas.
 - **Stats page:** a sidebar page with squares broken, longest chain, lifetime earnings and time played.

@@ -43,7 +43,12 @@ func get_price() -> int:
 	return _round_price(price * pow(price_growth, bought))
 
 
+## Owned upgrades stay listed whatever happens.
 func is_available() -> bool:
+	return get_level() > 0 or super()
+
+
+func meets_requirements() -> bool:
 	return requires == null or Game.has_upgrade(requires)
 
 

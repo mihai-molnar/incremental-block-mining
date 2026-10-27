@@ -1,6 +1,12 @@
 [gd_resource type="Resource" script_class="LuckyIntervalUpgrade" format=3]
 
 [ext_resource type="Script" path="res://upgrades/lucky_interval_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+stat = 2
+amount = 3000
 
 [resource]
 script = ExtResource("1_upgrade")
@@ -8,3 +14,4 @@ title = "Lucky Charm"
 price = 1200
 price_growth = 3.0
 max_level = 4
+unlock = SubResource("Resource_unlock")
