@@ -32,6 +32,8 @@ func _ready() -> void:
 		&"convert": _make_convert(),
 		&"crit": _make_crit(),
 		&"clear": _make_clear(),
+		&"lucky": _make_lucky(),
+		&"frenzy": _make_frenzy(),
 	}
 
 
@@ -138,6 +140,30 @@ func _make_clear() -> AudioStreamWAV:
 		var decay := 6.0 if i == notes.size() - 1 else 14.0
 		var tone := _pulse(t * notes[i], 0.5) * 0.16 + _pulse(t * notes[i] * 2.0, 0.25) * 0.05
 		return tone * exp(-local_t * decay))
+
+
+## A Lucky Cube appearing: a soft, high twinkle that rises and falls.
+func _make_lucky() -> AudioStreamWAV:
+	var notes := [2093.0, 2637.0, 3136.0, 3951.0, 3136.0, 2637.0]
+	return _render(0.5, func(t: float, _p: float) -> float:
+		var i := mini(int(t / 0.07), notes.size() - 1)
+		var local_t := t - i * 0.07
+		return _pulse(t * notes[i], 0.25) * 0.09 * exp(-local_t * 18.0))
+
+
+## Catching a Lucky Cube: a fast run up into a held, shimmering chord.
+func _make_frenzy() -> AudioStreamWAV:
+	var run := [523.25, 659.25, 783.99, 1046.5]
+	var chord := [1046.5, 1318.5, 1568.0]
+	return _render(0.9, func(t: float, _p: float) -> float:
+		if t < 0.2:
+			var i := mini(int(t / 0.05), run.size() - 1)
+			return _pulse(t * run[i], 0.5) * 0.18 * exp(-(t - i * 0.05) * 10.0)
+		# Each note doubled a hair sharp, so the pair beats and shimmers.
+		var sum := 0.0
+		for note: float in chord:
+			sum += (_pulse(t * note, 0.5) + _pulse(t * note * 1.006, 0.5)) * 0.04
+		return sum * exp(-(t - 0.2) * 3.5))
 
 
 func _make_click() -> AudioStreamWAV:

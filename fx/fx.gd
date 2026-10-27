@@ -4,12 +4,14 @@ extends Node2D
 ## Gameplay code says what happened; the feel of it is tuned here.
 
 const POPUP_FONT := preload("res://assets/fonts/Silkscreen-Bold.ttf")
+const SMALL_FONT := preload("res://assets/fonts/Silkscreen-Regular.ttf")
 const POPUP_COLOR := Color("ffcd75")
 const SPARK_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75")]
 const DUST_COLORS: Array[Color] = [Color("566c86"), Color("94b0c2"), Color("333c57")]
 const FIRE_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75"), Color("ffcd75"), Color("ef7d57"), Color("b13e53")]
 const CRIT_COLOR := Color("ef7d57")
 const CLEAR_COLOR := Color("73eff7")
+const LUCKY_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("f4f4f4")]
 
 @export var camera: ShakeCamera
 @export var hud: Hud
@@ -17,7 +19,7 @@ const CLEAR_COLOR := Color("73eff7")
 @export var screen_layer: CanvasLayer
 @export var screen_flash: ColorRect
 
-## Popup text styles by font color; the first one is the gold payout style.
+## Popup text styles by font color and size.
 var _popup_settings := {}
 var _hitstop_depth := 0
 ## Frame of the last explosion boom, so explosions going off together share one.
@@ -123,31 +125,74 @@ func critical_hits(squares: Array[CubeSquare]) -> void:
 ## A finished cube's clear bonus: a "CLEAR!" banner with the multiplier and the bonus,
 ## and the bonus flying to the money counter. Call it with cube_exploded.
 func cube_cleared(cube: Cube, multiplier: float, bonus: int) -> void:
-	var at := cube.global_position
-	var banner := Node2D.new()
-	add_child(banner)
-	var title := _make_label("CLEAR! x" + Upgrade.format_number(multiplier), CLEAR_COLOR)
-	var amount := _make_label("+" + Currency.format(bonus), POPUP_COLOR)
-	banner.add_child(title)
-	banner.add_child(amount)
-	title.size = title.get_minimum_size()
-	amount.size = amount.get_minimum_size()
-	title.position = Vector2(-title.size.x / 2.0, -title.size.y).round()
-	amount.position = Vector2(-amount.size.x / 2.0, 0).round()
-	# Kept on screen when the cube sits near an edge.
-	var half_width := maxf(title.size.x, amount.size.x) / 2.0 + 4.0
-	at.x = clampf(at.x, half_width, get_viewport_rect().size.x - half_width)
-	banner.position = at.round()
-	banner.scale = Vector2.ONE * 2.0
-	var tween := banner.create_tween()
-	tween.tween_property(banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(banner, "position:y", banner.position.y - 20.0, 1.0) \
-		.set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
-	tween.tween_property(banner, "modulate:a", 0.0, 0.25)
-	tween.tween_callback(banner.queue_free)
+	_banner(cube.global_position, [
+		_make_label("CLEAR! x" + Upgrade.format_number(multiplier), CLEAR_COLOR),
+		_make_label("+" + Currency.format(bonus), POPUP_COLOR),
+	], 1.0)
 	# The coins wait for the banner to land, so they don't fly over it as it pops.
 	coins(cube.global_position + Vector2(0, 8), bonus, 8, 0.35)
 	Sfx.play(&"clear", 0.0)
+
+
+## A Lucky Cube setting off across the field: a chime so the player looks up.
+func lucky_cube_appeared() -> void:
+	Sfx.play(&"lucky", 0.0)
+
+
+## Sparkles a drifting Lucky Cube leaves behind.
+func lucky_trail(at: Vector2) -> void:
+	var sparkles := _burst(at, LUCKY_COLORS, 2)
+	sparkles.speed_min = 5.0
+	sparkles.speed_max = 25.0
+	sparkles.gravity = 30.0
+	sparkles.damping = 2.0
+	sparkles.lifetime_min = 0.3
+	sparkles.lifetime_max = 0.6
+	sparkles.size_max = 2
+	sparkles.emit_extents = Vector2(10, 10)
+	sparkles.start()
+
+
+## A Lucky Cube caught: it bursts in a flash of gold, and a banner names the frenzy.
+func lucky_caught(at: Vector2, frenzy: Frenzy) -> void:
+	var ring := SquareShockwave.new()
+	ring.position = at
+	ring.start_half_size = 12.0
+	ring.end_half_size = 70.0
+	ring.thickness = 4.0
+	ring.duration = 0.45
+	ring.color = frenzy.color
+	add_child(ring)
+	var core := SquareShockwave.new()
+	core.position = at
+	core.start_half_size = 6.0
+	core.end_half_size = 24.0
+	core.thickness = 12.0
+	core.duration = 0.2
+	core.color = Color("f4f4f4")
+	add_child(core)
+	var colors: Array[Color] = LUCKY_COLORS.duplicate()
+	colors.append(frenzy.color)
+	var sparks := _burst(at, colors, 40)
+	sparks.speed_min = 80.0
+	sparks.speed_max = 260.0
+	sparks.gravity = 120.0
+	sparks.damping = 3.0
+	sparks.lifetime_min = 0.4
+	sparks.lifetime_max = 0.9
+	sparks.size_min = 1
+	sparks.size_max = 3
+	sparks.emit_extents = Vector2(8, 8)
+	sparks.start()
+	_banner(at, [
+		_make_label("FRENZY!", Color("f4f4f4")),
+		_make_label(frenzy.get_title(), frenzy.color),
+		_make_label(frenzy.get_description(), Color("f4f4f4"), true),
+	], 1.8)
+	flash_screen(0.25)
+	shake(0.6)
+	hitstop(0.06)
+	Sfx.play(&"frenzy", 0.0)
 
 
 ## The big one: call after the hitstop, right before the cube is removed.
@@ -320,21 +365,49 @@ func popup_text(at: Vector2, text: String, color := POPUP_COLOR) -> void:
 	tween.tween_callback(label.queue_free)
 
 
-## A label in the popup style (bold, with a drop shadow). Size it once it's in the tree.
-func _make_label(text: String, color: Color) -> Label:
-	if not _popup_settings.has(color):
+## A label in the popup style (bold 16, with a drop shadow), or regular 8 when `small`.
+## Size it once it's in the tree.
+func _make_label(text: String, color: Color, small := false) -> Label:
+	var key := [color, small]
+	if not _popup_settings.has(key):
 		var settings := LabelSettings.new()
-		settings.font = POPUP_FONT
-		settings.font_size = 16
+		settings.font = SMALL_FONT if small else POPUP_FONT
+		settings.font_size = 8 if small else 16
 		settings.font_color = color
 		settings.shadow_color = Color("0f1020")
-		settings.shadow_offset = Vector2(1, 2)
+		settings.shadow_offset = Vector2(1, 1) if small else Vector2(1, 2)
 		settings.shadow_size = 0
-		_popup_settings[color] = settings
+		_popup_settings[key] = settings
 	var label := Label.new()
 	label.text = text
-	label.label_settings = _popup_settings[color]
+	label.label_settings = _popup_settings[key]
 	return label
+
+
+## Centered lines of text that pop in at `at`, drift up for `duration` and fade, kept on
+## screen when `at` is near an edge.
+func _banner(at: Vector2, labels: Array[Label], duration: float) -> void:
+	var banner := Node2D.new()
+	add_child(banner)
+	var size := Vector2.ZERO
+	for label in labels:
+		banner.add_child(label)
+		label.size = label.get_minimum_size()
+		size = Vector2(maxf(size.x, label.size.x), size.y + label.size.y)
+	var y := -size.y / 2.0
+	for label in labels:
+		label.position = Vector2(-label.size.x / 2.0, y).round()
+		y += label.size.y
+	var half := size / 2.0 + Vector2(4, 4)
+	var view := get_viewport_rect().size
+	banner.position = Vector2(clampf(at.x, half.x, view.x - half.x), clampf(at.y, half.y + 20.0, view.y - half.y)).round()
+	banner.scale = Vector2.ONE * 2.0
+	var tween := banner.create_tween()
+	tween.tween_property(banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(banner, "position:y", banner.position.y - 20.0, duration) \
+		.set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tween.tween_property(banner, "modulate:a", 0.0, 0.25)
+	tween.tween_callback(banner.queue_free)
 
 
 ## Sends coins flying from a world position to the HUD money counter, up to `max_count`

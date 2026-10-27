@@ -338,8 +338,8 @@ func _on_square_broken(_cube: Cube, square: CubeSquare) -> void:
 
 
 ## Pays out and plays the effects for everything the last click hit and broke, then
-## lines up any explosives it broke as the next link of a chain reaction. The player's
-## clicks pay with the combo multiplier; soft ones (drones) pay the squares' value.
+## lines up any explosives it broke as the next link of a chain reaction. Payouts get
+## Game.get_payout_multiplier() (a money frenzy), and the player's clicks the combo too.
 func _resolve_click(soft := false) -> void:
 	if not _pending_blasts.is_empty():
 		var timer := get_tree().create_timer(CHAIN_DELAY, false)
@@ -350,6 +350,7 @@ func _resolve_click(soft := false) -> void:
 		var total := 0
 		for square in _clicked_breaks:
 			total += square.value
+		total = roundi(total * Game.get_payout_multiplier())
 		var payout := total if soft else combo.multiply(total)
 		_update_field_value()
 		Game.earn(payout)

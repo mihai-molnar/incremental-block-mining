@@ -150,3 +150,18 @@ func modify_combo_window(seconds: float, _level: int) -> float:
 ## Chance (0..1) that one of the player's hits breaks a square outright.
 func modify_crit_chance(chance: float, _level: int) -> float:
 	return chance
+
+
+## What every payout from squares is multiplied by.
+func modify_payout_multiplier(multiplier: float, _level: int) -> float:
+	return multiplier
+
+
+## Seconds until the next Lucky Cube drifts by.
+func modify_lucky_interval(seconds: float, _level: int) -> float:
+	return seconds
+
+
+## Seconds a frenzy lasts.
+func modify_frenzy_duration(seconds: float, _level: int) -> float:
+	return seconds

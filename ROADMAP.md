@@ -19,14 +19,7 @@ Unpredictable rewards are the strongest hook in the genre.
 - **Combo meter:** +x0.1 per player hit up to x2, dropping after 1s without a hit. Hot Streak raises the cap, Steady Hands the window. Drone hits don't count.
 - **Critical hits:** 2% of player hits break a square outright. Lucky Strike adds 2% per tier.
 - **Diamonds scale after upgrades:** they take 3x the clicks of their cube's squares as Sharp Pickaxe lowers them, instead of a fixed 3x of the base.
-
-### Golden events
-- Every 2-5 minutes a meteor or "Lucky Cube" drifts across the field. Clicking it starts a 30s frenzy, picked at random from:
-  - x7 money
-  - every new square is a diamond
-  - drones at triple speed
-- New node `world/lucky_event.gd`. It reads its spawn interval and frenzy length from hooks, so upgrades can tune them.
-- The frenzy is a timed modifier that `Game` folds in alongside upgrades. A good shape is `Game.add_timed_effect(effect, seconds)`, with effects being `Upgrade`-like objects that use the same hooks.
+- **Golden events:** a Lucky Cube drifts by every 2-5 minutes. Catching it starts a 30s frenzy: Money x7, Diamond Rush or Drone Overdrive. Lucky Charm brings them sooner, Gold Fever makes frenzies longer. Frenzies are `Frenzy` resources folded in through `Game.add_timed_effect`.
 
 ### More special squares
 These are `SquareType` resources. Each needs a `SquareChanceUpgrade` to unlock it, plus a little code where noted.

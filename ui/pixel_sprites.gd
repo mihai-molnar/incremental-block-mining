@@ -16,6 +16,8 @@ const PALETTE := {
 	"C": Color("73eff7"),
 	"U": Color("3b5dc9"),
 	"u": Color("41a6f6"),
+	"g": Color("a7f070"),
+	"D": Color("38b764"),
 }
 
 const SPRITES := {
@@ -285,6 +287,38 @@ const SPRITES := {
 		"...KKKKKK...",
 		"..KBBBBBBK..",
 		"..KKKKKKKK..",
+	],
+	# Lucky Charm: Lucky Cubes come sooner.
+	&"clover": [
+		".KKK.....KKK.",
+		"KgWgK...KgWgK",
+		"KggggK.KggggK",
+		"KggggDKDggggK",
+		".KgggDDDgggK.",
+		"..KKDDDDDKK..",
+		"...KDDDDDK...",
+		"..KKDDDDDKK..",
+		".KgggDDDgggK.",
+		"KggggDKDggggK",
+		"KggggK.KggggK",
+		"KgggK...KgggK",
+		".KKK.....KKK.",
+	],
+	# Gold Fever: a Lucky Cube.
+	&"lucky_cube": [
+		"KKKKKKKKKKKKK",
+		"KWWYYYKWWYYYK",
+		"KWYYYYKWYYYYK",
+		"KYYYYYKYYYYYK",
+		"KYYYYOKYYYYOK",
+		"KYYYOOKYYYOOK",
+		"KKKKKKKKKKKKK",
+		"KWWYYYKWWYYYK",
+		"KWYYYYKWYYYYK",
+		"KYYYYYKYYYYYK",
+		"KYYYYOKYYYYOK",
+		"KYYYOOKYYYOOK",
+		"KKKKKKKKKKKKK",
 	],
 }
 

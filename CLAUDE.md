@@ -28,7 +28,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 ```
 
 - macOS has no `timeout`, so `perl alarm` stops a hung harness.
-- In debug builds the `=` key (`dev_add_money`, handled in `Hud`) adds 100K money, for playtesting expensive content.
+- In debug builds the `=` key (`dev_add_money`, handled in `Hud`) adds 100K money, for playtesting expensive content, and the `-` key (`dev_lucky_cube`, handled in `LuckyEvent`) sends a Lucky Cube across right away.
 - A harness calls `change_scene_to_file("res://main.tscn")`, waits a few `process_frame`s, drives
   the scene through `Game`, `WorkArea.spawn_cube` or `Cube.hit_at`, prints results, then calls `quit()`.
 - To test loading, write a save file first, then run the harness with `--save` pointing at it. `Game` loads it in `_ready`, before the scene.
@@ -54,8 +54,10 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 
 **`Game` autoload (`autoload/game.gd`) is the rules engine.**
 - It holds money, owned upgrade levels and `field_value`, the money still left in unbroken squares.
-- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type`, `Game.get_pickaxe_size`, `Game.get_blast_radius`, `Game.get_drone_count`, `Game.get_drone_hit_rate`, `Game.get_auto_buy_slots`, `Game.get_clear_bonus`, `Game.get_combo_cap`, `Game.get_combo_window` or `Game.get_crit_chance`.
-- Each of those folds over every owned `Upgrade`, calling its hook: `modify_square_hp`, `modify_square_type`, `modify_pickaxe_size`, `modify_blast_radius`, `modify_drone_count`, `modify_drone_hit_rate`, `modify_auto_buy_slots`, `modify_clear_bonus`, `modify_combo_cap`, `modify_combo_window` or `modify_crit_chance`. The base values (`CLEAR_BONUS`, `COMBO_STEP`, `COMBO_CAP`, `COMBO_WINDOW`, `CRIT_CHANCE`) are constants at the top of `Game`.
+- Gameplay never hardcodes upgrade effects. It asks `Game.get_square_hp`, `Game.roll_square_type`, `Game.get_pickaxe_size`, `Game.get_blast_radius`, `Game.get_drone_count`, `Game.get_drone_hit_rate`, `Game.get_auto_buy_slots`, `Game.get_clear_bonus`, `Game.get_combo_cap`, `Game.get_combo_window`, `Game.get_crit_chance`, `Game.get_payout_multiplier`, `Game.roll_lucky_interval` or `Game.get_frenzy_duration`.
+- Each of those folds over `Game._modifiers`, calling each one's hook: `modify_square_hp`, `modify_square_type`, `modify_pickaxe_size`, `modify_blast_radius`, `modify_drone_count`, `modify_drone_hit_rate`, `modify_auto_buy_slots`, `modify_clear_bonus`, `modify_combo_cap`, `modify_combo_window`, `modify_crit_chance`, `modify_payout_multiplier`, `modify_lucky_interval` or `modify_frenzy_duration`. The base values (`CLEAR_BONUS`, `COMBO_*`, `CRIT_CHANCE`, `LUCKY_INTERVAL_*`, `FRENZY_DURATION`) are constants at the top of `Game`.
+- `_modifiers` is the owned upgrades plus running timed effects (at level 1), rebuilt by `_refresh_modifiers` whenever either changes. Code that edits `_upgrade_levels` directly must call it.
+- Timed effects: `Game.add_timed_effect(effect, seconds)` folds any `Upgrade` into the rules for a while. `Game._process` counts them down (pausing with the tree) and emits `timed_effect_started`/`timed_effect_ended`. They aren't saved.
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
 **Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × price_growth^level`, rounded to two significant digits from 100 up (`Upgrade._round_price`). Each `.tres` sets its own `price_growth` (default 1.5). Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
@@ -86,9 +88,11 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 7. Hits and breaks are collected and resolved once per click: one `Game.earn`, one `Fx.squares_hit`/`squares_broken`, one sound. A Big Pickaxe click that breaks 36 squares produces one payout popup, not 36. Non-soft payouts go through `Combo.multiply`, which carries rounding leftovers to the next payout. Chain links keep the `soft` flag of the click that started them.
 8. The last square emits `Cube.completed`. `WorkArea` pays the clear bonus (`Game.get_clear_payout` of `Cube.get_total_value`) right away, then plays a short hitstop, the explosion fx, the `cube_cleared` banner, and `queue_free`.
 
+**Lucky Cubes (`world/lucky_event.gd`).** `LuckyEvent` (under `Main`, after `WorkArea` so it sees clicks first) counts down `Game.roll_lucky_interval()`, pausing while a cube is out or `Game.has_timed_effects()`. It sends a `LuckyCube` drifting across. Clicking it adds a random useful `Frenzy` from its `frenzies` array as a timed effect for `Game.get_frenzy_duration()`. A `Frenzy` (`upgrades/frenzy.gd`, instances in `upgrades/frenzies/`) is an `Upgrade` that's never sold: its exports set a payout multiplier, a square type for landing cubes, or a drone rate multiplier. Payouts apply `Game.get_payout_multiplier()` in `WorkArea._resolve_click` and `Game.get_clear_payout`. `FrenzyMeter` (under `Hud/Root`) shows running frenzies.
+
 **Combo (`world/combo.gd`).** A node under `Main` holding the hit count and time left; it emits `changed` on each hit and when it drops. `ComboMeter` (under `Hud/Root`) draws it below the money counter.
 
-**Fx (`fx/fx.gd`).** All "juice" goes through this node as named recipes (`squares_broken`, `critical_hits`, `cube_cleared`, `cube_exploded`, `explosion`, ...): particles, debris chunks, shockwave, camera trauma shake, hitstop via `Engine.time_scale`, and flying coins. The HUD money counter only catches up as coins arrive, through `Hud.on_coin_arrived`.
+**Fx (`fx/fx.gd`).** All "juice" goes through this node as named recipes (`squares_broken`, `critical_hits`, `cube_cleared`, `lucky_caught`, `cube_exploded`, `explosion`, ...): particles, debris chunks, shockwave, camera trauma shake, hitstop via `Engine.time_scale`, and flying coins. The HUD money counter only catches up as coins arrive, through `Hud.on_coin_arrived`.
 
 **Sidebar UI.** `Sidebar` holds `SidebarPage` children. Each page names its `tab_button` and `toggle_action`.
 - `ItemListPage` builds a `ShopItemRow` for each item.

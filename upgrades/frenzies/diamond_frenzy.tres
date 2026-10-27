@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Frenzy" format=3]
+
+[ext_resource type="Script" path="res://upgrades/frenzy.gd" id="1_frenzy"]
+[ext_resource type="Resource" path="res://cubes/squares/diamond_square.tres" id="2_diamond"]
+
+[resource]
+script = ExtResource("1_frenzy")
+color = Color(0.45098, 0.937255, 0.968627, 1)
+square_type = ExtResource("2_diamond")
+title = "Diamond Rush"
+description = "New cubes are solid diamond"

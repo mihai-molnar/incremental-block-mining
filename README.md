@@ -27,6 +27,7 @@ behind as faint outlines until the whole cube is gone.
 | U     | Open or close upgrades                          |
 | Esc   | Pause menu                                      |
 | =     | Dev cheat: +100K money (debug builds only)      |
+| -     | Dev cheat: send a Lucky Cube now (debug builds only) |
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
 
@@ -40,6 +41,20 @@ A red dot on the Upgrades tab means a new upgrade (or its next tier) has become 
   drones never do.
 - **Clear bonus:** finishing a cube pays a quarter of its squares' value on top (x1.25),
   shown as a "CLEAR!" banner. Cubes the drones finish get it too.
+
+### Lucky Cubes and frenzies
+
+Every 2 to 5 minutes a golden Lucky Cube drifts across the field with a chime, taking about
+14 seconds to cross. Click it before it leaves to start a 30-second frenzy, picked at random:
+
+| Frenzy          | Effect                                                     |
+|-----------------|------------------------------------------------------------|
+| Money x7        | Every square pays 7x, drones' hits and the clear bonus too |
+| Diamond Rush    | Every cube that lands is solid diamond (explosives stay)   |
+| Drone Overdrive | Drones hit 3x as fast (only picked once you own a drone)   |
+
+The running frenzy and its time left show under the combo meter. No Lucky Cube comes while
+a frenzy is running, and frenzies aren't saved: quitting ends one.
 
 ### Saving
 
@@ -94,6 +109,8 @@ significant digits.
 | Clean Sweep     | 300, ×3 per tier          | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
 | Steady Hands    | 350, ×2.5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
 | Hot Streak      | 600, ×3 per tier          | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
+| Lucky Charm     | 1,200, ×3 per tier        | Lucky Cubes come 15% sooner per tier, up to 60% (4 tiers)      |
+| Gold Fever      | 1,500, ×3 per tier        | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
 | Mining Drone    | 400, ×1.8 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
 | Drone Overclock | 1,000, ×2.2 per tier      | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
 | Auto-Buyer      | 1,500 / 6,000 / 24,000    | Keeps 1, then 2, then 3 cubes of your pick on the field; listed once you own a Mining Drone |

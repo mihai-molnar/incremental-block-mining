@@ -37,6 +37,14 @@
 [ext_resource type="Resource" path="res://upgrades/items/hot_streak.tres" id="49_hot_streak"]
 [ext_resource type="Resource" path="res://upgrades/items/steady_hands.tres" id="50_steady_hands"]
 [ext_resource type="Resource" path="res://upgrades/items/clean_sweep.tres" id="51_clean_sweep"]
+[ext_resource type="Script" path="res://world/lucky_event.gd" id="52_lucky_event"]
+[ext_resource type="Script" path="res://upgrades/frenzy.gd" id="53_frenzy"]
+[ext_resource type="Resource" path="res://upgrades/frenzies/money_frenzy.tres" id="54_money_frenzy"]
+[ext_resource type="Resource" path="res://upgrades/frenzies/diamond_frenzy.tres" id="55_diamond_frenzy"]
+[ext_resource type="Resource" path="res://upgrades/frenzies/drone_frenzy.tres" id="56_drone_frenzy"]
+[ext_resource type="Script" path="res://ui/frenzy_meter.gd" id="57_frenzy_meter"]
+[ext_resource type="Resource" path="res://upgrades/items/lucky_charm.tres" id="58_lucky_charm"]
+[ext_resource type="Resource" path="res://upgrades/items/gold_fever.tres" id="59_gold_fever"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -62,6 +70,11 @@ combo = NodePath("../Combo")
 [node name="Drones" type="Node2D" parent="." node_paths=PackedStringArray("work_area")]
 script = ExtResource("43_swarm")
 work_area = NodePath("../WorkArea")
+
+[node name="LuckyEvent" type="Node2D" parent="." node_paths=PackedStringArray("fx")]
+script = ExtResource("52_lucky_event")
+fx = NodePath("../Fx")
+frenzies = Array[ExtResource("53_frenzy")]([ExtResource("54_money_frenzy"), ExtResource("55_diamond_frenzy"), ExtResource("56_drone_frenzy")])
 
 [node name="AutoBuyer" type="Node" parent="." node_paths=PackedStringArray("work_area")]
 script = ExtResource("44_auto_buyer")
@@ -119,6 +132,15 @@ offset_bottom = 52.0
 mouse_filter = 2
 script = ExtResource("47_combo_meter")
 combo = NodePath("../../../Combo")
+
+[node name="FrenzyMeter" type="Control" parent="Hud/Root"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 56.0
+offset_right = 160.0
+offset_bottom = 108.0
+mouse_filter = 2
+script = ExtResource("57_frenzy_meter")
 
 [node name="ModeBar" type="HBoxContainer" parent="Hud/Root"]
 layout_mode = 1
@@ -216,7 +238,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("58_lucky_charm"), ExtResource("59_gold_fever"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
