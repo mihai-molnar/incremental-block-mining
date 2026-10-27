@@ -1,6 +1,6 @@
 class_name UnlockToast
 extends Control
-## "UNLOCKED!" with the names of the shop items whose goals were just met (or Prestige).
+## "UNLOCKED!" with the names of the shop items whose goals were just met.
 ## Pops in at the bottom of the field and fades after a few seconds; unlocks close
 ## together share one.
 
@@ -17,7 +17,6 @@ var _names: Array[String] = []
 ## Which sidebar tabs the unlocked items are on.
 var _in_shop := false
 var _in_upgrades := false
-var _in_prestige := false
 var _tween: Tween
 
 
@@ -25,7 +24,6 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	modulate.a = 0.0
 	Game.items_unlocked.connect(_on_items_unlocked)
-	Game.prestige_unlocked.connect(_on_prestige_unlocked)
 
 
 func _on_items_unlocked(items: Array[ShopItem]) -> void:
@@ -39,20 +37,12 @@ func _on_items_unlocked(items: Array[ShopItem]) -> void:
 	_pop()
 
 
-func _on_prestige_unlocked() -> void:
-	_start()
-	_names.append("Prestige")
-	_in_prestige = true
-	_pop()
-
-
 ## Starts a fresh list unless the last toast is still up.
 func _start() -> void:
 	if modulate.a <= 0.0:
 		_names.clear()
 		_in_shop = false
 		_in_upgrades = false
-		_in_prestige = false
 
 
 func _pop() -> void:
@@ -89,8 +79,6 @@ func _get_hint() -> String:
 		tabs.append("the Shop [S]")
 	if _in_upgrades:
 		tabs.append("Upgrades [U]")
-	if _in_prestige:
-		tabs.append("Prestige [P]")
 	return "in " + " and ".join(tabs)
 
 

@@ -12,11 +12,13 @@ extends Upgrade
 @export var square_type: SquareType
 ## Drones hit this many times as fast.
 @export var drone_rate_multiplier := 1.0
+## Clicks cost the pickaxe no HP.
+@export var free_clicks := false
 
 
 ## Whether it would do anything right now: drone frenzies need drones.
 func is_useful() -> bool:
-	return is_equal_approx(drone_rate_multiplier, 1.0) or Game.get_drone_count() > 0
+	return is_equal_approx(drone_rate_multiplier, 1.0) or Game.drones_out > 0
 
 
 func modify_payout_multiplier(multiplier: float, _level: int) -> float:
@@ -31,3 +33,7 @@ func modify_square_type(for_cube: CubeType, current: SquareType, _level: int) ->
 
 func modify_drone_hit_rate(rate: float, _level: int) -> float:
 	return rate * drone_rate_multiplier
+
+
+func modify_click_cost(cost: int, _level: int) -> int:
+	return 0 if free_clicks else cost

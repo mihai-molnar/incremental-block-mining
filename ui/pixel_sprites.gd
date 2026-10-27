@@ -418,6 +418,43 @@ const SPRITES := {
 		"........K...",
 		"............",
 	],
+	&"pickaxe_small": [
+		".KKKKK...",
+		"KWLLLGK..",
+		"KLKKKKGK.",
+		"KK.KBK.KK",
+		"..KBK....",
+		".KBK.....",
+		"KBK......",
+		"KK.......",
+	],
+	# Drawn over the pickaxe cursor as it wears down.
+	&"pickaxe_cracks_1": [
+		"................",
+		".....K..........",
+		"....K...........",
+		".........K......",
+	],
+	&"pickaxe_cracks_2": [
+		"................",
+		".....K..........",
+		"....K...........",
+		"..K......K......",
+		"..........K.....",
+		"................",
+		"............K...",
+	],
+	&"whetstone": [
+		"..........Y...",
+		".........YWY..",
+		"..........Y...",
+		"..KKKKKKKKKK..",
+		".KLLLLLLLLLGK.",
+		"KLWWLLLLLLLGGK",
+		"KLLLLLLLLLGGGK",
+		"KGGGGGGGGGGGGK",
+		".KKKKKKKKKKKK.",
+	],
 }
 
 static var _cache := {}

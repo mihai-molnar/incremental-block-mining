@@ -1,7 +1,8 @@
 class_name DroneSwarm
 extends Node2D
-## Keeps as many mining drones flying as the player owns, and finds them squares to mine.
-## Drawn above the work area, so drones fly over the cubes.
+## The mining drones out on the field. Launches one for every drone bought (and Drone Bay's
+## when a run starts), finds them squares to mine and lets each go when its HP runs out.
+## Saves their HP with the game. Drawn above the work area, so drones fly over the cubes.
 
 ## Idle drones line up along the top of the field, right of the money counter.
 const HOME_START := Vector2(140, 18)
@@ -11,14 +12,20 @@ const HOME_SPACING := 22.0
 const TARGET_JITTER := 24.0
 
 @export var work_area: WorkArea
+@export var fx: Fx
 
 var _drones: Array[Drone] = []
 
 
 func _ready() -> void:
-	Game.upgrade_purchased.connect(func(_upgrade: Upgrade) -> void: _add_missing_drones(true))
-	# Drones owned from a loaded save are simply there.
-	_add_missing_drones(false)
+	Game.drone_launched.connect(func() -> void: _add_drone(Game.get_drone_hp(), true))
+	Game.saving.connect(_on_saving)
+	# Drones from a loaded save, or a new run's Drone Bay, are simply there.
+	var saved: Variant = Game.take_saved("drones", [])
+	if saved is Array:
+		for hp: Variant in saved:
+			_add_drone(int(hp), false)
+	Game.set_drones_out(_drones.size())
 
 
 ## Whether a drone can keep working on this square. Drones leave rocks alone.
@@ -56,12 +63,46 @@ func find_target(drone: Drone) -> CubeSquare:
 	return best
 
 
-func _add_missing_drones(fly_in: bool) -> void:
-	while _drones.size() < Game.get_drone_count():
-		var drone := Drone.new()
-		drone.swarm = self
-		drone.home = HOME_START + Vector2(HOME_SPACING * _drones.size(), 0)
-		# New drones fly in from above the screen.
-		drone.position = drone.home - Vector2(0, 40) if fly_in else drone.home
-		add_child(drone)
-		_drones.append(drone)
+## Called by a drone whose last hit used up its HP: it breaks, and the rest close ranks.
+func on_drone_spent(drone: Drone) -> void:
+	_drones.erase(drone)
+	fx.drone_broken(drone.global_position)
+	drone.queue_free()
+	for i in _drones.size():
+		_drones[i].home = _get_home(i)
+	Game.set_drones_out(_drones.size())
+
+
+## Every drone breaks at once (the mine collapsing at the end of a run).
+func clear() -> void:
+	for drone in _drones:
+		fx.drone_broken(drone.global_position)
+		drone.queue_free()
+	_drones.clear()
+	Game.set_drones_out(0)
+
+
+func _add_drone(hp: int, fly_in: bool) -> void:
+	if hp <= 0 or _drones.size() >= Game.MAX_DRONES:
+		return
+	var drone := Drone.new()
+	drone.swarm = self
+	drone.hp = hp
+	drone.max_hp = maxi(hp, Game.get_drone_hp())
+	drone.home = _get_home(_drones.size())
+	# New drones fly in from above the screen.
+	drone.position = drone.home - Vector2(0, 40) if fly_in else drone.home
+	add_child(drone)
+	_drones.append(drone)
+	Game.set_drones_out(_drones.size())
+
+
+func _get_home(index: int) -> Vector2:
+	return HOME_START + Vector2(HOME_SPACING * index, 0)
+
+
+func _on_saving(data: Dictionary) -> void:
+	var hps: Array[int] = []
+	for drone in _drones:
+		hps.append(drone.hp)
+	data["drones"] = hps

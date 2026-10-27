@@ -2,10 +2,12 @@ class_name PauseMenu
 extends CanvasLayer
 ## Pauses the game and shows the pause menu. Toggled with the "pause" action (Esc).
 ## Its process mode is Always, so it keeps working while the tree is paused.
-## Reset progress asks for a second click before it wipes the save.
+## End run and Reset progress ask for a second click before they do anything. Closing it
+## leaves the game paused while the run-end screen is up.
 
+const END_RUN_LABEL := "End run"
 const RESET_LABEL := "Reset progress"
-const RESET_CONFIRM_LABEL := "Click to confirm"
+const CONFIRM_LABEL := "Click to confirm"
 
 var is_open := false
 
@@ -13,6 +15,7 @@ var _tween: Tween
 
 @onready var _dim: ColorRect = %Dim
 @onready var _panel: Control = %Panel
+@onready var _end_run_button: Button = %EndRunButton
 @onready var _reset_button: Button = %ResetButton
 @onready var _quit_button: Button = %QuitButton
 
@@ -20,6 +23,7 @@ var _tween: Tween
 func _ready() -> void:
 	visible = false
 	_panel.resized.connect(func() -> void: _panel.pivot_offset = _panel.size / 2.0)
+	_end_run_button.pressed.connect(_on_end_run_pressed)
 	_reset_button.pressed.connect(_on_reset_pressed)
 	_quit_button.pressed.connect(_on_quit_pressed)
 
@@ -41,6 +45,7 @@ func open() -> void:
 	is_open = true
 	get_tree().paused = true
 	visible = true
+	_end_run_button.visible = Game.is_run_active()
 	Sfx.play(&"click")
 	if _tween:
 		_tween.kill()
@@ -54,16 +59,27 @@ func open() -> void:
 
 func close() -> void:
 	is_open = false
-	get_tree().paused = false
+	get_tree().paused = Game.run_over
 	visible = false
+	_end_run_button.text = END_RUN_LABEL
 	_reset_button.text = RESET_LABEL
 	Sfx.play(&"click")
 
 
+## Breaks the pickaxe, which ends the run as if its HP had run out.
+func _on_end_run_pressed() -> void:
+	if _end_run_button.text != CONFIRM_LABEL:
+		Sfx.play(&"click")
+		_end_run_button.text = CONFIRM_LABEL
+		return
+	close()
+	Game.break_pickaxe()
+
+
 func _on_reset_pressed() -> void:
 	Sfx.play(&"click")
-	if _reset_button.text != RESET_CONFIRM_LABEL:
-		_reset_button.text = RESET_CONFIRM_LABEL
+	if _reset_button.text != CONFIRM_LABEL:
+		_reset_button.text = CONFIRM_LABEL
 		return
 	Game.reset_progress()
 	get_tree().paused = false

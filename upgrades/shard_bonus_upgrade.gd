@@ -2,7 +2,7 @@ class_name ShardBonusUpgrade
 extends Upgrade
 ## Each tier makes every Shard ever earned add more to earnings.
 
-## Extra boost per Shard per tier (0.01 takes 5% per Shard to 6%, then 7%...).
+## Extra boost per Shard per tier (0.01 takes 2% per Shard to 3%, then 4%...).
 @export_range(0.0, 0.1, 0.005) var bonus_per_tier := 0.01
 
 
@@ -19,7 +19,7 @@ func get_description() -> String:
 
 
 func _format_bonus(level: int) -> String:
-	return "%d%%" % roundi((Game.SHARD_BONUS + bonus_per_tier * level) * 100.0)
+	return format_number((Game.SHARD_BONUS + bonus_per_tier * level) * 100.0) + "%"
 
 
 func create_icon() -> Control:

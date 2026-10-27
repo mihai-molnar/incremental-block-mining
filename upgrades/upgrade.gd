@@ -147,8 +147,23 @@ func modify_blast_radius(radius: int, _level: int) -> int:
 	return radius
 
 
-## How many mining drones fly around the field.
-func modify_drone_count(count: int, _level: int) -> int:
+## The pickaxe's HP at the start of a run.
+func modify_max_pickaxe_hp(hp: int, _level: int) -> int:
+	return hp
+
+
+## Pickaxe HP one click that hits costs.
+func modify_click_cost(cost: int, _level: int) -> int:
+	return cost
+
+
+## Hits a new mining drone makes before it breaks.
+func modify_drone_hp(hp: int, _level: int) -> int:
+	return hp
+
+
+## Drones a new run starts with.
+func modify_starting_drones(count: int, _level: int) -> int:
 	return count
 
 
@@ -187,9 +202,9 @@ func modify_payout_multiplier(multiplier: float, _level: int) -> float:
 	return multiplier
 
 
-## Seconds until the next Lucky Cube drifts by.
-func modify_lucky_interval(seconds: float, _level: int) -> float:
-	return seconds
+## Squares the player breaks before the next Lucky Cube drifts by.
+func modify_lucky_interval(squares: float, _level: int) -> float:
+	return squares
 
 
 ## Seconds a frenzy lasts.

@@ -2,7 +2,8 @@
 
 A small incremental game made in Godot 4.5. You buy cubes, which are grids of squares, and
 break the squares with a pickaxe to earn money. Then you spend that money on bigger cubes and
-better tools.
+better tools. The pickaxe wears down with every click: when it breaks, the run ends, and the
+Shards it paid buy perks that make the next run last longer.
 
 ## Running it
 
@@ -15,9 +16,9 @@ better tools.
 
 ## How to play
 
-You start with 20 money, enough for your first Blue cube. Open the shop, buy it, and click
-its squares until they break. Every broken square pays out right away. Broken squares stay
-behind as faint outlines until the whole cube is gone.
+You start with 20 money, enough for your first Blue cube, and a pickaxe with 100 HP. Open the
+shop, buy it, and click its squares until they break. Every broken square pays out right
+away. Broken squares stay behind as faint outlines until the whole cube is gone.
 
 | Key   | Action                                          |
 |-------|-------------------------------------------------|
@@ -25,7 +26,6 @@ behind as faint outlines until the whole cube is gone.
 | M     | Move mode: drag cubes around the field          |
 | S     | Open or close the shop                          |
 | U     | Open or close upgrades                          |
-| P     | Open or close Prestige (once it's unlocked)     |
 | Esc   | Pause menu                                      |
 | =     | Dev cheat: +100K money (debug builds only)      |
 | -     | Dev cheat: send a Lucky Cube now (debug builds only) |
@@ -59,8 +59,8 @@ you buy.
 | Rose Quartz Cubes |                   |                    | Magma Cube       |
 | Magma Cubes      |                    |                    | Void Cube        |
 
-Blast Radius and Drone Overclock need no goal: they show up once you own Explosive Squares
-and a Mining Drone (which the Auto-Buyer needs too). Upgrades you already own always stay
+The Whetstone is there from the start. Blast Radius and Drone Overclock need no goal: they
+show up once you own Explosive Squares, and once you've bought a Mining Drone in the run. Upgrades you already own always stay
 listed. Each upgrade's first tier costs about one or two of the cubes that unlock it, and
 later tiers climb steeply, so upgrades stay worth saving for all the way down the ladder.
 
@@ -77,48 +77,62 @@ later tiers climb steeply, so upgrades stay worth saving for all the way down th
 
 ### Lucky Cubes and frenzies
 
-Every 2 to 5 minutes a golden Lucky Cube drifts across the field with a chime, taking about
-14 seconds to cross. Click it before it leaves to start a 30-second frenzy, picked at random:
+After every 60 to 120 squares you break (a random number each time), a golden Lucky Cube
+drifts across the field with a chime, taking about 14 seconds to cross. Squares your clicks
+break count, explosions and lightning included; drones' don't, so you can't wait one out. Click it before it leaves to start a 30-second frenzy, picked at random:
 
 | Frenzy          | Effect                                                     |
 |-----------------|------------------------------------------------------------|
 | Money x7        | Every square pays 7x, drones' hits and the clear bonus too |
 | Diamond Rush    | Every cube that lands is solid diamond (explosives stay)   |
-| Drone Overdrive | Drones hit 3x as fast (only picked once you own a drone)   |
+| Drone Overdrive | Drones hit 3x as fast (only picked while drones are out)   |
+| Unbreakable     | Clicks cost the pickaxe no HP                              |
 
-The running frenzy and its time left show under the combo meter. No Lucky Cube comes while
-a frenzy is running, and frenzies aren't saved: quitting ends one.
+The running frenzy and its time left show under the combo meter. Squares broken while a
+frenzy runs don't count toward the next Lucky Cube, and frenzies aren't saved: quitting ends
+one.
 
-### Prestige: collapsing the mine
+### Runs: the pickaxe's HP
 
-Once you've earned 100M in total, a Prestige tab appears. Collapsing the mine (click the
-button twice) shatters the field and starts a new run, paying **Shards**:
-floor(√(money earned this run ÷ 1B)), so 1B pays 1, 4B pays 2, 9B pays 3, 100B pays 10.
+Every click that hits a square costs the pickaxe 1 HP, however many squares it breaks.
+Missing costs nothing, and neither do drones or the explosions and lightning a click sets
+off. The HP bar under the money counter flashes once it's low, and the cursor's pickaxe
+cracks. During a run, the **Whetstone** repairs 25 HP, each repair costing 4x the last.
 
-- Money, upgrades, the cubes on the field and the Auto-Buyer's pick reset.
+When the HP runs out, the pickaxe breaks and the run is over: the field collapses and the
+run-end screen takes over. (The pause menu's **End run** breaks it early.) It shows the run's
+time, clicks, cubes cleared and money earned, marking new records, and pays **Shards**: the
+cube root of (money earned in the run ÷ 50), rounded down, so 50 pays 1, 400 pays 2, 50K
+pays 10 and 50M pays 100. The bar under the HP bar fills toward the run's next Shard.
+
+- Money, upgrades, the cubes on the field, drones and the Auto-Buyer's pick reset.
 - Shards, perks, unlocked cubes and upgrades, and lifetime stats stay.
-- Every Shard you've ever earned adds 10% to all earnings, spent or not.
+- Every Shard you've ever earned adds 2% to all earnings, spent or not.
 
-Shards buy perks, which are kept forever:
+Shards buy perks on the run-end screen, which are kept forever:
 
 | Perk             | Price (Shards)     | Effect                                                    |
 |------------------|--------------------|-----------------------------------------------------------|
-| Head Start       | 1, ×3 per tier     | Runs start with 500, then 5K, 50K, 500K money (4 tiers)  |
+| Sturdy Handle    | 1, ×1.5 per tier   | The pickaxe gets 25 more HP per tier (no tier limit)      |
+| Head Start       | 2, ×4 per tier     | Runs start with 200, then 2K, 20K, 200K money (4 tiers)  |
 | Diamond Tips     | 2, ×2 per tier     | Runs start with a free Sharp Pickaxe tier per tier (5 tiers) |
-| Drone Bay        | 3, ×2.5 per tier   | Runs start with a free Mining Drone tier per tier (3 tiers) |
+| Drone Bay        | 3, ×2.5 per tier   | Runs start with a drone out per tier (3 tiers)            |
+| Drone Plating    | 3, ×2 per tier     | Drones last 20 more hits per tier (5 tiers)               |
 | Four-Leaf Clover | 4, ×3 per tier     | Lucky Cubes come 10% sooner per tier, on top of Lucky Charm (3 tiers) |
-| Standing Order   | 8                  | Runs start with a free Auto-Buyer tier |
-| Shard Resonance  | 5, ×2.2 per tier   | Each Shard adds 2% more, up to 30% per Shard (10 tiers, the last costs 6,000) |
+| Standing Order   | 8                  | Runs start with a free Auto-Buyer tier                    |
+| Shard Resonance  | 5, ×2.2 per tier   | Each Shard adds 0.5% more, up to 7% per Shard (10 tiers, the last costs 6,000) |
 
 ### Saving
 
 Progress saves on its own every 30 seconds, when the window loses focus and when you quit:
-money, upgrades, the auto-buyer's pick and every cube on the field, down to the clicks left
-on each square. The pause menu has **Reset progress** (click it twice) to start over.
+money, the pickaxe's HP, upgrades, the auto-buyer's pick, the drones and every cube on the
+field, down to the clicks left on each square. Quitting on the run-end screen brings you
+back to it. The pause menu has **Reset progress** (click it twice) to start over.
 
 Nothing is mined while the game is closed: you pick up exactly where you left off.
 
-Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5M.
+Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5M, then B, T,
+Qa (quadrillions) and Qi (quintillions).
 
 ### Cubes
 
@@ -172,18 +186,20 @@ significant digits.
 | Clean Sweep     | 1,000, ×3.5 per tier      | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
 | Steady Hands    | 1,500, ×5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
 | Hot Streak      | 20,000, ×6 per tier       | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
-| Lucky Charm     | 100,000, ×5 per tier      | Lucky Cubes come 15% sooner per tier, up to 60% (4 tiers)      |
+| Lucky Charm     | 100,000, ×5 per tier      | Lucky Cubes come 15% sooner (fewer squares) per tier, up to 60% (4 tiers) |
 | Gold Fever      | 300,000, ×6 per tier      | Frenzies last 5s longer per tier, up to 50s (4 tiers)          |
-| Mining Drone    | 150, ×3.5 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
-| Drone Overclock | 2,000, ×3 per tier        | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
-| Auto-Buyer      | 400K / 2M / 10M           | Keeps 1, then 2, then 3 cubes of your pick on the field; needs a Mining Drone |
+| Whetstone       | 40, ×4 per repair         | Repairs 25 of the pickaxe's HP; the price resets each run      |
+| Mining Drone    | 150, ×1.3 per drone       | A drone that flies to squares and hits them 1.5 times a second, then breaks after 60 hits. Up to 10 at once; the price resets each run |
+| Drone Overclock | 2,000, ×3 per tier        | Drones hit 25% faster per tier (10 tiers); listed once you've bought a Mining Drone |
+| Auto-Buyer      | 400K / 2M / 10M           | Keeps 1, then 2, then 3 cubes of your pick on the field        |
 
 A diamond always takes 3x the clicks of the cube's other squares, counted after Sharp
 Pickaxe: when Grey squares drop from 5 clicks to 1, Grey diamonds drop from 15 to 3.
 
 Drones pick the nearest square no other drone is working on and drill it until it breaks.
-Their hits pay out like your clicks, and they set off explosives too. They leave alone the
-cube you're dragging.
+Their hits pay out like your clicks and cost the pickaxe nothing, and they set off
+explosives too. Each drone's HP shows on a bar above it. They leave alone the cube you're
+dragging.
 
 Once you own the Auto-Buyer, every cube in the shop gets an **Auto** toggle. Turn it on for
 one cube and the auto-buyer buys that cube whenever the field has fewer unfinished cubes than

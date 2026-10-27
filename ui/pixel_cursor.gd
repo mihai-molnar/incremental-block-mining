@@ -2,7 +2,8 @@ class_name PixelCursor
 extends Node2D
 ## Software cursor drawn at the game's pixel resolution, so it matches the art.
 ## Shows a pickaxe in break mode, a hand in move mode and an arrow over UI. With a
-## bigger pickaxe, corner brackets around the pickaxe mark the area a click hits.
+## bigger pickaxe, corner brackets around the pickaxe mark the area a click hits. The
+## pickaxe shows cracks as its HP runs down.
 
 ## Point of each sprite that lines up with the mouse position.
 const HOTSPOTS := {
@@ -15,12 +16,15 @@ const HOTSPOTS := {
 const PICKAXE_GRIP := Vector2(1, 12)
 const REACH_BRACKET := 4
 const REACH_COLOR := Color(1, 1, 1, 0.55)
+## Share of its max HP under which the pickaxe shows each stage of cracks.
+const CRACKS := {&"pickaxe_cracks_1": 0.5, &"pickaxe_cracks_2": 0.25}
 
 @export var work_area: WorkArea
 
 var _current := &""
 var _pivot: Node2D
 var _sprite: Sprite2D
+var _cracks: Sprite2D
 var _swing_tween: Tween
 
 
@@ -31,7 +35,11 @@ func _ready() -> void:
 	_sprite = Sprite2D.new()
 	_sprite.centered = false
 	_pivot.add_child(_sprite)
+	_cracks = Sprite2D.new()
+	_cracks.centered = false
+	_sprite.add_child(_cracks)
 	work_area.tool_used.connect(_on_tool_used)
+	Game.pickaxe_changed.connect(func(_hp: int) -> void: _update_cracks())
 	Game.upgrade_purchased.connect(func(_upgrade: Upgrade) -> void: queue_redraw())
 
 
@@ -71,7 +79,18 @@ func _set_shape(shape: StringName) -> void:
 		_pivot.position = Vector2.ZERO
 		_sprite.position = -hotspot
 	_pivot.rotation = 0.0
+	_update_cracks()
 	queue_redraw()
+
+
+func _update_cracks() -> void:
+	var ratio := float(Game.pickaxe_hp) / Game.get_max_pickaxe_hp()
+	var texture: Texture2D = null
+	if _current == &"pickaxe":
+		for stage: StringName in CRACKS:
+			if ratio < CRACKS[stage]:
+				texture = PixelSprites.get_texture(stage)
+	_cracks.texture = texture
 
 
 func _draw() -> void:

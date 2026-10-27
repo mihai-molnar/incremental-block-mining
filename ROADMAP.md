@@ -18,15 +18,18 @@ Unpredictable rewards are the strongest hook in the genre.
 - **Combo meter:** +x0.1 per player hit up to x2, dropping after 1s without a hit. Hot Streak raises the cap, Steady Hands the window. Drone hits don't count.
 - **Critical hits:** 2% of player hits break a square outright. Lucky Strike adds 2% per tier.
 - **Diamonds scale after upgrades:** they take 3x the clicks of their cube's squares as Sharp Pickaxe lowers them, instead of a fixed 3x of the base.
-- **Golden events:** a Lucky Cube drifts by every 2-5 minutes. Catching it starts a 30s frenzy: Money x7, Diamond Rush or Drone Overdrive. Lucky Charm brings them sooner, Gold Fever makes frenzies longer. Frenzies are `Frenzy` resources folded in through `Game.add_timed_effect`.
+- **Golden events:** a Lucky Cube drifts by every 2-5 minutes at first, now after every 60-120 squares the player breaks (drones' don't count), so a player can't sit on 1 HP waiting for one. Catching it starts a 30s frenzy: Money x7, Diamond Rush or Drone Overdrive. Lucky Charm brings them sooner, Gold Fever makes frenzies longer. Frenzies are `Frenzy` resources folded in through `Game.add_timed_effect`.
 - **Special squares:** Lightning (row and column), Coin Pouch (4x), Multiplier (2x its cube while unbroken) from chance upgrades. Rocks (2x clicks, worthless, not needed to clear) make up 8% of the deep cubes; Prospector turns them into 3x ore.
 
 ## Phase 3: long-term goals
 
-### Prestige ("Collapse the mine") (done)
-- The tab unlocks at 100M earned in total. Collapsing pays floor(√(run earnings ÷ 1B)) Shards and resets money, upgrades and cubes; Shards, perks, unlocks and stats stay. (It was ÷ 1M at first, which paid ~400 Shards for a 160B run.)
-- Every Shard ever earned adds 10% to all earnings. Shards buy perks kept forever: Head Start, Diamond Tips, Drone Bay, Four-Leaf Clover, Standing Order, and Shard Resonance as the long-term sink.
-- Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, Lucky Cubes sooner.
+### Runs and prestige (done)
+- The goal is longer and longer runs. The pickaxe has HP (100 to start), and every click that hits costs 1, however many squares it breaks. At 0 the run ends: the field collapses and a full-screen run-end screen shows the run's time, clicks, cubes and money (with records), the Shards it paid (∛(run earnings ÷ 50), rounded down) and the perk shop. Start next run resets money, upgrades and cubes; Shards, perks, unlocks and stats stay.
+- During a run: the Whetstone repairs 25 HP (each repair costs 4x the last), Mining Drones are bought one at a time and break after 60 hits (10 at once, each 1.3x the last), and the Unbreakable frenzy makes clicks free.
+- Every Shard ever earned adds 2% to all earnings. Shards buy perks kept forever: Sturdy Handle (+25 max HP per tier, no limit) as the long-term sink, Head Start, Diamond Tips, Drone Bay, Drone Plating, Four-Leaf Clover, Standing Order and Shard Resonance.
+- History: prestige started as a Collapse button that unlocked at 100M earned and paid √(run earnings ÷ 1B). Runs had no end, so they ran into the trillions.
+- Tuned with a bot that plays runs (scratch harness): square-root Shards and a Whetstone at 1.5x per repair fed each other into runs of quadrillions by run 4. With cube-root Shards, x4 repairs, a 2% boost and a smaller Head Start, runs grow from 150 to about 850 clicks over 13 runs. Earnings still jump once runs reach the Bars (each cube tier pays ~5x the last), but HP caps how much that lengthens a run. With Lucky Cubes counted in squares, the bot reaches the Void Cube at run 14 and ~2,000-click runs by run 18; late runs earn ~10^17, so money and stats stop at `Game.MAX_AMOUNT` instead of overflowing.
+- Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, a cheaper first Whetstone.
 
 ### Achievements
 - Milestones that each give a small permanent bonus:

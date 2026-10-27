@@ -9,4 +9,4 @@ price = 5
 price_growth = 2.2
 max_level = 10
 costs_shards = true
-bonus_per_tier = 0.02
+bonus_per_tier = 0.005

@@ -40,6 +40,13 @@ theme_type_variation = &"TitleLabel"
 text = "Paused"
 horizontal_alignment = 1
 
+[node name="EndRunButton" type="Button" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+focus_mode = 0
+text = "End run"
+
 [node name="ResetButton" type="Button" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 0)

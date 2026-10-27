@@ -7,6 +7,9 @@ extends Node2D
 signal mode_changed(mode: Mode)
 ## Emitted on every break-mode click on the field (hit or miss), for cursor animation.
 signal tool_used(hit: bool)
+## Emitted when a click (and the chain reactions it set off), or a drone's hit (`soft`),
+## breaks squares.
+signal squares_broken(count: int, soft: bool)
 
 enum Mode { BREAK, MOVE }
 
@@ -116,7 +119,8 @@ func drone_hit(square: CubeSquare) -> void:
 	_hit_squares([square], true)
 
 
-## Removes every cube at once (the mine collapsing). Play the effects first.
+## Removes every cube at once (the mine collapsing at the end of a run). Play the effects
+## first.
 func clear_field() -> void:
 	if _dragged:
 		_end_drag()
@@ -235,11 +239,17 @@ func _process(delta: float) -> void:
 	_update_hover(point)
 
 
+## A pickaxe click. One that hits anything costs the pickaxe HP, however many squares it
+## hits; a broken pickaxe hits nothing.
 func _break_at(point: Vector2) -> void:
+	if not Game.is_run_active():
+		return
 	var targets := get_squares_in_reach(point)
 	if not targets.is_empty():
 		combo.add_hit()
 	_hit_squares(targets, false)
+	if not targets.is_empty():
+		Game.use_pickaxe()
 	tool_used.emit(not targets.is_empty())
 
 
@@ -424,12 +434,13 @@ func _resolve_click(soft := false) -> void:
 	if not _clicked_breaks.is_empty():
 		var multiplier := Game.get_payout_multiplier() * (1.0 if soft else combo.get_multiplier())
 		var exact := _clicked_value * multiplier + _payout_carry
-		var payout := floori(exact)
+		var payout := floori(minf(exact, Game.MAX_AMOUNT))
 		_payout_carry = exact - payout
 		_update_field_value()
 		Game.add_stat(Game.STAT_SQUARES_BROKEN, _clicked_breaks.size())
 		Game.earn(payout)
 		fx.squares_broken(_clicked_breaks, payout, soft)
+		squares_broken.emit(_clicked_breaks.size(), soft)
 	_clicked_hits = []
 	_clicked_breaks = []
 	_clicked_value = 0

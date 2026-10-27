@@ -26,5 +26,5 @@ func create_icon() -> Control:
 	return create_sprite_icon(&"clover")
 
 
-func modify_lucky_interval(seconds: float, level: int) -> float:
-	return seconds * maxf(1.0 - cut_per_tier * level, 0.1)
+func modify_lucky_interval(squares: float, level: int) -> float:
+	return squares * maxf(1.0 - cut_per_tier * level, 0.1)

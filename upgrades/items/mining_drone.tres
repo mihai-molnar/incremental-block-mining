@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="DroneCountUpgrade" format=3]
+[gd_resource type="Resource" script_class="DroneUpgrade" format=3]
 
-[ext_resource type="Script" path="res://upgrades/drone_count_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Script" path="res://upgrades/drone_upgrade.gd" id="1_upgrade"]
 [ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
 [ext_resource type="Resource" path="res://cubes/types/grey_cube.tres" id="goal_cube"]
 
@@ -13,6 +13,6 @@ cube_type = ExtResource("goal_cube")
 script = ExtResource("1_upgrade")
 title = "Mining Drone"
 price = 150
-price_growth = 3.5
-max_level = 10
+price_growth = 1.3
+max_level = 0
 unlock = SubResource("Resource_unlock")

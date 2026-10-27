@@ -2,6 +2,7 @@ class_name Drone
 extends Node2D
 ## A mining drone. Picks an unbroken square, flies over it and drills it until it breaks,
 ## then moves on to another. Its hits go through the work area, so they pay out like clicks.
+## Each hit costs it one HP, shown on a bar above it; the swarm lets it go at 0.
 ## The node's position is the drill tip.
 
 ## Top speed, and how quickly the drone slows down as it nears its target.
@@ -16,10 +17,19 @@ const ROTOR_FRAME := 0.05
 ## Where the drill tip is in the drone sprite.
 const DRILL_TIP := Vector2(6, 11)
 const SHADOW_COLOR := Color(0, 0, 0, 0.3)
+## The HP bar above the drone: below LOW_HP of its max it turns red.
+const HP_BAR := Rect2(-4, -14, 8, 1)
+const LOW_HP := 0.25
+const HP_COLOR := Color("38b764")
+const LOW_HP_COLOR := Color("e43b44")
+const HP_TRACK_COLOR := Color("333c57")
 
 var swarm: DroneSwarm
 ## Where the drone waits when there's nothing to mine.
 var home := Vector2.ZERO
+## Hits left before it breaks, out of the HP it was launched with.
+var hp := 1
+var max_hp := 1
 
 var _target: CubeSquare
 var _cooldown := 0.0
@@ -36,8 +46,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	# A square that broke and whose cube is gone has been freed along with it.
-	if not is_instance_valid(_target) or not swarm.is_workable(_target):
+	if not Game.is_run_active():
+		# The pickaxe broke: the run is over, so drones head home.
+		_target = null
+	elif not is_instance_valid(_target) or not swarm.is_workable(_target):
+		# A square that broke and whose cube is gone has been freed along with it.
 		_target = swarm.find_target(self)
 	var goal := home if _target == null else _target.global_position - Vector2(0, HOVER_HEIGHT)
 	var distance := global_position.distance_to(goal)
@@ -56,6 +69,10 @@ func get_target() -> CubeSquare:
 
 func _drill() -> void:
 	swarm.work_area.drone_hit(_target)
+	hp -= 1
+	if hp <= 0:
+		swarm.on_drone_spent(self)
+		return
 	if _peck_tween:
 		_peck_tween.kill()
 	_peck = 1.0
@@ -70,3 +87,9 @@ func _draw() -> void:
 	draw_rect(Rect2(-3, 7, 7, 2), SHADOW_COLOR)
 	var sprite := &"drone" if floori(_time / ROTOR_FRAME) % 2 == 0 else &"drone_spin"
 	draw_texture(PixelSprites.get_texture(sprite), -DRILL_TIP + Vector2(0, bob + dip))
+	var ratio := float(hp) / max_hp
+	var bar := HP_BAR
+	bar.position.y += bob + dip
+	draw_rect(bar, HP_TRACK_COLOR)
+	bar.size.x = maxf(roundf(bar.size.x * ratio), 1.0)
+	draw_rect(bar, LOW_HP_COLOR if ratio < LOW_HP else HP_COLOR)

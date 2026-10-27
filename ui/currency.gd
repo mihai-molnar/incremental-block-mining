@@ -4,7 +4,8 @@ class_name Currency
 ## the ".0" (10K). Always rounded down, so the HUD never shows more than you have.
 
 const SHORTEN_FROM := 10_000
-const SUFFIXES: Array[String] = ["K", "M", "B", "T"]
+## Up to quintillions, as far as a 64-bit int goes (9.2Qi).
+const SUFFIXES: Array[String] = ["K", "M", "B", "T", "Qa", "Qi"]
 
 
 static func format(amount: int) -> String:

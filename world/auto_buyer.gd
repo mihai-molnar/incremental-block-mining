@@ -17,7 +17,7 @@ func _process(delta: float) -> void:
 		return
 	_wait = CHECK_INTERVAL
 	var cube_type := Game.auto_buy_cube
-	if cube_type == null or _count_unfinished_cubes() >= Game.get_auto_buy_slots():
+	if cube_type == null or not Game.is_run_active() or _count_unfinished_cubes() >= Game.get_auto_buy_slots():
 		return
 	if Game.try_spend(cube_type.price):
 		Game.deliver_cube(cube_type)

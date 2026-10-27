@@ -50,13 +50,18 @@
 [ext_resource type="Resource" path="res://upgrades/items/multiplier_squares.tres" id="62_multiplier"]
 [ext_resource type="Resource" path="res://upgrades/items/prospector.tres" id="63_prospector"]
 [ext_resource type="Script" path="res://ui/unlock_toast.gd" id="64_unlock_toast"]
-[ext_resource type="Script" path="res://ui/prestige_page.gd" id="65_prestige_page"]
+[ext_resource type="Script" path="res://ui/run_end_screen.gd" id="65_run_end_screen"]
 [ext_resource type="Resource" path="res://upgrades/perks/head_start.tres" id="66_head_start"]
 [ext_resource type="Resource" path="res://upgrades/perks/drone_bay.tres" id="67_drone_bay"]
 [ext_resource type="Resource" path="res://upgrades/perks/standing_order.tres" id="68_standing_order"]
 [ext_resource type="Resource" path="res://upgrades/perks/shard_resonance.tres" id="69_shard_resonance"]
 [ext_resource type="Resource" path="res://upgrades/perks/diamond_tips.tres" id="70_diamond_tips"]
 [ext_resource type="Resource" path="res://upgrades/perks/four_leaf.tres" id="71_four_leaf"]
+[ext_resource type="Resource" path="res://upgrades/perks/sturdy_handle.tres" id="72_sturdy_handle"]
+[ext_resource type="Resource" path="res://upgrades/perks/drone_plating.tres" id="73_drone_plating"]
+[ext_resource type="Resource" path="res://upgrades/items/whetstone.tres" id="74_whetstone"]
+[ext_resource type="Resource" path="res://upgrades/frenzies/unbreakable_frenzy.tres" id="75_unbreakable_frenzy"]
+[ext_resource type="Script" path="res://ui/run_meter.gd" id="76_run_meter"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -79,14 +84,16 @@ script = ExtResource("3_work")
 fx = NodePath("../Fx")
 combo = NodePath("../Combo")
 
-[node name="Drones" type="Node2D" parent="." node_paths=PackedStringArray("work_area")]
+[node name="Drones" type="Node2D" parent="." node_paths=PackedStringArray("work_area", "fx")]
 script = ExtResource("43_swarm")
 work_area = NodePath("../WorkArea")
+fx = NodePath("../Fx")
 
-[node name="LuckyEvent" type="Node2D" parent="." node_paths=PackedStringArray("fx")]
+[node name="LuckyEvent" type="Node2D" parent="." node_paths=PackedStringArray("fx", "work_area")]
 script = ExtResource("52_lucky_event")
 fx = NodePath("../Fx")
-frenzies = Array[ExtResource("53_frenzy")]([ExtResource("54_money_frenzy"), ExtResource("55_diamond_frenzy"), ExtResource("56_drone_frenzy")])
+work_area = NodePath("../WorkArea")
+frenzies = Array[ExtResource("53_frenzy")]([ExtResource("54_money_frenzy"), ExtResource("55_diamond_frenzy"), ExtResource("56_drone_frenzy"), ExtResource("75_unbreakable_frenzy")])
 
 [node name="AutoBuyer" type="Node" parent="." node_paths=PackedStringArray("work_area")]
 script = ExtResource("44_auto_buyer")
@@ -135,12 +142,21 @@ layout_mode = 2
 theme_type_variation = &"MoneyLabel"
 text = "30"
 
-[node name="ComboMeter" type="Control" parent="Hud/Root" node_paths=PackedStringArray("combo")]
+[node name="RunMeter" type="Control" parent="Hud/Root"]
 layout_mode = 0
 offset_left = 8.0
 offset_top = 28.0
 offset_right = 120.0
-offset_bottom = 52.0
+offset_bottom = 50.0
+mouse_filter = 2
+script = ExtResource("76_run_meter")
+
+[node name="ComboMeter" type="Control" parent="Hud/Root" node_paths=PackedStringArray("combo")]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 54.0
+offset_right = 120.0
+offset_bottom = 78.0
 mouse_filter = 2
 script = ExtResource("47_combo_meter")
 combo = NodePath("../../../Combo")
@@ -148,9 +164,9 @@ combo = NodePath("../../../Combo")
 [node name="FrenzyMeter" type="Control" parent="Hud/Root"]
 layout_mode = 0
 offset_left = 8.0
-offset_top = 56.0
+offset_top = 82.0
 offset_right = 160.0
-offset_bottom = 108.0
+offset_bottom = 134.0
 mouse_filter = 2
 script = ExtResource("57_frenzy_meter")
 
@@ -263,31 +279,18 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("60_coin_pouches"), ExtResource("61_lightning"), ExtResource("62_multiplier"), ExtResource("63_prospector"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("58_lucky_charm"), ExtResource("59_gold_fever"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("60_coin_pouches"), ExtResource("61_lightning"), ExtResource("62_multiplier"), ExtResource("63_prospector"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("58_lucky_charm"), ExtResource("59_gold_fever"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer"), ExtResource("74_whetstone")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
 tab_button = NodePath("../../../../../Tabs/UpgradesTab")
-
-[node name="PrestigePage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("fx", "work_area", "tab_button")]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 4
-script = ExtResource("65_prestige_page")
-fx = NodePath("../../../../../../../../Fx")
-work_area = NodePath("../../../../../../../../WorkArea")
-items = Array[ExtResource("7_shop_item")]([ExtResource("66_head_start"), ExtResource("67_drone_bay"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance"), ExtResource("70_diamond_tips"), ExtResource("71_four_leaf")])
-title = "Prestige"
-toggle_action = &"toggle_prestige"
-notify_when_affordable = true
-tab_button = NodePath("../../../../../Tabs/PrestigeTab")
 
 [node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
 layout_mode = 0
 offset_left = -98.0
 offset_top = 6.0
 offset_right = -6.0
-offset_bottom = 72.0
+offset_bottom = 50.0
 mouse_filter = 2
 theme_override_constants/separation = 4
 
@@ -303,12 +306,6 @@ focus_mode = 0
 toggle_mode = true
 text = "[U] Upgrades"
 
-[node name="PrestigeTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
-layout_mode = 2
-focus_mode = 0
-toggle_mode = true
-text = "[P] Prestige"
-
 [node name="ScreenFx" type="CanvasLayer" parent="."]
 layer = 2
 
@@ -320,6 +317,15 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
+
+[node name="RunEnd" type="CanvasLayer" parent="." node_paths=PackedStringArray("fx", "work_area", "drones", "sidebar")]
+layer = 40
+script = ExtResource("65_run_end_screen")
+fx = NodePath("../Fx")
+work_area = NodePath("../WorkArea")
+drones = NodePath("../Drones")
+sidebar = NodePath("../Hud/Root/Sidebar")
+perks = Array[ExtResource("7_shop_item")]([ExtResource("72_sturdy_handle"), ExtResource("66_head_start"), ExtResource("70_diamond_tips"), ExtResource("67_drone_bay"), ExtResource("73_drone_plating"), ExtResource("71_four_leaf"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance")])
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
 

@@ -4,8 +4,9 @@
 
 [resource]
 script = ExtResource("1_upgrade")
+amount = 200
 title = "Head Start"
-price = 1
-price_growth = 3.0
+price = 2
+price_growth = 4.0
 max_level = 4
 costs_shards = true

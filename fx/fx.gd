@@ -14,6 +14,7 @@ const CLEAR_COLOR := Color("73eff7")
 const LUCKY_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("f4f4f4")]
 const BOLT_COLORS: Array[Color] = [Color("f4f4f4"), Color("73eff7"), Color("ffcd75")]
 const COIN_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("ef7d57"), Color("f4f4f4")]
+const METAL_COLORS: Array[Color] = [Color("f4f4f4"), Color("94b0c2"), Color("566c86"), Color("7a4630")]
 
 @export var camera: ShakeCamera
 @export var hud: Hud
@@ -210,26 +211,42 @@ func lucky_caught(at: Vector2, frenzy: Frenzy) -> void:
 	Sfx.play(&"frenzy", 0.0)
 
 
-## The mine collapsing for prestige: every cube on the field shatters at once, under a
-## white-out and a long rumble.
+## The pickaxe out of HP: it shatters at the cursor, and the run is over.
+func pickaxe_broken(at: Vector2) -> void:
+	var shards := _burst(at, METAL_COLORS, 18)
+	shards.speed_min = 60.0
+	shards.speed_max = 170.0
+	shards.lifetime_max = 0.8
+	shards.size_max = 4
+	shards.start()
+	_banner(get_viewport_rect().size / 2.0, [
+		_make_label("PICKAXE BROKE!", CRIT_COLOR),
+		_make_label("The run is over", Color("f4f4f4"), true),
+	], 1.6)
+	flash_screen(0.35)
+	shake(0.7)
+	hitstop(0.12)
+	Sfx.play(&"crit", 0.0, 0.0, 0.7)
+
+
+## A mining drone out of HP falling apart.
+func drone_broken(at: Vector2) -> void:
+	var bits := _burst(at, METAL_COLORS, 8)
+	bits.speed_min = 30.0
+	bits.speed_max = 90.0
+	bits.size_max = 2
+	bits.start()
+	Sfx.play(&"break", 0.1, -6.0)
+
+
+## The mine collapsing at the end of a run: every cube on the field shatters at once,
+## under a white-out and a long rumble.
 func mine_collapsed(cubes: Array[Cube]) -> void:
 	for cube in cubes:
 		cube_exploded(cube)
 	flash_screen(0.7)
 	shake(1.0)
 	Sfx.play(&"collapse", 0.0)
-
-
-## The start of a run after a collapse: the Shards it paid, mid-screen.
-func shards_gained(amount: int, boost: float) -> void:
-	var view := get_viewport_rect().size
-	_banner(view / 2.0, [
-		_make_label("MINE COLLAPSED", Color("f4f4f4")),
-		_make_label("+%d SHARD%s" % [amount, "" if amount == 1 else "S"], CLEAR_COLOR),
-		_make_label("All earnings now +%d%%" % roundi(boost * 100.0), Color("f4f4f4"), true),
-	], 2.5)
-	flash_screen(0.3)
-	Sfx.play(&"frenzy", 0.0)
 
 
 ## The big one: call after the hitstop, right before the cube is removed.
