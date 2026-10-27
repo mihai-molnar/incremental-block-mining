@@ -32,6 +32,12 @@
 [ext_resource type="Script" path="res://world/drone_swarm.gd" id="43_swarm"]
 [ext_resource type="Script" path="res://world/auto_buyer.gd" id="44_auto_buyer"]
 [ext_resource type="PackedScene" path="res://ui/welcome_back.tscn" id="45_welcome"]
+[ext_resource type="Script" path="res://world/combo.gd" id="46_combo"]
+[ext_resource type="Script" path="res://ui/combo_meter.gd" id="47_combo_meter"]
+[ext_resource type="Resource" path="res://upgrades/items/lucky_strike.tres" id="48_lucky_strike"]
+[ext_resource type="Resource" path="res://upgrades/items/hot_streak.tres" id="49_hot_streak"]
+[ext_resource type="Resource" path="res://upgrades/items/steady_hands.tres" id="50_steady_hands"]
+[ext_resource type="Resource" path="res://upgrades/items/clean_sweep.tres" id="51_clean_sweep"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -46,9 +52,13 @@ script = ExtResource("1_bg")
 anchor_mode = 0
 script = ExtResource("2_cam")
 
-[node name="WorkArea" type="Node2D" parent="." node_paths=PackedStringArray("fx")]
+[node name="Combo" type="Node" parent="."]
+script = ExtResource("46_combo")
+
+[node name="WorkArea" type="Node2D" parent="." node_paths=PackedStringArray("fx", "combo")]
 script = ExtResource("3_work")
 fx = NodePath("../Fx")
+combo = NodePath("../Combo")
 
 [node name="Drones" type="Node2D" parent="." node_paths=PackedStringArray("work_area")]
 script = ExtResource("43_swarm")
@@ -100,6 +110,16 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MoneyLabel"
 text = "30"
+
+[node name="ComboMeter" type="Control" parent="Hud/Root" node_paths=PackedStringArray("combo")]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 28.0
+offset_right = 120.0
+offset_bottom = 52.0
+mouse_filter = 2
+script = ExtResource("47_combo_meter")
+combo = NodePath("../../../Combo")
 
 [node name="ModeBar" type="HBoxContainer" parent="Hud/Root"]
 layout_mode = 1
@@ -197,7 +217,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true

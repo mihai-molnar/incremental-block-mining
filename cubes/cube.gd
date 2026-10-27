@@ -74,6 +74,14 @@ func get_squares() -> Array[CubeSquare]:
 	return _squares
 
 
+## What all the cube's squares pay together, broken or not.
+func get_total_value() -> int:
+	var total := 0
+	for square in _squares:
+		total += square.value
+	return total
+
+
 ## Each square's clicks left (0 = broken) and, when it isn't the cube's default, its type.
 ## In grid order, for the save file.
 func get_save_data() -> Array[Dictionary]:

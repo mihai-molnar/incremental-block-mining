@@ -30,6 +30,8 @@ func _ready() -> void:
 		&"drop": _make_drop(),
 		&"click": _make_click(),
 		&"convert": _make_convert(),
+		&"crit": _make_crit(),
+		&"clear": _make_clear(),
 	}
 
 
@@ -116,6 +118,26 @@ func _make_convert() -> AudioStreamWAV:
 	return _render(0.2, func(t: float, _p: float) -> float:
 		var i := mini(int(t / 0.04), notes.size() - 1)
 		return _pulse(t * notes[i], 0.25) * 0.12 * exp(-t * 10.0))
+
+
+## A critical hit: a bright two-note ping over a sharp crack.
+func _make_crit() -> AudioStreamWAV:
+	var noise := _held_noise(2)
+	return _render(0.24, func(t: float, _p: float) -> float:
+		var freq := 1760.0 if t < 0.04 else 2637.0
+		var ping := _pulse(t * freq, 0.25) * 0.2 * exp(-maxf(t - 0.04, 0.0) * 14.0)
+		return ping + noise.call() * 0.45 * exp(-t * 70.0))
+
+
+## A cube cleared for a bonus: a quick rising fanfare that rings out on the last note.
+func _make_clear() -> AudioStreamWAV:
+	var notes := [523.25, 659.25, 783.99, 1046.5, 1318.5]
+	return _render(0.55, func(t: float, _p: float) -> float:
+		var i := mini(int(t / 0.06), notes.size() - 1)
+		var local_t := t - i * 0.06
+		var decay := 6.0 if i == notes.size() - 1 else 14.0
+		var tone := _pulse(t * notes[i], 0.5) * 0.16 + _pulse(t * notes[i] * 2.0, 0.25) * 0.05
+		return tone * exp(-local_t * decay))
 
 
 func _make_click() -> AudioStreamWAV:

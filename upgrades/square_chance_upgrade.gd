@@ -41,9 +41,9 @@ func _describe_square() -> String:
 	if square_type.value_multiplier <= 0.0:
 		parts.append("pays " + Currency.format(square_type.value))
 	elif not is_equal_approx(square_type.value_multiplier, 1.0):
-		parts.append("%sx value" % _format_multiplier(square_type.value_multiplier))
+		parts.append("%sx value" % format_number(square_type.value_multiplier))
 	if square_type.hp_multiplier > 0.0:
-		parts.append("%sx clicks" % _format_multiplier(square_type.hp_multiplier))
+		parts.append("%sx clicks" % format_number(square_type.hp_multiplier))
 	else:
 		parts.append("%d click%s" % [square_type.hp, "" if square_type.hp == 1 else "s"])
 	if square_type.is_explosive():
@@ -53,12 +53,6 @@ func _describe_square() -> String:
 
 static func _format_percent(value: float) -> String:
 	return "%d%%" % roundi(value * 100.0)
-
-
-static func _format_multiplier(multiplier: float) -> String:
-	if is_equal_approx(multiplier, roundf(multiplier)):
-		return str(roundi(multiplier))
-	return str(multiplier)
 
 
 func create_icon() -> Control:

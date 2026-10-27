@@ -23,6 +23,15 @@ const DRONE_HITS_PER_SECOND := 1.5
 const OFFLINE_EFFICIENCY := 0.5
 const OFFLINE_CAP := 2 * 3600
 const OFFLINE_MIN := 60
+## Finishing a cube pays this multiple of its squares' value: 1.25 adds a quarter on top.
+const CLEAR_BONUS := 1.25
+## Each of the player's hits in a row adds COMBO_STEP to the payout multiplier, up to
+## COMBO_CAP. The combo drops when COMBO_WINDOW seconds pass without a hit.
+const COMBO_STEP := 0.1
+const COMBO_CAP := 2.0
+const COMBO_WINDOW := 1.0
+## Chance that one of the player's hits breaks a square outright.
+const CRIT_CHANCE := 0.02
 
 var money: int = STARTING_MONEY
 ## Money still sitting in unbroken squares on the field. Kept current by the work area.
@@ -171,7 +180,12 @@ func get_blast_radius(square_type: SquareType) -> int:
 
 
 ## Clicks needed to break a square of this type inside a cube of that type. Never less than 1.
+## Squares with an hp_multiplier (diamonds) scale off the cube's default square after
+## upgrades, so they stay 3x as tough however sharp the pickaxe gets, and no tougher.
 func get_square_hp(square_type: SquareType, cube_type: CubeType) -> int:
+	if square_type.hp_multiplier > 0.0 and cube_type and square_type != cube_type.square_type:
+		var base_hp := get_square_hp(cube_type.square_type, cube_type)
+		return maxi(roundi(base_hp * square_type.hp_multiplier), 1)
 	var hp := square_type.get_hp(cube_type)
 	for upgrade: Upgrade in _upgrade_levels:
 		hp = upgrade.modify_square_hp(square_type, hp, _upgrade_levels[upgrade])
@@ -200,6 +214,43 @@ func get_auto_buy_slots() -> int:
 	for upgrade: Upgrade in _upgrade_levels:
 		slots = upgrade.modify_auto_buy_slots(slots, _upgrade_levels[upgrade])
 	return maxi(slots, 0)
+
+
+## What finishing a cube pays, as a multiple of its squares' value (1.25 = a quarter more).
+func get_clear_bonus() -> float:
+	var multiplier := CLEAR_BONUS
+	for upgrade: Upgrade in _upgrade_levels:
+		multiplier = upgrade.modify_clear_bonus(multiplier, _upgrade_levels[upgrade])
+	return maxf(multiplier, 1.0)
+
+
+## The money a finished cube pays on top of its squares, which were worth `cube_value`.
+func get_clear_payout(cube_value: int) -> int:
+	return roundi(cube_value * (get_clear_bonus() - 1.0))
+
+
+## Highest payout multiplier the combo meter reaches.
+func get_combo_cap() -> float:
+	var cap := COMBO_CAP
+	for upgrade: Upgrade in _upgrade_levels:
+		cap = upgrade.modify_combo_cap(cap, _upgrade_levels[upgrade])
+	return maxf(cap, 1.0)
+
+
+## Seconds the combo meter waits for the player's next hit before it drops.
+func get_combo_window() -> float:
+	var seconds := COMBO_WINDOW
+	for upgrade: Upgrade in _upgrade_levels:
+		seconds = upgrade.modify_combo_window(seconds, _upgrade_levels[upgrade])
+	return maxf(seconds, 0.1)
+
+
+## Chance (0..1) that one of the player's hits breaks a square outright.
+func get_crit_chance() -> float:
+	var chance := CRIT_CHANCE
+	for upgrade: Upgrade in _upgrade_levels:
+		chance = upgrade.modify_crit_chance(chance, _upgrade_levels[upgrade])
+	return clampf(chance, 0.0, 1.0)
 
 
 # --- Saving -----------------------------------------------------------------
@@ -272,7 +323,8 @@ func _load_game() -> void:
 
 
 ## While the game was closed, the drones kept clearing the auto-buyer's cube at a discount.
-## Works out how many cubes they'd have finished in that time and what that made.
+## Works out how many cubes they'd have finished in that time and what that made, clear
+## bonus included.
 func _estimate_offline_earnings(seconds_away: int) -> void:
 	offline_earnings = 0
 	var cube_type := auto_buy_cube
@@ -282,7 +334,8 @@ func _estimate_offline_earnings(seconds_away: int) -> void:
 	var hits := get_drone_count() * get_drone_hit_rate() * away * OFFLINE_EFFICIENCY
 	var square_type := cube_type.square_type
 	var hits_per_cube := cube_type.get_square_count() * get_square_hp(square_type, cube_type)
-	var profit := cube_type.get_square_count() * square_type.get_value(cube_type) - cube_type.price
+	var cube_value := cube_type.get_square_count() * square_type.get_value(cube_type)
+	var profit := cube_value + get_clear_payout(cube_value) - cube_type.price
 	var cubes := floori(hits / hits_per_cube)
 	if cubes <= 0 or profit <= 0:
 		return

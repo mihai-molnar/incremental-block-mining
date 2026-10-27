@@ -30,6 +30,17 @@ behind as faint outlines until the whole cube is gone.
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
 
+### Combos, crits and clearing cubes
+
+- **Combo:** each click that hits something adds x0.1 to what your clicks pay, up to x2. It
+  drops back to x1 when a second passes without a hit. The meter under the money counter
+  shows the multiplier and the time left. Drone hits don't count toward it and don't get it.
+- **Crits:** 2% of your hits break the square outright, whatever clicks it had left, with a
+  gold flash and "CRIT!". Only squares more than one click from breaking can crit, and
+  drones never do.
+- **Clear bonus:** finishing a cube pays a quarter of its squares' value on top (x1.25),
+  shown as a "CLEAR!" banner. Cubes the drones finish get it too.
+
 ### Saving and time away
 
 Progress saves on its own every 30 seconds, when the window loses focus and when you quit:
@@ -62,9 +73,10 @@ Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5
 | Magma    |  150M |    10x6 |                85 |            9.6M |
 | Void     |    1B |     8x8 |               100 |             64M |
 
-The first seven cubes pay back between 1.6x and 2.7x their price. From Silver on, each cube
-costs 4 to 7 times the one before and pays back a little more, up to 4.1x for the Void Cube, so
-money keeps multiplying into the billions. Jade fits a maxed Big Pickaxe in one hit,
+The first seven cubes pay back between 1.6x and 2.7x their price in squares, or 2x to 3.3x
+with the clear bonus. From Silver on, each cube costs 4 to 7 times the one before and pays
+back a little more, up to 4.1x (5.1x with the bonus) for the Void Cube, so money keeps
+multiplying into the billions. Combos pay more on top of that. Jade fits a maxed Big Pickaxe in one hit,
 Obsidian is big and tough enough that explosives pay off most there, and the shimmering
 Gold Bar and Ruby Bar are the jackpots.
 
@@ -77,12 +89,19 @@ significant digits.
 |-----------------|---------------------------|----------------------------------------------------------------|
 | Diamond Squares | 60                        | 15% of squares on any cube turn into diamonds, which pay 5x and take 3x the clicks |
 | Sharp Pickaxe   | 100, ×1.5 per tier        | Each tier makes squares take 1 click less (never below 1); no tier limit |
+| Lucky Strike    | 150, ×1.8 per tier        | Each tier adds 2% crit chance, up to 20% (9 tiers)             |
 | Big Pickaxe     | 250 / 500 / 1,000         | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
 | Explosive Squares | 75, ×1.6 per tier       | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
 | Blast Radius    | 300 / 900 / 2,700         | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
+| Clean Sweep     | 300, ×3 per tier          | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
+| Steady Hands    | 350, ×2.5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
+| Hot Streak      | 600, ×3 per tier          | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
 | Mining Drone    | 400, ×1.8 per tier        | Each tier adds a drone that flies to squares and hits them 1.5 times a second (10 tiers) |
 | Drone Overclock | 1,000, ×2.2 per tier      | Drones hit 25% faster per tier (10 tiers); listed once you own a Mining Drone |
 | Auto-Buyer      | 1,500 / 6,000 / 24,000    | Keeps 1, then 2, then 3 cubes of your pick on the field; listed once you own a Mining Drone |
+
+A diamond always takes 3x the clicks of the cube's other squares, counted after Sharp
+Pickaxe: when Grey squares drop from 5 clicks to 1, Grey diamonds drop from 15 to 3.
 
 Drones pick the nearest square no other drone is working on and drill it until it breaks.
 Their hits pay out like your clicks, and they set off explosives too. They leave alone the

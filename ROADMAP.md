@@ -12,24 +12,13 @@ builds on the one before. All numbers are starting guesses to tune by playtestin
 
 ## Phase 2: make clicks feel lucky
 
-Unpredictable rewards are the strongest hook in the genre. Build these next.
+Unpredictable rewards are the strongest hook in the genre.
 
-### Clear bonus
-- Finishing a cube pays a bonus, shown as a big "CLEAR! x1.5" popup.
-- An upgrade raises the multiplier per tier.
-- Hook: `modify_clear_bonus(multiplier, level)`, folded by `Game.get_clear_bonus()` and paid in `WorkArea._on_cube_completed`.
-- Fx recipe: `cube_cleared`.
-
-### Combo meter
-- Player hits in quick succession build a payout multiplier up to x3. It falls off after about 1 second without a hit.
-- Drone hits don't count, so active play still pays more than idling.
-- The meter lives in `WorkArea` (or a small `Combo` node) and multiplies the total in `_resolve_click` when the click isn't soft.
-- Show the meter under the money counter.
-- Upgrades: longer decay window, higher cap.
-
-### Critical hits
-- Each player hit has a small chance to break the square outright, with a gold flash and "CRIT".
-- Hook: `modify_crit_chance(chance, level)`. Roll it per square in `_hit_squares`.
+### Done
+- **Clear bonus:** finishing a cube pays x1.25 of its value, with a "CLEAR!" banner. Clean Sweep adds x0.25 per tier.
+- **Combo meter:** +x0.1 per player hit up to x2, dropping after 1s without a hit. Hot Streak raises the cap, Steady Hands the window. Drone hits don't count.
+- **Critical hits:** 2% of player hits break a square outright. Lucky Strike adds 2% per tier.
+- **Diamonds scale after upgrades:** they take 3x the clicks of their cube's squares as Sharp Pickaxe lowers them, instead of a fixed 3x of the base.
 
 ### Golden events
 - Every 2-5 minutes a meteor or "Lucky Cube" drifts across the field. Clicking it starts a 30s frenzy, picked at random from:

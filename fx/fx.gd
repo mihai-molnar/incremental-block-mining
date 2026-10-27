@@ -8,6 +8,8 @@ const POPUP_COLOR := Color("ffcd75")
 const SPARK_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75")]
 const DUST_COLORS: Array[Color] = [Color("566c86"), Color("94b0c2"), Color("333c57")]
 const FIRE_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75"), Color("ffcd75"), Color("ef7d57"), Color("b13e53")]
+const CRIT_COLOR := Color("ef7d57")
+const CLEAR_COLOR := Color("73eff7")
 
 @export var camera: ShakeCamera
 @export var hud: Hud
@@ -15,20 +17,11 @@ const FIRE_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75"), Color("ffcd
 @export var screen_layer: CanvasLayer
 @export var screen_flash: ColorRect
 
-var _popup_settings: LabelSettings
+## Popup text styles by font color; the first one is the gold payout style.
+var _popup_settings := {}
 var _hitstop_depth := 0
 ## Frame of the last explosion boom, so explosions going off together share one.
 var _last_boom_frame := -1
-
-
-func _ready() -> void:
-	_popup_settings = LabelSettings.new()
-	_popup_settings.font = POPUP_FONT
-	_popup_settings.font_size = 16
-	_popup_settings.font_color = POPUP_COLOR
-	_popup_settings.shadow_color = Color("0f1020")
-	_popup_settings.shadow_offset = Vector2(1, 2)
-	_popup_settings.shadow_size = 0
 
 
 # --- Recipes -----------------------------------------------------------------
@@ -55,13 +48,11 @@ func squares_hit(squares: Array[CubeSquare], soft := false) -> void:
 ## Squares broken by one click: each shatters, and the payout shows once, as a total
 ## popup with coins from the middle of the broken squares. Soft breaks (from drones)
 ## don't shake, sound quieter and send fewer coins.
-func squares_broken(squares: Array[CubeSquare], soft := false) -> void:
-	var total := 0
+func squares_broken(squares: Array[CubeSquare], payout: int, soft := false) -> void:
 	var center := Vector2.ZERO
 	for square in squares:
 		var at := square.global_position
 		var type := square.square_type
-		total += square.value
 		center += at
 		_chunks(at, type.outline_color, type.base_color, type.light_color).start()
 		var debris := _burst(at, type.get_debris_colors(), 10 if squares.size() < 4 else 5)
@@ -80,14 +71,83 @@ func squares_broken(squares: Array[CubeSquare], soft := false) -> void:
 		sparks.size_max = 1
 		sparks.start()
 	center /= squares.size()
-	popup_text(center + Vector2(0, -10), "+" + Currency.format(total))
+	popup_text(center + Vector2(0, -10), "+" + Currency.format(payout))
 	if soft:
-		coins(center, total, 3)
+		coins(center, payout, 3)
 		Sfx.play(&"break", 0.1, -8.0)
 		return
-	coins(center, total)
+	coins(center, payout)
 	shake(minf(0.2 + 0.04 * (squares.size() - 1), 0.5))
 	Sfx.play(&"break", 0.1, minf(squares.size() - 1, 4.0))
+
+
+## Squares a click broke outright with a critical hit: a gold flash on each, and one
+## "CRIT!" popup above them. Play it before the break effects of the same click.
+func critical_hits(squares: Array[CubeSquare]) -> void:
+	var center := Vector2.ZERO
+	for square in squares:
+		var at := square.global_position
+		center += at
+		var core := SquareShockwave.new()
+		core.position = at
+		core.start_half_size = 4.0
+		core.end_half_size = 10.0
+		core.thickness = 8.0
+		core.duration = 0.16
+		core.color = Color("f4f4f4")
+		add_child(core)
+		var ring := SquareShockwave.new()
+		ring.position = at
+		ring.start_half_size = 8.0
+		ring.end_half_size = 22.0
+		ring.thickness = 3.0
+		ring.duration = 0.3
+		ring.color = POPUP_COLOR
+		add_child(ring)
+		var sparks := _burst(at, SPARK_COLORS, 12)
+		sparks.speed_min = 110.0
+		sparks.speed_max = 220.0
+		sparks.gravity = 0.0
+		sparks.damping = 5.0
+		sparks.lifetime_min = 0.15
+		sparks.lifetime_max = 0.3
+		sparks.size_max = 2
+		sparks.start()
+	center /= squares.size()
+	var text := "CRIT!" if squares.size() == 1 else "CRIT x%d!" % squares.size()
+	popup_text(center + Vector2(0, -28), text, CRIT_COLOR)
+	shake(0.15)
+	Sfx.play(&"crit", 0.05)
+
+
+## A finished cube's clear bonus: a "CLEAR!" banner with the multiplier and the bonus,
+## and the bonus flying to the money counter. Call it with cube_exploded.
+func cube_cleared(cube: Cube, multiplier: float, bonus: int) -> void:
+	var at := cube.global_position
+	var banner := Node2D.new()
+	add_child(banner)
+	var title := _make_label("CLEAR! x" + Upgrade.format_number(multiplier), CLEAR_COLOR)
+	var amount := _make_label("+" + Currency.format(bonus), POPUP_COLOR)
+	banner.add_child(title)
+	banner.add_child(amount)
+	title.size = title.get_minimum_size()
+	amount.size = amount.get_minimum_size()
+	title.position = Vector2(-title.size.x / 2.0, -title.size.y).round()
+	amount.position = Vector2(-amount.size.x / 2.0, 0).round()
+	# Kept on screen when the cube sits near an edge.
+	var half_width := maxf(title.size.x, amount.size.x) / 2.0 + 4.0
+	at.x = clampf(at.x, half_width, get_viewport_rect().size.x - half_width)
+	banner.position = at.round()
+	banner.scale = Vector2.ONE * 2.0
+	var tween := banner.create_tween()
+	tween.tween_property(banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(banner, "position:y", banner.position.y - 20.0, 1.0) \
+		.set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tween.tween_property(banner, "modulate:a", 0.0, 0.25)
+	tween.tween_callback(banner.queue_free)
+	# The coins wait for the banner to land, so they don't fly over it as it pops.
+	coins(cube.global_position + Vector2(0, 8), bonus, 8, 0.35)
+	Sfx.play(&"clear", 0.0)
 
 
 ## The big one: call after the hitstop, right before the cube is removed.
@@ -245,10 +305,8 @@ func cube_dropped(cube: Cube) -> void:
 
 # --- Building blocks -------------------------------------------------------------
 
-func popup_text(at: Vector2, text: String) -> void:
-	var label := Label.new()
-	label.text = text
-	label.label_settings = _popup_settings
+func popup_text(at: Vector2, text: String, color := POPUP_COLOR) -> void:
+	var label := _make_label(text, color)
 	add_child(label)
 	label.size = label.get_minimum_size()
 	label.pivot_offset = (label.size / 2.0).round()
@@ -262,9 +320,26 @@ func popup_text(at: Vector2, text: String) -> void:
 	tween.tween_callback(label.queue_free)
 
 
+## A label in the popup style (bold, with a drop shadow). Size it once it's in the tree.
+func _make_label(text: String, color: Color) -> Label:
+	if not _popup_settings.has(color):
+		var settings := LabelSettings.new()
+		settings.font = POPUP_FONT
+		settings.font_size = 16
+		settings.font_color = color
+		settings.shadow_color = Color("0f1020")
+		settings.shadow_offset = Vector2(1, 2)
+		settings.shadow_size = 0
+		_popup_settings[color] = settings
+	var label := Label.new()
+	label.text = text
+	label.label_settings = _popup_settings[color]
+	return label
+
+
 ## Sends coins flying from a world position to the HUD money counter, up to `max_count`
-## of them, splitting the value between them.
-func coins(world_at: Vector2, value: int, max_count := 8) -> void:
+## of them, splitting the value between them. They set off after `delay` seconds.
+func coins(world_at: Vector2, value: int, max_count := 8, delay := 0.0) -> void:
 	if hud == null or screen_layer == null:
 		return
 	var count := clampi(value, 1, max_count)
@@ -277,7 +352,7 @@ func coins(world_at: Vector2, value: int, max_count := 8) -> void:
 		remaining -= coin.value
 		screen_layer.add_child(coin)
 		coin.arrived.connect(_on_coin_arrived)
-		coin.launch(from, target, randf_range(0.4, 0.55), i * 0.05)
+		coin.launch(from, target, randf_range(0.4, 0.55), delay + i * 0.05)
 
 
 func flash_screen(alpha: float) -> void:

@@ -80,6 +80,13 @@ static func create_sprite_icon(sprite: StringName) -> Control:
 	return icon
 
 
+## Multipliers and seconds for descriptions: "2" when whole, "1.25" otherwise.
+static func format_number(value: float) -> String:
+	if is_equal_approx(value, roundf(value)):
+		return str(roundi(value))
+	return String.num(value, 2)
+
+
 ## Keeps prices readable: two significant digits from 100 up (1139 -> 1100).
 static func _round_price(value: float) -> int:
 	if value < 100.0:
@@ -123,3 +130,23 @@ func modify_drone_hit_rate(rate: float, _level: int) -> float:
 ## How many cubes the auto-buyer keeps on the field (0 = there's no auto-buyer).
 func modify_auto_buy_slots(slots: int, _level: int) -> int:
 	return slots
+
+
+## Payout multiplier for finishing a cube (1.25 pays a quarter of its value on top).
+func modify_clear_bonus(multiplier: float, _level: int) -> float:
+	return multiplier
+
+
+## Highest payout multiplier the combo meter reaches.
+func modify_combo_cap(cap: float, _level: int) -> float:
+	return cap
+
+
+## Seconds the combo meter waits for the next hit before it drops.
+func modify_combo_window(seconds: float, _level: int) -> float:
+	return seconds
+
+
+## Chance (0..1) that one of the player's hits breaks a square outright.
+func modify_crit_chance(chance: float, _level: int) -> float:
+	return chance
