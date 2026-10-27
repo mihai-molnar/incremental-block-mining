@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SquareChanceUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/square_chance_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://cubes/squares/coin_pouch_square.tres" id="2_square"]
+[ext_resource type="Resource" path="res://cubes/types/blue_cube.tres" id="3_preview"]
+
+[resource]
+script = ExtResource("1_upgrade")
+square_type = ExtResource("2_square")
+chance_per_tier = 0.02
+preview_cube = ExtResource("3_preview")
+title = "Coin Pouches"
+price = 500
+price_growth = 1.7
+max_level = 5

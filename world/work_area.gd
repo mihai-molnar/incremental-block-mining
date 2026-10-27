@@ -19,15 +19,21 @@ const CONVERT_STAGGER := 0.08
 const CHAIN_DELAY := 0.12
 
 
-## An explosive square that broke and is going off. Keeps its own copy of where, since by
+## A square that broke and is going off: an explosive, breaking a ring `radius` squares
+## out, or lightning, breaking its row and column. Keeps its own copy of where, since by
 ## the time a chain reaction reaches it, its cube may be gone.
 class Blast:
 	var at: Vector2
 	var radius: int
+	var lines: bool
+	## Lightning: the cube it was on, which its bolts span at the least.
+	var area: Rect2
 
-	func _init(center: Vector2, reach: int) -> void:
+	func _init(center: Vector2, reach: int, strike_lines := false, cube_area := Rect2()) -> void:
 		at = center
 		radius = reach
+		lines = strike_lines
+		area = cube_area
 
 
 @export var fx: Fx
@@ -50,7 +56,13 @@ var _hovered_squares: Array[CubeSquare] = []
 var _resolving_click := false
 var _clicked_hits: Array[CubeSquare] = []
 var _clicked_breaks: Array[CubeSquare] = []
-## Explosive squares broken since the last blast went off; the next wave of the chain.
+## What the squares broken by the click being resolved pay, multiplier squares included.
+var _clicked_value := 0
+## Each cube's value multiplier as the click being resolved first reached it, so breaking
+## a multiplier square doesn't take the bonus off the squares broken alongside it.
+var _cube_bonus := {}
+## Explosive and lightning squares broken since the last blast went off; the next wave
+## of the chain.
 var _pending_blasts: Array[Blast] = []
 
 
@@ -144,6 +156,20 @@ func get_squares_in_blast(center: Vector2, radius: int) -> Array[CubeSquare]:
 	return result
 
 
+## Unbroken squares a lightning square at the point strikes: every square whose center
+## lies within half a square of its row or column, on any cube.
+func get_squares_in_lines(center: Vector2) -> Array[CubeSquare]:
+	var result: Array[CubeSquare] = []
+	for cube in get_cubes():
+		if cube.is_complete():
+			continue
+		for square in cube.get_squares():
+			var offset := square.global_position - center
+			if not square.is_broken() and (absf(offset.x) < CubeSquare.HALF or absf(offset.y) < CubeSquare.HALF):
+				result.append(square)
+	return result
+
+
 ## Topmost cube under the point that can still be interacted with.
 func get_cube_at(global_point: Vector2) -> Cube:
 	for i in range(get_child_count() - 1, -1, -1):
@@ -217,7 +243,7 @@ func _hit_squares(targets: Array[CubeSquare], soft: bool) -> void:
 		if square.hp > 1 and randf() < crit_chance:
 			damage = square.hp
 			crits.append(square)
-		(square.get_parent() as Cube).hit_square(square, damage)
+		_hit(square, damage)
 	_detonate(_take_pending_blasts())
 	_resolving_click = false
 	if not crits.is_empty():
@@ -237,9 +263,32 @@ func _chain_blasts(blasts: Array[Blast], soft: bool) -> void:
 ## Breaks every square each blast reaches, whatever clicks it had left.
 func _detonate(blasts: Array[Blast]) -> void:
 	for blast in blasts:
-		fx.explosion(blast.at, blast.radius)
-		for square in get_squares_in_blast(blast.at, blast.radius):
-			(square.get_parent() as Cube).hit_square(square, square.hp)
+		var struck: Array[CubeSquare] = []
+		if blast.lines:
+			struck = get_squares_in_lines(blast.at)
+			fx.lightning(blast.at, _get_bolt_span(blast, struck))
+		else:
+			struck = get_squares_in_blast(blast.at, blast.radius)
+			fx.explosion(blast.at, blast.radius)
+		for square in struck:
+			_hit(square, square.hp)
+
+
+## How far a lightning blast's bolts reach: across its cube and every square they struck.
+func _get_bolt_span(blast: Blast, struck: Array[CubeSquare]) -> Rect2:
+	var span := blast.area if blast.area.has_area() else Rect2(blast.at, Vector2.ZERO)
+	for square in struck:
+		span = span.merge(Rect2(square.global_position - Vector2.ONE * CubeSquare.HALF, Vector2.ONE * CubeSquare.SIZE))
+	return span
+
+
+## Hits a square as part of the click being resolved. The click's first hit on each cube
+## notes the cube's value multiplier for every square the click breaks there.
+func _hit(square: CubeSquare, damage: int) -> void:
+	var cube := square.get_parent() as Cube
+	if not _cube_bonus.has(cube):
+		_cube_bonus[cube] = cube.get_value_multiplier()
+	cube.hit_square(square, damage)
 
 
 func _take_pending_blasts() -> Array[Blast]:
@@ -307,16 +356,18 @@ func _on_cube_landed(cube: Cube) -> void:
 	fx.cube_landed(cube)
 	var delay := CONVERT_DELAY
 	for square in cube.get_squares():
-		var new_type := Game.roll_square_type(cube.cube_type)
+		var new_type := Game.roll_square_type(cube.cube_type, square.square_type)
 		if new_type != square.square_type:
 			get_tree().create_timer(delay).timeout.connect(_convert_square.bind(square, new_type))
 			delay += CONVERT_STAGGER
 
 
 func _convert_square(square: CubeSquare, type: SquareType) -> void:
-	if not is_instance_valid(square) or square.is_broken():
+	if not is_instance_valid(square) or square.is_broken() or (square.get_parent() as Cube).is_complete():
 		return
 	square.convert_to(type)
+	# A rock turned into ore is one more square the cube needs broken.
+	(square.get_parent() as Cube).recount()
 	fx.square_converted(square.global_position, type)
 	_update_field_value()
 
@@ -328,11 +379,16 @@ func _on_square_hit(_cube: Cube, square: CubeSquare) -> void:
 		_resolve_click()
 
 
-func _on_square_broken(_cube: Cube, square: CubeSquare) -> void:
+func _on_square_broken(cube: Cube, square: CubeSquare) -> void:
 	_clicked_breaks.append(square)
+	var bonus: float = _cube_bonus.get(cube, cube.get_value_multiplier())
+	_clicked_value += roundi(square.value * bonus)
 	var radius := Game.get_blast_radius(square.square_type)
 	if radius > 0:
 		_pending_blasts.append(Blast.new(square.global_position, radius))
+	if square.square_type.strikes_lines:
+		var area := Rect2(cube.global_position - cube.get_size() / 2.0, cube.get_size())
+		_pending_blasts.append(Blast.new(square.global_position, 0, true, area))
 	if not _resolving_click:
 		_resolve_click()
 
@@ -347,16 +403,15 @@ func _resolve_click(soft := false) -> void:
 	if not _clicked_hits.is_empty():
 		fx.squares_hit(_clicked_hits, soft)
 	if not _clicked_breaks.is_empty():
-		var total := 0
-		for square in _clicked_breaks:
-			total += square.value
-		total = roundi(total * Game.get_payout_multiplier())
+		var total := roundi(_clicked_value * Game.get_payout_multiplier())
 		var payout := total if soft else combo.multiply(total)
 		_update_field_value()
 		Game.earn(payout)
 		fx.squares_broken(_clicked_breaks, payout, soft)
 	_clicked_hits = []
 	_clicked_breaks = []
+	_clicked_value = 0
+	_cube_bonus.clear()
 
 
 ## A finished cube pays its clear bonus right away; the banner shows with the explosion.

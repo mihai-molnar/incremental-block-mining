@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SquareChanceUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/square_chance_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://cubes/squares/ore_square.tres" id="2_square"]
+[ext_resource type="Resource" path="res://cubes/types/meteorite.tres" id="3_preview"]
+[ext_resource type="Resource" path="res://cubes/squares/rock_square.tres" id="4_rock"]
+
+[resource]
+script = ExtResource("1_upgrade")
+square_type = ExtResource("2_square")
+from_square_type = ExtResource("4_rock")
+chance = 1.0
+description = "Rocks in new cubes turn into ore worth 3x a square"
+preview_cube = ExtResource("3_preview")
+title = "Prospector"
+price = 20000

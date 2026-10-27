@@ -50,6 +50,9 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 
 - A `SquareType` can set `hp_multiplier` or `value_multiplier` above 0. It then scales off the containing cube's default square, which is how diamonds give 5x value and 3x clicks on any cube. `Game.get_square_hp` multiplies the default square's hp *after* upgrades, so Sharp Pickaxe shrinks diamonds in proportion.
 - A `SquareType` with `blast_radius` above 0 is explosive, and its `emblem` names a `PixelSprites` sprite drawn on the tile.
+- Other `SquareType` flags: `strikes_lines` (lightning: breaks its row and column across lined-up cubes), `cube_value_bonus` (multiplier: its cube pays that much more while it's unbroken), `coin_shower` (coin pouch fx) and `required` (false for rocks: `Cube.is_complete` ignores them and drones skip them).
+- A `CubeType` can set `mixed_square_type`/`mixed_chance`, so some squares start as another type (rocks in the deep cubes). `Game.roll_square_type(cube_type, current)` starts from that type, and `SquareChanceUpgrade.from_square_type` converts from it (Prospector: rock to ore).
+- Keep diamonds the toughest and richest square: other square types stay below 3x clicks and 5x value.
 - Shop contents live in `main.tscn`, in the `items` arrays of the `ItemListPage` nodes under `Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages`. A new cube or upgrade needs a `.tres` file plus an entry there.
 
 **`Game` autoload (`autoload/game.gd`) is the rules engine.**
@@ -73,7 +76,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - `Game.reset_progress` deletes the file and clears state; the pause menu then reloads the scene.
 
 **Drones and the auto-buyer.**
-- `DroneSwarm` (under `Main`, drawn above `WorkArea`) keeps `Game.get_drone_count()` `Drone`s alive. Each drone takes the nearest unbroken square no other drone has (`find_target`), skipping the held cube.
+- `DroneSwarm` (under `Main`, drawn above `WorkArea`) keeps `Game.get_drone_count()` `Drone`s alive. Each drone takes the nearest unbroken square no other drone has (`find_target`), skipping the held cube, rocks, and multiplier squares while their cube has other squares left.
 - A drone hit goes through `WorkArea.drone_hit`, which resolves it like a click with `soft` effects: no shake, quieter sound, fewer coins. The cursor doesn't swing for it.
 - `AutoBuyer` checks every 0.5s and buys `Game.auto_buy_cube` (spend plus `deliver_cube`) while fewer unfinished cubes than `Game.get_auto_buy_slots()` are on the field.
 - The shop row shows an Auto toggle when `ShopItem.can_auto_buy()` is true; `CubeShopItem` sets `Game.auto_buy_cube`, which allows only one pick.
@@ -84,7 +87,8 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 3. `WorkArea.spawn_cube` spawns the cube.
 4. When `Cube.landed` fires, `WorkArea` converts squares through `Game.roll_square_type`, staggered so each conversion pops.
 5. In break mode, `WorkArea._break_at` adds a hit to the `Combo` node (if it hit anything), then hits every square that `get_squares_in_reach` returns, while `_resolving_click` is set. Each square rolls `Game.get_crit_chance()`; a crit deals the square's remaining hp and plays `Fx.critical_hits`. Drone (`soft`) hits never crit.
-6. Explosives the click broke go off in the same click (`WorkArea._detonate`), breaking every square `get_squares_in_blast` returns, across cubes. Explosives caught in a blast are the next link of the chain, set off `CHAIN_DELAY` later and resolved like a click of their own.
+6. Explosives the click broke go off in the same click (`WorkArea._detonate`), breaking every square `get_squares_in_blast` returns, across cubes. Lightning squares are blasts too, breaking what `get_squares_in_lines` returns. Explosives and lightning caught in a blast are the next link of the chain, set off `CHAIN_DELAY` later and resolved like a click of their own.
+   Every hit inside a resolution goes through `WorkArea._hit`, which notes each cube's `get_value_multiplier()` on first contact. Breaks pay `square.value` times that snapshot, so a click that breaks a multiplier square still pays it on everything it broke.
 7. Hits and breaks are collected and resolved once per click: one `Game.earn`, one `Fx.squares_hit`/`squares_broken`, one sound. A Big Pickaxe click that breaks 36 squares produces one payout popup, not 36. Non-soft payouts go through `Combo.multiply`, which carries rounding leftovers to the next payout. Chain links keep the `soft` flag of the click that started them.
 8. The last square emits `Cube.completed`. `WorkArea` pays the clear bonus (`Game.get_clear_payout` of `Cube.get_total_value`) right away, then plays a short hitstop, the explosion fx, the `cube_cleared` banner, and `queue_free`.
 

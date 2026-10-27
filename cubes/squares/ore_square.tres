@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"ore"
+display_name = "Ore"
+hp = 2
+hp_multiplier = 1.0
+value = 2
+value_multiplier = 3.0
+emblem = &"ore"
+outline_color = Color(0.058824, 0.062745, 0.12549, 1)
+shadow_color = Color(0.239216, 0.207843, 0.188235, 1)
+base_color = Color(0.419608, 0.372549, 0.341176, 1)
+light_color = Color(0.54902, 0.501961, 0.466667, 1)
+shine_color = Color(0.658824, 0.611765, 0.572549, 1)

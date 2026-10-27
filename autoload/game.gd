@@ -181,9 +181,10 @@ func set_auto_buy_cube(cube_type: CubeType) -> void:
 
 # --- Rules (every owned upgrade and running timed effect gets a say) ---------------
 
-## Picks the type for one square of a newly landed cube.
-func roll_square_type(cube_type: CubeType) -> SquareType:
-	var result := cube_type.square_type
+## Picks the type for one square of a newly landed cube, which started out as `current`
+## (the cube's default square, or a rock).
+func roll_square_type(cube_type: CubeType, current: SquareType) -> SquareType:
+	var result := current
 	for modifier: Upgrade in _modifiers:
 		result = modifier.modify_square_type(cube_type, result, _modifiers[modifier])
 	return result

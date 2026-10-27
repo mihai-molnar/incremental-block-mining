@@ -86,10 +86,15 @@ Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5
 | Magma    |  150M |    10x6 |                85 |            9.6M |
 | Void     |    1B |     8x8 |               100 |             64M |
 
+From Silver on, about 8% of each cube's squares are rock, except in the two Bars. Rocks
+take twice the clicks and pay nothing, but the cube is done without them: they crumble when
+its last other square breaks, and drones leave them alone. Prospector turns them into ore
+worth 3x a square.
+
 The first seven cubes pay back between 1.6x and 2.7x their price in squares, or 2x to 3.3x
 with the clear bonus. From Silver on, each cube costs 4 to 7 times the one before and pays
-back a little more, up to 4.1x (5.1x with the bonus) for the Void Cube, so money keeps
-multiplying into the billions. Combos pay more on top of that. Jade fits a maxed Big Pickaxe in one hit,
+back a little more, up to 3.8x (4.7x with the bonus) for the Void Cube counting its rocks as
+worthless, so money keeps multiplying into the billions. Combos pay more on top of that. Jade fits a maxed Big Pickaxe in one hit,
 Obsidian is big and tough enough that explosives pay off most there, and the shimmering
 Gold Bar and Ruby Bar are the jackpots.
 
@@ -106,6 +111,10 @@ significant digits.
 | Big Pickaxe     | 250 / 500 / 1,000         | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
 | Explosive Squares | 75, ×1.6 per tier       | Each tier turns 1% more squares into explosives, up to 10% (10 tiers) |
 | Blast Radius    | 300 / 900 / 2,700         | Explosions reach 1 more square per tier (3 tiers); listed once you own Explosive Squares |
+| Coin Pouches    | 500, ×1.7 per tier        | Each tier turns 2% more squares into coin pouches, up to 10% (5 tiers) |
+| Lightning Squares | 2,000, ×2 per tier      | Each tier turns 1% more squares into lightning, up to 5% (5 tiers) |
+| Multiplier Squares | 3,000, ×2.5 per tier   | Each tier turns 1% more squares into multipliers, up to 3% (3 tiers) |
+| Prospector      | 20,000                    | Rocks in new cubes turn into ore, worth 3x a square            |
 | Clean Sweep     | 300, ×3 per tier          | Each tier adds x0.25 to the clear bonus, up to x3.25 (8 tiers) |
 | Steady Hands    | 350, ×2.5 per tier        | Each tier gives combos 0.25s more between hits, up to 2s (4 tiers) |
 | Hot Streak      | 600, ×3 per tier          | Each tier raises the combo cap by x0.5, up to x4 (4 tiers)     |
@@ -130,6 +139,17 @@ An explosive square breaks in one click and blows up every square around it, pay
 of them, however many clicks they had left. Explosives caught in a blast go off a moment
 later, so they chain. Blasts also reach squares on other cubes that touch, so drag cubes
 together before you set one off.
+
+The other special squares:
+
+| Square     | Clicks | Pays | What it does |
+|------------|-------:|-----:|--------------|
+| Lightning  | 1      | 1x   | Breaks every square in its row and column, on its cube and on any cube lined up with it. Explosives and lightning it hits go off next, like a chain |
+| Coin Pouch | 1x     | 4x   | Bursts in a fountain of coins |
+| Multiplier | 1x     | 1x   | While it's unbroken, every square on its cube pays 2x (a green frame marks the cube). Break it last; drones do |
+| Ore        | 1x     | 3x   | What Prospector turns rocks into |
+
+Diamonds stay the toughest and richest: 3x the clicks and 5x the value.
 
 The shop won't sell you an upgrade if paying for it would leave you unable to afford the
 cheapest cube. Money still sitting in unbroken squares counts toward that.

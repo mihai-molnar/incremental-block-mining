@@ -9,13 +9,20 @@ func get_title() -> String:
 	return cube_type.display_name
 
 
-## Squares, clicks per square (after upgrades) and payout, one per line.
+## Squares, clicks per square (after upgrades) and payout, one per line. Cubes with rocks
+## say how many, and their total leaves the rocks out.
 func get_description() -> String:
 	var count := cube_type.get_square_count()
 	var clicks := Game.get_square_hp(cube_type.square_type, cube_type)
 	var each := cube_type.square_type.get_value(cube_type)
-	return "%d squares\n%d click%s each\nPays %s each (%s total)" % [
-		count, clicks, "" if clicks == 1 else "s", Currency.format(each), Currency.format(each * count)]
+	var squares := "%d squares" % count
+	var total := Currency.format(each * count)
+	var mixed := cube_type.mixed_square_type
+	if mixed and cube_type.mixed_chance > 0.0:
+		squares += " (%d%% %s)" % [roundi(cube_type.mixed_chance * 100.0), mixed.display_name.to_lower()]
+		total = "~" + Currency.format(roundi(each * count * (1.0 - cube_type.mixed_chance)))
+	return "%s\n%d click%s each\nPays %s each (%s total)" % [
+		squares, clicks, "" if clicks == 1 else "s", Currency.format(each), total]
 
 
 func get_price() -> int:

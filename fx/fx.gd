@@ -12,6 +12,8 @@ const FIRE_COLORS: Array[Color] = [Color("f4f4f4"), Color("ffcd75"), Color("ffcd
 const CRIT_COLOR := Color("ef7d57")
 const CLEAR_COLOR := Color("73eff7")
 const LUCKY_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("f4f4f4")]
+const BOLT_COLORS: Array[Color] = [Color("f4f4f4"), Color("73eff7"), Color("ffcd75")]
+const COIN_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("ef7d57"), Color("f4f4f4")]
 
 @export var camera: ShakeCamera
 @export var hud: Hud
@@ -22,8 +24,10 @@ const LUCKY_COLORS: Array[Color] = [Color("ffcd75"), Color("ffcd75"), Color("f4f
 ## Popup text styles by font color and size.
 var _popup_settings := {}
 var _hitstop_depth := 0
-## Frame of the last explosion boom, so explosions going off together share one.
+## Frame of the last explosion boom and lightning zap, so ones going off together
+## share a single sound and flash.
 var _last_boom_frame := -1
+var _last_zap_frame := -1
 
 
 # --- Recipes -----------------------------------------------------------------
@@ -49,13 +53,18 @@ func squares_hit(squares: Array[CubeSquare], soft := false) -> void:
 
 ## Squares broken by one click: each shatters, and the payout shows once, as a total
 ## popup with coins from the middle of the broken squares. Soft breaks (from drones)
-## don't shake, sound quieter and send fewer coins.
+## don't shake, sound quieter and send fewer coins. Coin pouches burst in a fountain of
+## coins with a jingle, however they broke.
 func squares_broken(squares: Array[CubeSquare], payout: int, soft := false) -> void:
 	var center := Vector2.ZERO
+	var pouches := 0
 	for square in squares:
 		var at := square.global_position
 		var type := square.square_type
 		center += at
+		if type.coin_shower:
+			pouches += 1
+			_coin_fountain(at)
 		_chunks(at, type.outline_color, type.base_color, type.light_color).start()
 		var debris := _burst(at, type.get_debris_colors(), 10 if squares.size() < 4 else 5)
 		debris.speed_min = 50.0
@@ -74,11 +83,17 @@ func squares_broken(squares: Array[CubeSquare], payout: int, soft := false) -> v
 		sparks.start()
 	center /= squares.size()
 	popup_text(center + Vector2(0, -10), "+" + Currency.format(payout))
+	if pouches > 0:
+		coins(center, payout, 8 + 6 * mini(pouches, 2))
+		for i in 4:
+			get_tree().create_timer(i * 0.07).timeout.connect(Sfx.play.bind(&"coin", 0.12, -3.0))
 	if soft:
-		coins(center, payout, 3)
+		if pouches == 0:
+			coins(center, payout, 3)
 		Sfx.play(&"break", 0.1, -8.0)
 		return
-	coins(center, payout)
+	if pouches == 0:
+		coins(center, payout)
 	shake(minf(0.2 + 0.04 * (squares.size() - 1), 0.5))
 	Sfx.play(&"break", 0.1, minf(squares.size() - 1, 4.0))
 
@@ -289,6 +304,36 @@ func explosion(at: Vector2, radius: int) -> void:
 		Sfx.play(&"blast", 0.1)
 
 
+## A lightning square going off: crackling bolts along its row and column across `span`,
+## sparks where they cross, and a kick of shake. Lightning in the same frame shares one
+## zap and flash.
+func lightning(at: Vector2, span: Rect2) -> void:
+	var ends: Array[Vector2] = [
+		Vector2(span.position.x, at.y), Vector2(span.end.x, at.y),
+		Vector2(at.x, span.position.y), Vector2(at.x, span.end.y),
+	]
+	for i in range(0, ends.size(), 2):
+		var bolt := LightningBolt.new()
+		bolt.from = ends[i]
+		bolt.to = ends[i + 1]
+		add_child(bolt)
+	var sparks := _burst(at, BOLT_COLORS, 16)
+	sparks.speed_min = 80.0
+	sparks.speed_max = 200.0
+	sparks.gravity = 0.0
+	sparks.damping = 5.0
+	sparks.lifetime_min = 0.15
+	sparks.lifetime_max = 0.35
+	sparks.size_max = 2
+	sparks.start()
+	shake(0.35)
+	var frame := Engine.get_process_frames()
+	if frame != _last_zap_frame:
+		_last_zap_frame = frame
+		flash_screen(0.12)
+		Sfx.play(&"zap", 0.08)
+
+
 ## A square turning into another type (e.g. from an upgrade).
 func square_converted(at: Vector2, type: SquareType) -> void:
 	var sparkles := _burst(at, [type.shine_color, type.light_color, Color.WHITE], 8)
@@ -457,6 +502,22 @@ func _burst(at: Vector2, colors: Array[Color], amount: int) -> PixelBurst:
 	burst.amount = amount
 	add_child(burst)
 	return burst
+
+
+## Coins spraying up out of a broken coin pouch and raining back down.
+func _coin_fountain(at: Vector2) -> void:
+	var fountain := _burst(at, COIN_COLORS, 24)
+	fountain.direction = Vector2.UP
+	fountain.spread = 0.7
+	fountain.speed_min = 90.0
+	fountain.speed_max = 190.0
+	fountain.gravity = 420.0
+	fountain.damping = 0.5
+	fountain.lifetime_min = 0.5
+	fountain.lifetime_max = 0.9
+	fountain.size_min = 2
+	fountain.size_max = 3
+	fountain.start()
 
 
 func _chunks(at: Vector2, outline: Color, fill: Color, highlight: Color) -> TileChunks:

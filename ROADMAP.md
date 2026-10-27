@@ -10,23 +10,16 @@ builds on the one before. All numbers are starting guesses to tune by playtestin
 - Upgrade prices that multiply per tier (`price_growth`).
 - Eight more cubes after the Gold Bar, from Silver (12K) to Void (1B).
 
-## Phase 2: make clicks feel lucky
+## Phase 2: make clicks feel lucky (done)
 
 Unpredictable rewards are the strongest hook in the genre.
 
-### Done
 - **Clear bonus:** finishing a cube pays x1.25 of its value, with a "CLEAR!" banner. Clean Sweep adds x0.25 per tier.
 - **Combo meter:** +x0.1 per player hit up to x2, dropping after 1s without a hit. Hot Streak raises the cap, Steady Hands the window. Drone hits don't count.
 - **Critical hits:** 2% of player hits break a square outright. Lucky Strike adds 2% per tier.
 - **Diamonds scale after upgrades:** they take 3x the clicks of their cube's squares as Sharp Pickaxe lowers them, instead of a fixed 3x of the base.
 - **Golden events:** a Lucky Cube drifts by every 2-5 minutes. Catching it starts a 30s frenzy: Money x7, Diamond Rush or Drone Overdrive. Lucky Charm brings them sooner, Gold Fever makes frenzies longer. Frenzies are `Frenzy` resources folded in through `Game.add_timed_effect`.
-
-### More special squares
-These are `SquareType` resources. Each needs a `SquareChanceUpgrade` to unlock it, plus a little code where noted.
-- **Lightning:** breaking it clears its whole row and column. It's like a blast with a cross shape, so add a `blast_shape` to `SquareType` and a matching query to `WorkArea`.
-- **Multiplier:** while unbroken, doubles the value of every square on its cube. Breaking it last is the trick.
-- **Coin pouch:** pays a lump sum worth several squares.
-- **Rock:** tough and worthless, so the player has to choose where to click. Comes with an upgrade that turns rocks into ore.
+- **Special squares:** Lightning (row and column), Coin Pouch (4x), Multiplier (2x its cube while unbroken) from chance upgrades. Rocks (2x clicks, worthless, not needed to clear) make up 8% of the deep cubes; Prospector turns them into 3x ore.
 
 ## Phase 3: long-term goals
 

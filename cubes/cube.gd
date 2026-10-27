@@ -14,6 +14,8 @@ signal landed(cube: Cube)
 const SHADOW_OFFSET := Vector2(2, 3)
 const LIFTED_SHADOW_OFFSET := Vector2(5, 8)
 const SHADOW_COLOR := Color(0, 0, 0, 0.35)
+## Frame around a cube a multiplier square is boosting.
+const BOOST_COLOR := Color("a7f070")
 
 var cube_type: CubeType
 
@@ -24,6 +26,7 @@ var hovered := false:
 			queue_redraw()
 
 var _squares: Array[CubeSquare] = []
+## Required squares (see SquareType.required) still unbroken.
 var _remaining := 0
 var _shadow_offset := SHADOW_OFFSET
 var _has_landed := false
@@ -36,11 +39,14 @@ func setup(type: CubeType) -> void:
 	for y in type.grid_size.y:
 		for x in type.grid_size.x:
 			var square := CubeSquare.new()
-			square.setup(type.square_type, Vector2i(x, y), type)
+			var square_type := type.square_type
+			if type.mixed_square_type and randf() < type.mixed_chance:
+				square_type = type.mixed_square_type
+			square.setup(square_type, Vector2i(x, y), type)
 			square.position = Vector2(x + 0.5, y + 0.5) * CubeSquare.SIZE - size / 2.0
 			add_child(square)
 			_squares.append(square)
-	_remaining = _squares.size()
+	recount()
 
 
 func get_size() -> Vector2:
@@ -53,8 +59,34 @@ func get_rect() -> Rect2:
 	return Rect2(position - size / 2.0, size)
 
 
+## Done once every required square is broken. Rocks left over crumble with it.
 func is_complete() -> bool:
 	return _remaining == 0
+
+
+## Recounts the required squares left, after squares changed type.
+func recount() -> void:
+	_remaining = _squares.filter(func(square: CubeSquare) -> bool:
+		return square.square_type.required and not square.is_broken()).size()
+	queue_redraw()
+
+
+## What its squares pay right now: x1, plus each unbroken multiplier square's bonus.
+func get_value_multiplier() -> float:
+	var multiplier := 1.0
+	for square in _squares:
+		if not square.is_broken():
+			multiplier += square.square_type.cube_value_bonus
+	return multiplier
+
+
+## Whether any required square that isn't a multiplier is still unbroken. Drones leave
+## multipliers alone until it's false.
+func has_regular_squares_left() -> bool:
+	for square in _squares:
+		if not square.is_broken() and square.square_type.required and square.square_type.cube_value_bonus <= 0.0:
+			return true
+	return false
 
 
 func has_point(global_point: Vector2) -> bool:
@@ -103,7 +135,7 @@ func load_save_data(squares: Array) -> void:
 			continue
 		var type := Game.load_saved_resource(entry.get("type")) as SquareType
 		_squares[i].restore(type if type else cube_type.square_type, int(entry.get("hp", 1)))
-	_remaining = _squares.filter(func(square: CubeSquare) -> bool: return not square.is_broken()).size()
+	recount()
 	_has_landed = true
 
 
@@ -114,7 +146,8 @@ func hit_square(square: CubeSquare, damage := 1) -> bool:
 	var broke := square.hit(damage)
 	square_hit.emit(self, square)
 	if broke:
-		_remaining -= 1
+		if square.square_type.required:
+			_remaining -= 1
 		square_broken.emit(self, square)
 		queue_redraw()
 		if _remaining == 0:
@@ -194,13 +227,17 @@ func _draw() -> void:
 		if not square.is_broken():
 			var rect := Rect2(square.position - Vector2.ONE * CubeSquare.HALF, Vector2.ONE * CubeSquare.SIZE)
 			draw_rect(Rect2(rect.position + _shadow_offset, rect.size), SHADOW_COLOR)
+	if get_value_multiplier() > 1.0 and not is_complete():
+		_draw_frame(Rect2(-get_size() / 2.0, get_size()).grow(1), BOOST_COLOR)
 	if hovered:
-		var size := get_size()
-		var frame := Rect2(-size / 2.0, size).grow(2)
-		for side in [
-			Rect2(frame.position, Vector2(frame.size.x, 1)),
-			Rect2(frame.position + Vector2(0, frame.size.y - 1), Vector2(frame.size.x, 1)),
-			Rect2(frame.position, Vector2(1, frame.size.y)),
-			Rect2(frame.position + Vector2(frame.size.x - 1, 0), Vector2(1, frame.size.y)),
-		]:
-			draw_rect(side, Color(1, 1, 1, 0.85))
+		_draw_frame(Rect2(-get_size() / 2.0, get_size()).grow(2), Color(1, 1, 1, 0.85))
+
+
+func _draw_frame(frame: Rect2, color: Color) -> void:
+	for side in [
+		Rect2(frame.position, Vector2(frame.size.x, 1)),
+		Rect2(frame.position + Vector2(0, frame.size.y - 1), Vector2(frame.size.x, 1)),
+		Rect2(frame.position, Vector2(1, frame.size.y)),
+		Rect2(frame.position + Vector2(frame.size.x - 1, 0), Vector2(1, frame.size.y)),
+	]:
+		draw_rect(side, color)

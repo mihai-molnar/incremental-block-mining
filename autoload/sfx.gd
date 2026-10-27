@@ -34,6 +34,7 @@ func _ready() -> void:
 		&"clear": _make_clear(),
 		&"lucky": _make_lucky(),
 		&"frenzy": _make_frenzy(),
+		&"zap": _make_zap(),
 	}
 
 
@@ -164,6 +165,15 @@ func _make_frenzy() -> AudioStreamWAV:
 		for note: float in chord:
 			sum += (_pulse(t * note, 0.5) + _pulse(t * note * 1.006, 0.5)) * 0.04
 		return sum * exp(-(t - 0.2) * 3.5))
+
+
+## A lightning square: a buzzing tone that sweeps down under a stuttering crackle.
+func _make_zap() -> AudioStreamWAV:
+	var noise := _held_noise(1)
+	return _render(0.32, func(t: float, _p: float) -> float:
+		var buzz := _square(_sweep(t, 1600.0, 180.0, 0.32)) * 0.22 * exp(-t * 8.0)
+		var stutter := 1.0 if fmod(t * 45.0, 1.0) < 0.5 else 0.35
+		return buzz + noise.call() * 0.45 * stutter * exp(-t * 12.0))
 
 
 func _make_click() -> AudioStreamWAV:

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://cubes/cube_type.gd" id="1_type"]
 [ext_resource type="Resource" path="res://cubes/squares/silver_square.tres" id="2_square"]
+[ext_resource type="Resource" path="res://cubes/squares/rock_square.tres" id="3_rock"]
 
 [resource]
 script = ExtResource("1_type")
@@ -10,3 +11,5 @@ display_name = "Silver Cube"
 price = 12000
 grid_size = Vector2i(6, 6)
 square_type = ExtResource("2_square")
+mixed_square_type = ExtResource("3_rock")
+mixed_chance = 0.08

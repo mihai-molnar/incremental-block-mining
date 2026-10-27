@@ -45,6 +45,10 @@
 [ext_resource type="Script" path="res://ui/frenzy_meter.gd" id="57_frenzy_meter"]
 [ext_resource type="Resource" path="res://upgrades/items/lucky_charm.tres" id="58_lucky_charm"]
 [ext_resource type="Resource" path="res://upgrades/items/gold_fever.tres" id="59_gold_fever"]
+[ext_resource type="Resource" path="res://upgrades/items/coin_pouches.tres" id="60_coin_pouches"]
+[ext_resource type="Resource" path="res://upgrades/items/lightning_squares.tres" id="61_lightning"]
+[ext_resource type="Resource" path="res://upgrades/items/multiplier_squares.tres" id="62_multiplier"]
+[ext_resource type="Resource" path="res://upgrades/items/prospector.tres" id="63_prospector"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -238,7 +242,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("58_lucky_charm"), ExtResource("59_gold_fever"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("12_diamond"), ExtResource("14_pickaxe"), ExtResource("48_lucky_strike"), ExtResource("16_big_pickaxe"), ExtResource("21_explosive"), ExtResource("22_blast_radius"), ExtResource("60_coin_pouches"), ExtResource("61_lightning"), ExtResource("62_multiplier"), ExtResource("63_prospector"), ExtResource("51_clean_sweep"), ExtResource("50_steady_hands"), ExtResource("49_hot_streak"), ExtResource("58_lucky_charm"), ExtResource("59_gold_fever"), ExtResource("40_drone"), ExtResource("41_overclock"), ExtResource("42_auto_buyer")])
 title = "Upgrades"
 toggle_action = &"toggle_upgrades"
 notify_when_affordable = true

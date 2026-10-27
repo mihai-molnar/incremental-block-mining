@@ -21,15 +21,16 @@ func _ready() -> void:
 	_add_missing_drones(false)
 
 
-## Whether a drone can keep working on this square.
+## Whether a drone can keep working on this square. Drones leave rocks alone.
 func is_workable(square: CubeSquare) -> bool:
-	if square == null or square.is_broken():
+	if square == null or square.is_broken() or not square.square_type.required:
 		return false
 	var cube := square.get_parent() as Cube
 	return not cube.is_complete() and cube != work_area.get_held_cube()
 
 
-## The nearest workable square no other drone is on, or null if there's none.
+## The nearest workable square no other drone is on, or null if there's none. Multiplier
+## squares wait until the rest of their cube is broken, so the bonus pays on all of it.
 func find_target(drone: Drone) -> CubeSquare:
 	var claimed: Array[CubeSquare] = []
 	for other in _drones:
@@ -42,8 +43,11 @@ func find_target(drone: Drone) -> CubeSquare:
 	for cube in work_area.get_cubes():
 		if cube.is_complete() or cube == held:
 			continue
+		var multipliers_wait := cube.has_regular_squares_left()
 		for square in cube.get_squares():
-			if square.is_broken() or square in claimed:
+			if square.is_broken() or square in claimed or not square.square_type.required:
+				continue
+			if multipliers_wait and square.square_type.cube_value_bonus > 0.0:
 				continue
 			var score := square.global_position.distance_to(drone.global_position) + randf() * TARGET_JITTER
 			if score < best_score:

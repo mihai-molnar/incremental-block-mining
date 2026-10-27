@@ -20,6 +20,17 @@ extends Resource
 ## When above 0, breaking the square sets off an explosion that breaks every square within
 ## this many squares of it (1 = the 8 around it). Upgrades can widen it.
 @export var blast_radius := 0
+## Breaking it also breaks every square in its row and column, on its cube and on any
+## cube lined up with it (lightning).
+@export var strikes_lines := false
+## While it's unbroken, every square on its cube pays this much more (1 = double).
+## Several on one cube add up. Drones leave it until last.
+@export var cube_value_bonus := 0.0
+## Breaking it showers coins (coin pouches).
+@export var coin_shower := false
+## Whether the cube needs it broken to be finished. Squares that aren't (rocks) crumble
+## with the cube, and drones leave them alone.
+@export var required := true
 ## PixelSprites sprite drawn in the middle of the tile (e.g. a bomb on explosive squares).
 @export var emblem: StringName = &""
 

@@ -9,6 +9,9 @@ extends Resource
 @export var grid_size := Vector2i(4, 4)
 ## What every square of this cube starts as (before upgrades change some of them).
 @export var square_type: SquareType
+## Squares that start as this type instead, `mixed_chance` of them (rocks in deep cubes).
+@export var mixed_square_type: SquareType
+@export_range(0.0, 1.0, 0.01) var mixed_chance := 0.0
 
 
 func get_square_count() -> int:
