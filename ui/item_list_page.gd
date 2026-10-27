@@ -53,14 +53,16 @@ func mark_seen() -> void:
 
 
 ## Cheapest first by the price of the next tier; owned and maxed items sink to the bottom.
+## Anything a subclass put above the rows stays there.
 func _sort_rows() -> void:
+	var first := get_child_count() - _rows.size()
 	var sorted := _rows.duplicate()
 	sorted.sort_custom(func(a: ShopItemRow, b: ShopItemRow) -> bool:
 		if a.item.is_owned() != b.item.is_owned():
 			return b.item.is_owned()
 		return a.item.get_price() < b.item.get_price())
 	for i in sorted.size():
-		move_child(sorted[i], i)
+		move_child(sorted[i], first + i)
 
 
 ## Shows the cheapest locked item whose other requirements are met as a teaser.

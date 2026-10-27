@@ -12,10 +12,6 @@ var hits := 0
 ## Seconds left to land the next hit before the combo drops.
 var time_left := 0.0
 
-## What rounding took off earlier payouts, added to the next one so a x1.1 combo still
-## pays on 2-coin squares.
-var _carry := 0.0
-
 
 func _ready() -> void:
 	set_process(false)
@@ -42,14 +38,6 @@ func is_maxed() -> bool:
 ## How much of the time to the next hit is left (1 = a hit just landed).
 func get_time_ratio() -> float:
 	return clampf(time_left / Game.get_combo_window(), 0.0, 1.0)
-
-
-## A payout with the combo multiplier applied.
-func multiply(amount: int) -> int:
-	var exact := amount * get_multiplier() + _carry
-	var paid := floori(exact)
-	_carry = exact - paid
-	return paid
 
 
 func _process(delta: float) -> void:

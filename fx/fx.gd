@@ -210,6 +210,28 @@ func lucky_caught(at: Vector2, frenzy: Frenzy) -> void:
 	Sfx.play(&"frenzy", 0.0)
 
 
+## The mine collapsing for prestige: every cube on the field shatters at once, under a
+## white-out and a long rumble.
+func mine_collapsed(cubes: Array[Cube]) -> void:
+	for cube in cubes:
+		cube_exploded(cube)
+	flash_screen(0.7)
+	shake(1.0)
+	Sfx.play(&"collapse", 0.0)
+
+
+## The start of a run after a collapse: the Shards it paid, mid-screen.
+func shards_gained(amount: int, boost: float) -> void:
+	var view := get_viewport_rect().size
+	_banner(view / 2.0, [
+		_make_label("MINE COLLAPSED", Color("f4f4f4")),
+		_make_label("+%d SHARD%s" % [amount, "" if amount == 1 else "S"], CLEAR_COLOR),
+		_make_label("All earnings now +%d%%" % roundi(boost * 100.0), Color("f4f4f4"), true),
+	], 2.5)
+	flash_screen(0.3)
+	Sfx.play(&"frenzy", 0.0)
+
+
 ## The big one: call after the hitstop, right before the cube is removed.
 func cube_exploded(cube: Cube) -> void:
 	var center := cube.global_position

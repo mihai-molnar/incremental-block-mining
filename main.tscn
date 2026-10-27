@@ -50,6 +50,11 @@
 [ext_resource type="Resource" path="res://upgrades/items/multiplier_squares.tres" id="62_multiplier"]
 [ext_resource type="Resource" path="res://upgrades/items/prospector.tres" id="63_prospector"]
 [ext_resource type="Script" path="res://ui/unlock_toast.gd" id="64_unlock_toast"]
+[ext_resource type="Script" path="res://ui/prestige_page.gd" id="65_prestige_page"]
+[ext_resource type="Resource" path="res://upgrades/perks/head_start.tres" id="66_head_start"]
+[ext_resource type="Resource" path="res://upgrades/perks/drone_bay.tres" id="67_drone_bay"]
+[ext_resource type="Resource" path="res://upgrades/perks/standing_order.tres" id="68_standing_order"]
+[ext_resource type="Resource" path="res://upgrades/perks/shard_resonance.tres" id="69_shard_resonance"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -262,12 +267,25 @@ toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
 tab_button = NodePath("../../../../../Tabs/UpgradesTab")
 
+[node name="PrestigePage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("fx", "work_area", "tab_button")]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+script = ExtResource("65_prestige_page")
+fx = NodePath("../../../../../../../../Fx")
+work_area = NodePath("../../../../../../../../WorkArea")
+items = Array[ExtResource("7_shop_item")]([ExtResource("66_head_start"), ExtResource("67_drone_bay"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance")])
+title = "Prestige"
+toggle_action = &"toggle_prestige"
+notify_when_affordable = true
+tab_button = NodePath("../../../../../Tabs/PrestigeTab")
+
 [node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
 layout_mode = 0
 offset_left = -98.0
 offset_top = 6.0
 offset_right = -6.0
-offset_bottom = 50.0
+offset_bottom = 72.0
 mouse_filter = 2
 theme_override_constants/separation = 4
 
@@ -282,6 +300,12 @@ layout_mode = 2
 focus_mode = 0
 toggle_mode = true
 text = "[U] Upgrades"
+
+[node name="PrestigeTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[P] Prestige"
 
 [node name="ScreenFx" type="CanvasLayer" parent="."]
 layer = 2

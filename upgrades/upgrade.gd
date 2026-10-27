@@ -14,6 +14,9 @@ extends ShopItem
 @export_range(0, 99) var max_level := 1
 ## Stays out of the shop until this upgrade is owned.
 @export var requires: Upgrade
+## A perk: bought with Shards on the Prestige page instead of money, and kept when the
+## mine collapses.
+@export var costs_shards := false
 
 
 func get_level() -> int:
@@ -61,14 +64,26 @@ func get_owned_label() -> String:
 
 
 func can_purchase() -> bool:
-	return not is_maxed() and not Game.would_soft_lock(get_price()) and super()
+	if is_maxed() or not is_available():
+		return false
+	if costs_shards:
+		return Game.shards >= get_price()
+	return not Game.would_soft_lock(get_price()) and super()
 
 
 ## Upgrades don't make money themselves, so they can't eat the money needed for a cube.
 func get_block_reason() -> String:
-	if is_maxed() or not Game.can_afford(get_price()) or not Game.would_soft_lock(get_price()):
+	if costs_shards or is_maxed() or not Game.can_afford(get_price()) or not Game.would_soft_lock(get_price()):
 		return ""
 	return "Keep %s for a cube" % Currency.format(Game.get_cheapest_cube_price())
+
+
+func get_price_icon() -> StringName:
+	return &"shard_small" if costs_shards else super()
+
+
+func _pay(cost: int) -> bool:
+	return Game.try_spend_shards(cost) if costs_shards else super(cost)
 
 
 func _apply() -> void:
@@ -170,3 +185,13 @@ func modify_lucky_interval(seconds: float, _level: int) -> float:
 ## Seconds a frenzy lasts.
 func modify_frenzy_duration(seconds: float, _level: int) -> float:
 	return seconds
+
+
+## Money a new run starts with.
+func modify_starting_money(amount: int, _level: int) -> int:
+	return amount
+
+
+## How much each Shard ever earned adds to earnings.
+func modify_shard_bonus(bonus: float, _level: int) -> float:
+	return bonus

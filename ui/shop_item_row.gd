@@ -73,6 +73,7 @@ func _ready() -> void:
 	Game.auto_buy_changed.connect(_on_auto_buy_changed)
 	Game.items_unlocked.connect(func(_items: Array[ShopItem]) -> void: _refresh())
 	Game.stats_changed.connect(_on_stats_changed)
+	Game.shards_changed.connect(func(_shards: int) -> void: _refresh())
 	_refresh()
 
 
@@ -105,7 +106,7 @@ func _refresh() -> void:
 		_buy_button.icon = null
 	else:
 		_buy_button.text = Currency.format(item.get_price())
-		_buy_button.icon = PixelSprites.get_texture(&"coin_small")
+		_buy_button.icon = PixelSprites.get_texture(item.get_price_icon())
 	_buy_button.disabled = not item.can_purchase()
 	_reason_label.text = item.get_block_reason()
 	_reason_label.visible = not _reason_label.text.is_empty()

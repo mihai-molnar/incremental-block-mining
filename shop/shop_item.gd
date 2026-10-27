@@ -76,10 +76,20 @@ func on_listed() -> void:
 
 ## Spends the money and applies the item. Returns true if the purchase went through.
 func purchase() -> bool:
-	if not can_purchase() or not Game.try_spend(get_price()):
+	if not can_purchase() or not _pay(get_price()):
 		return false
 	_apply()
 	return true
+
+
+## PixelSprites sprite shown next to the price.
+func get_price_icon() -> StringName:
+	return &"coin_small"
+
+
+## Takes the payment. Returns false if there wasn't enough.
+func _pay(cost: int) -> bool:
+	return Game.try_spend(cost)
 
 
 ## Builds the small preview shown next to the item in the shop.

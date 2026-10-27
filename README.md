@@ -25,6 +25,7 @@ behind as faint outlines until the whole cube is gone.
 | M     | Move mode: drag cubes around the field          |
 | S     | Open or close the shop                          |
 | U     | Open or close upgrades                          |
+| P     | Open or close Prestige (once it's unlocked)     |
 | Esc   | Pause menu                                      |
 | =     | Dev cheat: +100K money (debug builds only)      |
 | -     | Dev cheat: send a Lucky Cube now (debug builds only) |
@@ -86,6 +87,25 @@ Every 2 to 5 minutes a golden Lucky Cube drifts across the field with a chime, t
 
 The running frenzy and its time left show under the combo meter. No Lucky Cube comes while
 a frenzy is running, and frenzies aren't saved: quitting ends one.
+
+### Prestige: collapsing the mine
+
+Once you've earned 1M in total, a Prestige tab appears. Collapsing the mine (click the
+button twice) shatters the field and starts a new run, paying **Shards**:
+floor(√(money earned this run ÷ 1M)), so 1M pays 1, 4M pays 2, 9M pays 3, 100M pays 10.
+
+- Money, upgrades, the cubes on the field and the Auto-Buyer's pick reset.
+- Shards, perks, unlocked cubes and upgrades, and lifetime stats stay.
+- Every Shard you've ever earned adds 5% to all earnings, spent or not.
+
+Shards buy perks, which are kept forever:
+
+| Perk            | Price (Shards)     | Effect                                                    |
+|-----------------|--------------------|-----------------------------------------------------------|
+| Head Start      | 1, ×3 per tier     | Runs start with 500, then 5K, 50K, 500K money (4 tiers)  |
+| Drone Bay       | 2, ×2.5 per tier   | A drone per tier in every run, on top of Mining Drones (3 tiers) |
+| Standing Order  | 5                  | An Auto-Buyer slot in every run, on top of the Auto-Buyer |
+| Shard Resonance | 3, ×2 per tier     | Each Shard adds 1% more, up to 10% per Shard (5 tiers)    |
 
 ### Saving
 

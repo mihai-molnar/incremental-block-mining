@@ -42,7 +42,7 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	for page in _pages:
-		if event.is_action_pressed(page.toggle_action):
+		if event.is_action_pressed(page.toggle_action) and page.tab_button.visible:
 			show_page(page)
 			get_viewport().set_input_as_handled()
 			return

@@ -64,6 +64,9 @@ var _cube_bonus := {}
 ## Explosive and lightning squares broken since the last blast went off; the next wave
 ## of the chain.
 var _pending_blasts: Array[Blast] = []
+## What rounding took off earlier payouts, added to the next one, so small multipliers
+## (a x1.1 combo, a +10% Shard boost) still count on 2-coin squares.
+var _payout_carry := 0.0
 
 
 func _ready() -> void:
@@ -111,6 +114,16 @@ func spawn_cube(type: CubeType) -> Cube:
 ## A mining drone's hit on one square. Resolved like a click, with softer effects.
 func drone_hit(square: CubeSquare) -> void:
 	_hit_squares([square], true)
+
+
+## Removes every cube at once (the mine collapsing). Play the effects first.
+func clear_field() -> void:
+	if _dragged:
+		_end_drag()
+	_set_hovered(null, [])
+	for cube in get_cubes():
+		cube.queue_free()
+	_update_field_value()
 
 
 ## Mouse position in world space, taken from the latest mouse event.
@@ -395,7 +408,8 @@ func _on_square_broken(cube: Cube, square: CubeSquare) -> void:
 
 ## Pays out and plays the effects for everything the last click hit and broke, then
 ## lines up any explosives it broke as the next link of a chain reaction. Payouts get
-## Game.get_payout_multiplier() (a money frenzy), and the player's clicks the combo too.
+## Game.get_payout_multiplier() (Shards, a money frenzy), and the player's clicks the
+## combo too.
 func _resolve_click(soft := false) -> void:
 	if not _pending_blasts.is_empty():
 		var timer := get_tree().create_timer(CHAIN_DELAY, false)
@@ -403,8 +417,10 @@ func _resolve_click(soft := false) -> void:
 	if not _clicked_hits.is_empty():
 		fx.squares_hit(_clicked_hits, soft)
 	if not _clicked_breaks.is_empty():
-		var total := roundi(_clicked_value * Game.get_payout_multiplier())
-		var payout := total if soft else combo.multiply(total)
+		var multiplier := Game.get_payout_multiplier() * (1.0 if soft else combo.get_multiplier())
+		var exact := _clicked_value * multiplier + _payout_carry
+		var payout := floori(exact)
+		_payout_carry = exact - payout
 		_update_field_value()
 		Game.add_stat(Game.STAT_SQUARES_BROKEN, _clicked_breaks.size())
 		Game.earn(payout)

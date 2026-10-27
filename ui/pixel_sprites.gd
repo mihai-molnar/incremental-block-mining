@@ -320,6 +320,28 @@ const SPRITES := {
 		"KYYYOOKYYYOOK",
 		"KKKKKKKKKKKKK",
 	],
+	# Prestige Shards: next to perk prices, and bigger on the Prestige page.
+	&"shard_small": [
+		"..KK..",
+		".KCWK.",
+		"KCWCuK",
+		"KCCuUK",
+		".KuUK.",
+		"..KK..",
+	],
+	&"shard": [
+		"....KK....",
+		"...KCWK...",
+		"..KCWCuK..",
+		"..KCWCuK..",
+		".KCWCCuUK.",
+		".KCWCuuUK.",
+		"KCWCCuuUUK",
+		".KCCuuUUK.",
+		"..KCuuUK..",
+		"...KuUK...",
+		"....KK....",
+	],
 	# Shown instead of the buy button on a locked shop item.
 	&"lock": [
 		"..KKKKK..",

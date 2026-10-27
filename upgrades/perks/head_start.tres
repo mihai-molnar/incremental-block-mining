@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StartingMoneyUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/starting_money_upgrade.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+title = "Head Start"
+price = 1
+price_growth = 3.0
+max_level = 4
+costs_shards = true

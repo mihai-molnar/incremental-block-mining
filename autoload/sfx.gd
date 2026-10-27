@@ -36,6 +36,7 @@ func _ready() -> void:
 		&"frenzy": _make_frenzy(),
 		&"zap": _make_zap(),
 		&"unlock": _make_unlock(),
+		&"collapse": _make_collapse(),
 	}
 
 
@@ -185,6 +186,16 @@ func _make_unlock() -> AudioStreamWAV:
 		var local_t := t - 0.12 if second else t
 		var tone := _pulse(t * freq, 0.5) * 0.14 + _pulse(t * freq * 2.0, 0.25) * 0.04
 		return tone * exp(-local_t * (7.0 if second else 16.0)))
+
+
+## The mine collapsing: a long, falling boom under rumbling, crumbling rock.
+func _make_collapse() -> AudioStreamWAV:
+	var rumble := _held_noise(12)
+	var crumble := _held_noise(4)
+	return _render(1.4, func(t: float, _p: float) -> float:
+		var boom := sin(TAU * _sweep(t, 90.0, 25.0, 1.4)) * 0.7 * exp(-t * 2.5)
+		var rocks: float = crumble.call() * 0.25 * exp(-t * 4.0) * (0.6 + 0.4 * sin(t * 40.0))
+		return boom + rumble.call() * 0.45 * exp(-t * 2.0) + rocks)
 
 
 func _make_click() -> AudioStreamWAV:

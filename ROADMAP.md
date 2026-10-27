@@ -23,13 +23,10 @@ Unpredictable rewards are the strongest hook in the genre.
 
 ## Phase 3: long-term goals
 
-### Prestige ("Collapse the mine")
-- Resets money, upgrades and cubes in exchange for Shards.
-- Shards earned = `floor(sqrt(lifetime_earned / 1M))`.
-- Each Shard gives +X% to all earnings.
-- Shards also buy permanent perks, kept across resets: start with more money, keep your drones, start with the Auto-Buyer.
-- Needs `lifetime_earned` in `Game` (and in the save).
-- Shard perks can be `Upgrade`s on a third sidebar page that `reset_progress` doesn't clear. Split `_upgrade_levels` into run levels and permanent levels.
+### Prestige ("Collapse the mine") (done)
+- Unlocks at 1M earned in total. Collapsing pays floor(√(run earnings ÷ 1M)) Shards and resets money, upgrades and cubes; Shards, perks, unlocks and stats stay.
+- Every Shard ever earned adds 5% to all earnings. Shards buy perks kept forever: Head Start, Drone Bay, Standing Order, Shard Resonance.
+- Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, Lucky Cubes sooner.
 
 ### Achievements
 - Milestones that each give a small permanent bonus:
