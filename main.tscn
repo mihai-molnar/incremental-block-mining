@@ -31,7 +31,6 @@
 [ext_resource type="Resource" path="res://upgrades/items/auto_buyer.tres" id="42_auto_buyer"]
 [ext_resource type="Script" path="res://world/drone_swarm.gd" id="43_swarm"]
 [ext_resource type="Script" path="res://world/auto_buyer.gd" id="44_auto_buyer"]
-[ext_resource type="PackedScene" path="res://ui/welcome_back.tscn" id="45_welcome"]
 [ext_resource type="Script" path="res://world/combo.gd" id="46_combo"]
 [ext_resource type="Script" path="res://ui/combo_meter.gd" id="47_combo_meter"]
 [ext_resource type="Resource" path="res://upgrades/items/lucky_strike.tres" id="48_lucky_strike"]
@@ -257,9 +256,6 @@ mouse_filter = 2
 color = Color(1, 1, 1, 0)
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
-
-[node name="WelcomeBack" parent="." node_paths=PackedStringArray("fx") instance=ExtResource("45_welcome")]
-fx = NodePath("../Fx")
 
 [node name="CursorLayer" type="CanvasLayer" parent="."]
 process_mode = 3

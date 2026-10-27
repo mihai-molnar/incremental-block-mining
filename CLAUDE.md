@@ -31,8 +31,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - In debug builds the `=` key (`dev_add_money`, handled in `Hud`) adds 100K money, for playtesting expensive content.
 - A harness calls `change_scene_to_file("res://main.tscn")`, waits a few `process_frame`s, drives
   the scene through `Game`, `WorkArea.spawn_cube` or `Cube.hit_at`, prints results, then calls `quit()`.
-- To test loading, write a save file first (edit `saved_at` back in time to test offline
-  earnings), then run the harness with `--save` pointing at it. `Game` loads it in `_ready`, before the scene.
+- To test loading, write a save file first, then run the harness with `--save` pointing at it. `Game` loads it in `_ready`, before the scene.
 - Inject keys with `Input.parse_input_event`. Mouse events need `root.get_final_transform() * pos`.
 - For screenshots, drop `--headless`, `await RenderingServer.frame_post_draw`, and save `root.get_texture().get_image()`.
 - ObjectDB leak warnings on a forced harness quit come from the harness's pending coroutines or audio, not from game code.
@@ -68,7 +67,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - Saves on a 30s timer, on `NOTIFICATION_WM_CLOSE_REQUEST` and `NOTIFICATION_APPLICATION_FOCUS_OUT`, and from the pause menu's Quit.
 - `Game` saves its own state, then emits `saving(data)` so other nodes add theirs. `WorkArea` adds the cubes (`Cube.get_save_data`: each square's clicks left and its type when it isn't the cube's default).
 - On load, a node takes its part back once with `Game.take_saved(key)`. `WorkArea._restore_cubes` rebuilds cubes with `Cube.load_save_data`, which marks them landed so their squares don't convert again.
-- Offline earnings are worked out at load (`Game._estimate_offline_earnings`): drone hits over the time away at `OFFLINE_EFFICIENCY`, capped at `OFFLINE_CAP`, turned into whole auto-buyer cubes times each cube's profit (clear bonus included). `WelcomeBack` shows them and pays out on Collect. Uncollected earnings are saved into money.
+- There are no offline earnings, on purpose: nothing is mined while the game is closed. `saved_at` is only a record.
 - `Game.reset_progress` deletes the file and clears state; the pause menu then reloads the scene.
 
 **Drones and the auto-buyer.**

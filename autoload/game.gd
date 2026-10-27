@@ -18,11 +18,6 @@ const SAVE_VERSION := 1
 const AUTOSAVE_INTERVAL := 30.0
 ## Hits per second one mining drone makes, before upgrades.
 const DRONE_HITS_PER_SECOND := 1.5
-## While the game is closed, drones keep mining at this fraction of their speed, for up
-## to OFFLINE_CAP seconds. Absences shorter than OFFLINE_MIN don't count.
-const OFFLINE_EFFICIENCY := 0.5
-const OFFLINE_CAP := 2 * 3600
-const OFFLINE_MIN := 60
 ## Finishing a cube pays this multiple of its squares' value: 1.25 adds a quarter on top.
 const CLEAR_BONUS := 1.25
 ## Each of the player's hits in a row adds COMBO_STEP to the payout multiplier, up to
@@ -41,12 +36,6 @@ var auto_buy_cube: CubeType
 ## Where progress is saved. Start the game with `-- --save=<path>` to use another file;
 ## harness runs do, so they never touch the real save.
 var save_path := SAVE_PATH
-
-## What the drones made while the game was closed, until the welcome-back panel collects it.
-var offline_earnings := 0
-var offline_seconds := 0
-var offline_cubes := 0
-var offline_cube_type: CubeType
 
 ## Cubes the shop sells; the cheapest one is the floor that spending must not drop below.
 var _cubes_for_sale: Array[CubeType] = []
@@ -141,14 +130,6 @@ func set_auto_buy_cube(cube_type: CubeType) -> void:
 		return
 	auto_buy_cube = cube_type
 	auto_buy_changed.emit(cube_type)
-
-
-## Pays out what the drones made while the game was closed. Returns the amount.
-func collect_offline_earnings() -> int:
-	var amount := offline_earnings
-	offline_earnings = 0
-	earn(amount)
-	return amount
 
 
 # --- Rules (every owned upgrade gets a say) ---------------------------------------
@@ -264,8 +245,7 @@ func save_game() -> void:
 			levels[upgrade.resource_path] = _upgrade_levels[upgrade]
 	data["version"] = SAVE_VERSION
 	data["saved_at"] = int(Time.get_unix_time_from_system())
-	# Offline earnings the player hasn't collected yet aren't lost.
-	data["money"] = money + offline_earnings
+	data["money"] = money
 	data["upgrades"] = levels
 	data["auto_buy"] = auto_buy_cube.resource_path if auto_buy_cube else ""
 	saving.emit(data)
@@ -299,7 +279,6 @@ func reset_progress() -> void:
 	auto_buy_cube = null
 	_upgrade_levels.clear()
 	_loaded_save = {}
-	offline_earnings = 0
 
 
 func _load_game() -> void:
@@ -319,30 +298,6 @@ func _load_game() -> void:
 				_upgrade_levels[upgrade] = int(levels[path])
 	auto_buy_cube = load_saved_resource(data.get("auto_buy")) as CubeType
 	_loaded_save = data
-	_estimate_offline_earnings(int(Time.get_unix_time_from_system()) - int(data.get("saved_at", 0)))
-
-
-## While the game was closed, the drones kept clearing the auto-buyer's cube at a discount.
-## Works out how many cubes they'd have finished in that time and what that made, clear
-## bonus included.
-func _estimate_offline_earnings(seconds_away: int) -> void:
-	offline_earnings = 0
-	var cube_type := auto_buy_cube
-	if seconds_away < OFFLINE_MIN or cube_type == null or get_auto_buy_slots() == 0:
-		return
-	var away := mini(seconds_away, OFFLINE_CAP)
-	var hits := get_drone_count() * get_drone_hit_rate() * away * OFFLINE_EFFICIENCY
-	var square_type := cube_type.square_type
-	var hits_per_cube := cube_type.get_square_count() * get_square_hp(square_type, cube_type)
-	var cube_value := cube_type.get_square_count() * square_type.get_value(cube_type)
-	var profit := cube_value + get_clear_payout(cube_value) - cube_type.price
-	var cubes := floori(hits / hits_per_cube)
-	if cubes <= 0 or profit <= 0:
-		return
-	offline_seconds = away
-	offline_cubes = cubes
-	offline_cube_type = cube_type
-	offline_earnings = cubes * profit
 
 
 func _set_money(value: int) -> void:

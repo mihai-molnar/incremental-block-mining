@@ -5,7 +5,7 @@ builds on the one before. All numbers are starting guesses to tune by playtestin
 
 ## Phase 1: the idle core (done)
 
-- Saving and offline earnings: autosave, a welcome-back panel, and Reset progress in the pause menu.
+- Saving: autosave and Reset progress in the pause menu. Offline earnings were built, then removed: the game shouldn't mine while it's closed.
 - Mining Drone, Drone Overclock and Auto-Buyer upgrades.
 - Upgrade prices that multiply per tier (`price_growth`).
 - Eight more cubes after the Gold Bar, from Silver (12K) to Void (1B).
@@ -41,7 +41,7 @@ These are `SquareType` resources. Each needs a `SquareChanceUpgrade` to unlock i
 - Resets money, upgrades and cubes in exchange for Shards.
 - Shards earned = `floor(sqrt(lifetime_earned / 1M))`.
 - Each Shard gives +X% to all earnings.
-- Shards also buy permanent perks, kept across resets: start with more money, keep your drones, start with the Auto-Buyer, a longer offline cap.
+- Shards also buy permanent perks, kept across resets: start with more money, keep your drones, start with the Auto-Buyer.
 - Needs `lifetime_earned` in `Game` (and in the save).
 - Shard perks can be `Upgrade`s on a third sidebar page that `reset_progress` doesn't clear. Split `_upgrade_levels` into run levels and permanent levels.
 
@@ -68,7 +68,6 @@ These are `SquareType` resources. Each needs a `SquareChanceUpgrade` to unlock i
 
 - **Sharp Pickaxe fades:** -1 click per tier matters less as cube clicks grow (Void squares take 100). Options: make it a percentage, or add a "Heavy Pickaxe" that adds damage per hit.
 - **Drone pacing:** drones hit 1.5 times a second for 1 damage each, so big cubes take them a while. Watch whether they feel useful in the mid game. Possible levers: base rate, a Drone Drill upgrade (+1 damage per tier), a smarter-targeting upgrade (explosives first).
-- **Offline upgrades:** raise the 2h cap and the 50% efficiency (good prestige perks).
 - **Endless cubes:** past the Void Cube, generate cube tiers on the fly (price `1B × 6^N`, a palette rotated from the existing ones) so the ladder never runs out.
 - **Several auto-buy picks:** let each Auto-Buyer tier pick its own cube instead of one cube for every slot.
 - **Art:** the clean pixel look is still a placeholder. Late cubes (Meteorite, Magma, Void) are dark and could use emblems or custom tiles to stand out.

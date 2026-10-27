@@ -41,15 +41,13 @@ A red dot on the Upgrades tab means a new upgrade (or its next tier) has become 
 - **Clear bonus:** finishing a cube pays a quarter of its squares' value on top (x1.25),
   shown as a "CLEAR!" banner. Cubes the drones finish get it too.
 
-### Saving and time away
+### Saving
 
 Progress saves on its own every 30 seconds, when the window loses focus and when you quit:
 money, upgrades, the auto-buyer's pick and every cube on the field, down to the clicks left
 on each square. The pause menu has **Reset progress** (click it twice) to start over.
 
-While the game is closed, your drones keep mining the auto-buyer's cube at half speed, for
-up to 2 hours. A "Welcome back" panel shows what they made; Collect (or Esc) pays it out.
-Without a drone, the auto-buyer and a picked cube, nothing is earned while you're away.
+Nothing is mined while the game is closed: you pick up exactly where you left off.
 
 Amounts of 10,000 or more are shortened to one decimal, rounded down: 10.3K, 2.5M.
 
