@@ -43,6 +43,11 @@ func _get_hint() -> String:
 	return ""
 
 
+## Seconds it stays up before fading.
+func _get_show_time() -> float:
+	return SHOW_TIME
+
+
 ## Pops it in (again) with the unlock chime, at `pitch`, and restarts the time it stays up.
 func _pop(pitch := 1.0) -> void:
 	queue_redraw()
@@ -54,7 +59,7 @@ func _pop(pitch := 1.0) -> void:
 	scale = Vector2.ONE * 1.3
 	_tween = create_tween()
 	_tween.tween_property(self, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_tween.tween_interval(SHOW_TIME)
+	_tween.tween_interval(_get_show_time())
 	_tween.tween_property(self, "modulate:a", 0.0, 0.4)
 	_tween.tween_callback(hide)
 

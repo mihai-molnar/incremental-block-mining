@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_type")
 id = &"yellow"
-display_name = "Yellow Cube"
+display_name = "Sandstone Cube"
 price = 30
 grid_size = Vector2i(4, 4)
 square_type = ExtResource("2_square")

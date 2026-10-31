@@ -8,12 +8,12 @@ extends Resource
 ## Clicks needed to break the square.
 @export var hp := 2
 ## When above 0, the square takes this multiple of its cube's default square's clicks
-## instead of `hp` (e.g. 3 makes a diamond take 3 clicks in a blue cube, 24 in a red one).
+## instead of `hp` (e.g. 3 makes a diamond take 3 clicks in a Lapis Cube, 24 in a Jasper one).
 @export var hp_multiplier := 0.0
 ## Money earned when the square breaks.
 @export var value := 2
 ## When above 0, the square pays this multiple of its cube's default square instead of
-## `value` (e.g. 5 makes a diamond worth 10 in a blue cube and 15 in a yellow one).
+## `value` (e.g. 5 makes a diamond worth 10 in a Lapis Cube and 15 in a Sandstone one).
 @export var value_multiplier := 0.0
 ## Precious squares (diamonds...) glint every few seconds with a light sweep and a twinkle.
 @export var shimmer := false
@@ -33,6 +33,12 @@ extends Resource
 @export var required := true
 ## PixelSprites sprite drawn in the middle of the tile (e.g. a bomb on explosive squares).
 @export var emblem: StringName = &""
+## When above 0, explosions and lightning that reach it take this many clicks off it
+## instead of breaking it outright (the Star Core).
+@export var blast_damage := 0
+## When above 0, a crit deals this multiple of the hit's damage instead of breaking it
+## outright (the Star Core).
+@export var crit_multiplier := 0.0
 
 @export_group("Palette")
 @export var outline_color := Color("0f1020")

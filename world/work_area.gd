@@ -209,6 +209,14 @@ func get_squares_in_lines(center: Vector2) -> Array[CubeSquare]:
 	return result
 
 
+## The Star Core on the field, or null.
+func get_star_core() -> Cube:
+	for cube in get_cubes():
+		if cube.cube_type.is_goal and not cube.is_complete():
+			return cube
+	return null
+
+
 ## Topmost cube under the point that can still be interacted with.
 func get_cube_at(global_point: Vector2) -> Cube:
 	for i in range(get_child_count() - 1, -1, -1):
@@ -284,10 +292,12 @@ func _hit_squares(targets: Array[CubeSquare], soft: bool) -> void:
 	_strike = Strike.new(soft)
 	_resolving_click = true
 	for square in targets:
-		var damage := 1
+		var damage := 1 if soft else Game.get_hit_damage(square.cube_type)
 		# A crit only shows when it saves clicks: a square one hit from breaking can't crit.
-		if square.hp > 1 and randf() < crit_chance:
-			damage = square.hp
+		if square.hp > damage and randf() < crit_chance:
+			# Most squares break outright; the Star Core's take a multiple of the hit.
+			var multiplier := square.square_type.crit_multiplier
+			damage = roundi(damage * multiplier) if multiplier > 0.0 else square.hp
 			crits.append(square)
 		_hit(square, damage)
 	_detonate(_take_pending_blasts())
@@ -308,7 +318,8 @@ func _chain_blasts(blasts: Array[Blast], strike: Strike) -> void:
 	_resolve_click()
 
 
-## Breaks every square each blast reaches, whatever clicks it had left.
+## Breaks every square each blast reaches, whatever clicks it had left. Squares with a
+## `blast_damage` (the Star Core's) only lose that many clicks.
 func _detonate(blasts: Array[Blast]) -> void:
 	_strike.blasts += blasts.size()
 	for blast in blasts:
@@ -320,7 +331,8 @@ func _detonate(blasts: Array[Blast]) -> void:
 			struck = get_squares_in_blast(blast.at, blast.radius)
 			fx.explosion(blast.at, blast.radius)
 		for square in struck:
-			_hit(square, square.hp)
+			var chip := square.square_type.blast_damage
+			_hit(square, chip if chip > 0 else square.hp)
 
 
 ## How far a lightning blast's bolts reach: across its cube and every square they struck.
@@ -410,9 +422,12 @@ func _set_hovered(cube: Cube, squares: Array[CubeSquare]) -> void:
 
 # --- Cube events -----------------------------------------------------------------
 
-## Once a cube is down, owned upgrades decide which of its squares change type.
+## Once a cube is down, owned upgrades decide which of its squares change type. The Star
+## Core's never do.
 func _on_cube_landed(cube: Cube) -> void:
 	fx.cube_landed(cube)
+	if cube.cube_type.is_goal:
+		return
 	var delay := CONVERT_DELAY
 	for square in cube.get_squares():
 		var new_type := Game.roll_square_type(cube.cube_type, square.square_type)
@@ -490,11 +505,13 @@ func _resolve_click() -> void:
 	_cube_bonus.clear()
 
 
-## Counts broken squares toward their cube type's mastery, drones' included.
+## Counts broken squares toward their cube type's mastery, drones' included. The Star
+## Core has none.
 func _add_mastery(squares: Array[CubeSquare]) -> void:
 	var counts := {}
 	for square in squares:
-		counts[square.cube_type] = counts.get(square.cube_type, 0) + 1
+		if not square.cube_type.is_goal:
+			counts[square.cube_type] = counts.get(square.cube_type, 0) + 1
 	for cube_type: CubeType in counts:
 		Game.add_mastery(cube_type, counts[cube_type])
 
@@ -506,6 +523,12 @@ func _on_cube_completed(cube: Cube) -> void:
 	_set_hovered(null, [])
 	var strike: Strike = _cube_strikes.get(cube)
 	_cube_strikes.erase(cube)
+	# The Star Core pays no clear bonus and isn't a cube cleared: breaking it frees the
+	# star, and the victory screen takes it from here.
+	if cube.cube_type.is_goal:
+		cube.flash_white()
+		Game.free_star()
+		return
 	if strike and not strike.soft:
 		Game.record_one_click_clear(cube.cube_type)
 	var multiplier := Game.get_clear_bonus()
@@ -521,8 +544,10 @@ func _on_cube_completed(cube: Cube) -> void:
 	cube.queue_free()
 
 
-## Reports how much money is still locked in unbroken squares, for the purchase guard.
+## Reports how much money is still locked in unbroken squares, for the purchase guard,
+## and whether a Star Core is out.
 func _update_field_value() -> void:
+	Game.set_star_core_out(get_star_core() != null)
 	var total := 0
 	for cube in get_cubes():
 		for square in cube.get_squares():

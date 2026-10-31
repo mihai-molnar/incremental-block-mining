@@ -82,7 +82,7 @@ func _get_goal() -> Goal:
 	return null
 
 
-## "Unlocks Grey Cube", "Achievement: Rubble, +2%".
+## "Unlocks Slate Cube", "Achievement: Rubble, +2%".
 func _get_reward_text() -> String:
 	if _target is ShopItem:
 		return "Unlocks " + (_target as ShopItem).get_title()

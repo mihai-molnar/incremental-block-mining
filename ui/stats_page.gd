@@ -44,7 +44,7 @@ func _build() -> void:
 
 
 func _refresh() -> void:
-	_show("Time mining", _format_time(Game.get_time_mining()))
+	_show("Time mining", format_time(Game.get_time_mining()))
 	_show("Runs finished", str(Game.get_stat(Game.STAT_RUNS)))
 	_show("Clicks", Currency.format(Game.get_lifetime_clicks()))
 	_show("Squares broken", Currency.format(Game.get_stat(Game.STAT_SQUARES_BROKEN)))
@@ -53,7 +53,7 @@ func _refresh() -> void:
 	_show("Shards earned", Currency.format(Game.total_shards))
 	_show("Lucky Cubes caught", str(Game.get_stat(Game.STAT_LUCKY_CAUGHT)))
 	_show("Longest run", "%s clicks" % Currency.format(Game.get_best_run_value("clicks")))
-	_show("Longest run time", _format_time(Game.get_best_run_value("seconds")))
+	_show("Longest run time", format_time(Game.get_best_run_value("seconds")))
 	_show("Most cubes in a run", Currency.format(Game.get_best_run_value("cubes")))
 	_show("Most money in a run", Currency.format(Game.get_best_run_value("earned")))
 	_show("Biggest click", "%s squares" % Currency.format(Game.get_stat(Game.STAT_BIGGEST_CLICK)))
@@ -90,7 +90,7 @@ func _show(stat: String, text: String) -> void:
 
 
 ## "1:02:03", or "2:03" under an hour.
-func _format_time(seconds: int) -> String:
+static func format_time(seconds: int) -> String:
 	var hours := floori(seconds / 3600.0)
 	var minutes := floori(seconds / 60.0) % 60
 	if hours > 0:

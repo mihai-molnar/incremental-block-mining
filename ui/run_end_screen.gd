@@ -30,6 +30,8 @@ var _background: ColorRect
 var _title: Label
 ## Game.last_run key -> [value label, best label].
 var _summary_labels := {}
+## Why the run ended: the pickaxe broke, or the star is free.
+var _subtitle: Label
 var _gained_label: Label
 var _boost_label: Label
 var _shards_label: Label
@@ -43,8 +45,8 @@ func _ready() -> void:
 	Game.pickaxe_broken.connect(_on_pickaxe_broken)
 	Game.shards_changed.connect(func(_shards: int) -> void: _refresh_shards())
 	if Game.run_over:
-		_show.call_deferred(false)
-	elif not Game.is_run_active():
+		present.call_deferred(false)
+	elif not Game.is_run_active() and not Game.run_won:
 		# The game closed while the field was collapsing: finish ending the run.
 		_on_pickaxe_broken.call_deferred()
 
@@ -73,8 +75,7 @@ func _build_summary(parent: Control) -> void:
 	box.add_theme_constant_override("separation", 8)
 	parent.add_child(box)
 	_title = _add_label(box, &"TitleLabel")
-	var subtitle := _add_label(box, &"MutedLabel")
-	subtitle.text = "Your pickaxe broke. The run went like this:"
+	_subtitle = _add_label(box, &"MutedLabel")
 	var grid := GridContainer.new()
 	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 12)
@@ -146,6 +147,10 @@ func _on_pickaxe_broken() -> void:
 	_ending = true
 	fx.pickaxe_broken(work_area.get_mouse_world_position())
 	await get_tree().create_timer(BREAK_TIME).timeout
+	# The last click's chain reaction freed the star: the victory screen takes over.
+	if Game.run_won:
+		_ending = false
+		return
 	sidebar.close()
 	fx.mine_collapsed(work_area.get_cubes())
 	work_area.clear_field()
@@ -153,10 +158,11 @@ func _on_pickaxe_broken() -> void:
 	await get_tree().create_timer(COLLAPSE_TIME).timeout
 	Engine.time_scale = 1.0
 	Game.end_run()
-	_show(true)
+	present(true)
 
 
-func _show(animated: bool) -> void:
+## Shows the screen over a paused game, fading in when `animated` (a run that just ended).
+func present(animated: bool) -> void:
 	_refresh()
 	_perk_list.on_shown()
 	visible = true
@@ -171,6 +177,9 @@ func _show(animated: bool) -> void:
 func _refresh() -> void:
 	var run := Game.last_run
 	_title.text = "Run %d is over" % run.get("run", 1)
+	var won := Game.star_free and Game.star_freed_in_run == int(run.get("run", 0))
+	_subtitle.text = "The star is free. The dig went like this:" if won \
+		else "Your pickaxe broke and the tunnel caved in. The dig went like this:"
 	var records: Array = run.get("records", [])
 	for key: String in _summary_labels:
 		var labels: Array = _summary_labels[key]
@@ -191,7 +200,7 @@ func _refresh() -> void:
 
 func _refresh_shards() -> void:
 	_shards_label.text = "%d Shard%s" % [Game.shards, "" if Game.shards == 1 else "s"]
-	_boost_label.text = "All earnings +%d%%: %s%% for each of the %d Shard%s you've earned" % [
+	_boost_label.text = "All earnings +%d%%: %s%% for each of the %d Shard%s of starlight you've dug up" % [
 		roundi(Game.get_shard_boost() * 100.0), Upgrade.format_number(Game.get_shard_bonus() * 100.0),
 		Game.total_shards, "" if Game.total_shards == 1 else "s"]
 

@@ -29,6 +29,10 @@ signal pickaxe_changed(hp: int)
 signal pickaxe_broken
 ## The run ended and paid its Shards; last_run holds its summary.
 signal run_ended
+## The Star Core broke: the star is free and the run is won. The victory screen takes over.
+signal star_freed
+## A cube with a story line was bought for the first time ever; the story toast shows it.
+signal story_reached(cube_type: CubeType)
 ## A mining drone was bought; the drone swarm launches it.
 signal drone_launched
 ## How many drones are out changed.
@@ -110,6 +114,14 @@ var pickaxe_shield := 0
 var pickaxe_shield_max := 0
 ## True from a run ending until the next one starts, while the run-end screen is up.
 var run_over := false
+## Whether the star has ever been freed, and in which run (its number).
+var star_free := false
+var star_freed_in_run := 0
+## True from the star being freed until end_run, while the victory plays and the ending
+## screen is up. Nothing can be mined meanwhile.
+var run_won := false
+## Whether the story's opening card has been seen. A new game shows it.
+var opening_seen := false
 ## This run so far: money earned (which sets the Shards it pays), clicks that hit,
 ## seconds played and cubes cleared.
 var run_earned := 0
@@ -122,6 +134,8 @@ var last_run := {}
 var best_run := {}
 ## Drones out right now, kept current by the drone swarm.
 var drones_out := 0
+## Whether a Star Core is on the field, kept current by the work area. Only one at a time.
+var star_core_out := false
 ## Money still sitting in unbroken squares on the field. Kept current by the work area.
 var field_value := 0
 ## Cube the auto-buyer keeps on the field, picked with Auto in the shop. Null when none is.
@@ -152,6 +166,8 @@ var _unlocked := {}
 var _achievements: Array[Achievement] = []
 var _earned := {}
 var _unseen_achievements: Array[Achievement] = []
+## Cube types whose story lines have been shown (id -> true), so each shows once ever.
+var _story_seen := {}
 ## The save file as loaded. Nodes take their own part of it with take_saved().
 var _loaded_save := {}
 
@@ -218,9 +234,22 @@ func try_spend_shards(cost: int) -> bool:
 	return true
 
 
-## Whether the player can still mine: the pickaxe holds and the run hasn't ended.
+## Whether the player can still mine: the pickaxe holds and the run hasn't ended or been won.
 func is_run_active() -> bool:
-	return not run_over and pickaxe_hp > 0
+	return not run_over and not run_won and pickaxe_hp > 0
+
+
+## Called when the Star Core's last square breaks. Wins the run, even when the click that
+## set off the chain reaction finishing it used the pickaxe's last HP.
+func free_star() -> void:
+	if run_over or run_won:
+		return
+	run_won = true
+	star_free = true
+	star_freed_in_run = get_stat(STAT_RUNS) + 1
+	_check_achievements()
+	star_freed.emit()
+	save_game()
 
 
 ## Called for every click that hits a square: takes 1 off the shield if there is one,
@@ -311,6 +340,7 @@ func end_run() -> int:
 	_timed_effects.clear()
 	_refresh_modifiers()
 	run_over = true
+	run_won = false
 	run_earned = 0
 	run_clicks = 0
 	run_time = 0.0
@@ -466,10 +496,11 @@ func get_mastery_multiplier(cube_type: CubeType) -> float:
 	return 1.0 + get_mastery_level(cube_type) * MASTERY_BONUS
 
 
-## How many of the cube types the shop sells are at the top mastery level.
+## How many of the cube types the shop sells are at the top mastery level. The Star Core
+## has no mastery.
 func get_mastered_count() -> int:
 	return _cubes_for_sale.filter(func(cube_type: CubeType) -> bool:
-		return get_mastery_level(cube_type) >= MASTERY_MAX_LEVEL).size()
+		return not cube_type.is_goal and get_mastery_level(cube_type) >= MASTERY_MAX_LEVEL).size()
 
 
 ## Called by shop pages for items with an unlock goal. Goals already met, and upgrades
@@ -568,9 +599,19 @@ func _check_achievements() -> void:
 		achievements_earned.emit(fresh)
 
 
-## Called by the shop when a cube is bought; the work area listens and spawns it.
+## Called by the shop when a cube is bought; the work area listens and spawns it. The
+## first purchase of a cube with a story line tells that part of the story.
 func deliver_cube(cube_type: CubeType) -> void:
 	cube_purchased.emit(cube_type)
+	if not cube_type.story_line.is_empty() and not _story_seen.has(cube_type.id):
+		_story_seen[cube_type.id] = true
+		story_reached.emit(cube_type)
+
+
+## The opening card was read: it doesn't show again (until Reset progress).
+func mark_opening_seen() -> void:
+	opening_seen = true
+	save_game()
 
 
 ## Called by the shop when a drone is bought; the drone swarm listens and launches it.
@@ -583,6 +624,10 @@ func set_drones_out(count: int) -> void:
 		return
 	drones_out = count
 	drones_changed.emit(count)
+
+
+func set_star_core_out(out: bool) -> void:
+	star_core_out = out
 
 
 func set_field_value(value: int) -> void:
@@ -666,6 +711,15 @@ func roll_square_type(cube_type: CubeType, current: SquareType) -> SquareType:
 	for modifier: Upgrade in _modifiers:
 		result = modifier.modify_square_type(cube_type, result, _modifiers[modifier])
 	return result
+
+
+## Clicks one of the player's hits takes off a square of a cube of this type (Starsteel
+## Edge adds to it on the Star Core).
+func get_hit_damage(cube_type: CubeType) -> int:
+	var damage := 1
+	for modifier: Upgrade in _modifiers:
+		damage = modifier.modify_hit_damage(cube_type, damage, _modifiers[modifier])
+	return maxi(damage, 1)
 
 
 ## Side, in squares, of the area one pickaxe click hits (1 = a single square).
@@ -856,6 +910,11 @@ func save_game() -> void:
 	data["pickaxe_hp"] = pickaxe_hp
 	data["pickaxe_shield"] = [pickaxe_shield, pickaxe_shield_max]
 	data["run_over"] = run_over
+	data["run_won"] = run_won
+	data["star_free"] = star_free
+	data["star_freed_in_run"] = star_freed_in_run
+	data["opening_seen"] = opening_seen
+	data["story_seen"] = _story_seen.keys()
 	data["run"] = {"earned": run_earned, "clicks": run_clicks, "seconds": run_time, "cubes": run_cubes}
 	data["last_run"] = last_run
 	data["best_run"] = best_run
@@ -894,6 +953,11 @@ func reset_progress() -> void:
 	pickaxe_shield = 0
 	pickaxe_shield_max = 0
 	run_over = false
+	run_won = false
+	star_free = false
+	star_freed_in_run = 0
+	opening_seen = false
+	_story_seen.clear()
 	run_earned = 0
 	run_clicks = 0
 	run_time = 0.0
@@ -924,6 +988,9 @@ func _load_game() -> void:
 	shards = int(data.get("shards", 0))
 	total_shards = int(data.get("total_shards", 0))
 	run_over = bool(data.get("run_over", false))
+	run_won = bool(data.get("run_won", false))
+	star_free = bool(data.get("star_free", false))
+	star_freed_in_run = int(data.get("star_freed_in_run", 0))
 	if data.get("run") is Dictionary:
 		var run: Dictionary = data.run
 		run_earned = int(run.get("earned", 0))
@@ -949,6 +1016,11 @@ func _load_game() -> void:
 	if data.get("unlocked") is Array:
 		for path: Variant in data.unlocked:
 			_unlocked[str(path)] = true
+	# Saves from before the story have no key: a player with progress already began.
+	opening_seen = bool(data.get("opening_seen", not _stats.is_empty()))
+	if data.get("story_seen") is Array:
+		for id: Variant in data.story_seen:
+			_story_seen[StringName(str(id))] = true
 	if data.get("achievements") is Array:
 		for path: Variant in data.achievements:
 			var achievement := load_saved_resource(path) as Achievement

@@ -8,6 +8,7 @@ extends Resource
 enum Stat {
 	SQUARES_BROKEN, CUBES_CLEARED, MONEY_EARNED, RUNS_FINISHED, RUN_CLICKS, RUN_EARNED,
 	LONGEST_CHAIN, BIGGEST_CLICK, ONE_CLICK_CLEARS, CUBES_MASTERED, LUCKY_CUBES, SHARDS_EARNED,
+	STAR_FREED,
 }
 
 @export var stat := Stat.CUBES_CLEARED
@@ -43,6 +44,8 @@ func get_value() -> int:
 			return Game.get_stat(Game.STAT_LUCKY_CAUGHT)
 		Stat.SHARDS_EARNED:
 			return Game.total_shards
+		Stat.STAR_FREED:
+			return 1 if Game.star_free else 0
 	return Game.get_stat(Game.get_cleared_stat(cube_type))
 
 
@@ -50,7 +53,7 @@ func is_met() -> bool:
 	return get_value() >= amount
 
 
-## "Clear 3 Yellow Cubes", "Break 600 squares", "Make a run last 300 clicks".
+## "Clear 3 Sandstone Cubes", "Break 600 squares", "Make a run last 300 clicks".
 func get_description() -> String:
 	var count := Currency.format(amount)
 	match stat:
@@ -76,6 +79,8 @@ func get_description() -> String:
 			return "Catch %s %s" % [count, _plural("Lucky Cube")]
 		Stat.SHARDS_EARNED:
 			return "Earn %s %s" % [count, _plural("Shard")]
+		Stat.STAR_FREED:
+			return "Free the star"
 	return "Clear %s %s" % [count, _plural(cube_type.display_name if cube_type else "cube")]
 
 

@@ -35,6 +35,12 @@ func meets_requirements() -> bool:
 	return true
 
 
+## Whether its row shows even while it's locked, not only as its page's teaser (the Star
+## Core, so the goal is in sight from the start).
+func is_always_shown() -> bool:
+	return false
+
+
 ## Whether a one-time item has already been bought. It stays listed, marked as owned.
 func is_owned() -> bool:
 	return false

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SquareType" format=3]
+
+[ext_resource type="Script" path="res://cubes/square_type.gd" id="1_square"]
+
+[resource]
+script = ExtResource("1_square")
+id = &"opal"
+display_name = "Opal"
+hp = 125
+value = 6800000000
+shimmer = true
+outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
+shadow_color = Color(0.580392, 0.690196, 0.760784, 1)
+base_color = Color(0.956863, 0.956863, 0.956863, 1)
+light_color = Color(0.45098, 0.937255, 0.968627, 1)
+shine_color = Color(0.654902, 0.941176, 0.439216, 1)

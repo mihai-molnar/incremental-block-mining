@@ -8,6 +8,7 @@
 script = ExtResource("1_type")
 id = &"magma_cube"
 display_name = "Magma Cube"
+story_line = "The deeper you dig, the warmer it gets. Something below still glows."
 price = 150000000
 grid_size = Vector2i(10, 6)
 square_type = ExtResource("2_square")

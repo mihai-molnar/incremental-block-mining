@@ -32,7 +32,7 @@ Unpredictable rewards are the strongest hook in the genre.
 - Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, a cheaper first Whetstone.
 
 ### Achievements (done)
-- 26 milestones on their own sidebar page ([A]), each adding +2% (or +5% for hard ones) to all earnings for good, +88% in all: squares broken, cubes cleared, the Void Cube, one-click clears (any cube, a Gold Bar), squares and blasts in one click, run length in clicks, money, Lucky Cubes, mastered cubes, runs and Shards.
+- 27 milestones on their own sidebar page ([A]), each adding +2% (or +5% for hard ones) to all earnings for good, +93% in all (Starlight, for freeing the star, came with the ending): squares broken, cubes cleared, the Void Cube, one-click clears (any cube, a Gold Bar), squares and blasts in one click, run length in clicks, money, Lucky Cubes, mastered cubes, runs and Shards.
 - New records in `Game`: longest chain and biggest click (the player's clicks, chains included), one-click clears per cube, Lucky Cubes caught.
 - Ideas: achievements for combos, crits or drones; varied rewards (pickaxe HP, a crit chance) instead of earnings only; showing the ones a run earned on the run-end screen.
 
@@ -48,6 +48,16 @@ Unpredictable rewards are the strongest hook in the genre.
 - **Next goal:** at the bottom of the field (the top-left column was full, and the income readout needs the room next to the money): the locked item whose goal is furthest along, its goal, a bar and what it unlocks. Unlocks are kept across runs, so once they're all done it shows the achievement closest to earned instead.
 - **Income per minute:** "+1.2K/min" next to the money counter, from earnings over the last minute (or since the run started, over 10s at the least).
 - **Stats page ([T]):** lifetime totals, records and bonuses. Lifetime clicks and time mining are new stats, added up as runs end.
+
+## The Fallen Star (done)
+
+- A light story: a star fell and lies under every layer of stone. A new game opens on a story card; the first purchase of each deep cube shows a line; breaking the Star Core frees the star (victory effects, an ending screen, the Starlight achievement), then play goes on.
+- The color cubes became materials (Lapis, Sandstone, Slate, Jasper; ids unchanged). Tektite (1B), Iridium Bar (10B) and Opal (100B) went in between Magma and Void, which moved to 1T.
+- The Star Core (1Qa, 12x12, 25,000 clicks a square) unlocks after 3 Void Cubes. Blasts only chip it, a crit deals 10 hits, nothing converts on it, it pays nothing. Starsteel Edge (a perk, 50K Shards every tier) adds a click per tier to hits on it.
+- Toughness is the gate, money the lesser one (the user's call). Tuned with a bot that plays runs (rewrite it from the plan in `docs/superpowers/plans/2026-10-31-fallen-star-ending.md`, Task 7):
+  - With the core at 2000 clicks a square the bot won at run 11. A 1.5x-per-tier Starsteel price made late damage grow only with the log of Shards, so no toughness gave a steady finish (at 24,000 it never won in 40 runs). A flat price fixed that: every run's Shards add damage, and each try gets further.
+  - Final numbers, four campaigns: core reached at runs 10-13, star freed at runs 20-25. In the run that first reaches them the bot clears about 3 Tektite, 4 Iridium Bars, 4 Opal and 3-4 Void. Late runs reach the money cap (`Game.MAX_AMOUNT`), as accepted.
+- Ideas: a perk or upgrade that helps drones on the core; showing the best core attempt on the run-end screen; a New Game+.
 
 ## Tuning notes and smaller ideas
 

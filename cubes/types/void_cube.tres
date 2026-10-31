@@ -8,7 +8,8 @@
 script = ExtResource("1_type")
 id = &"void_cube"
 display_name = "Void Cube"
-price = 1000000000
+story_line = "Nothing reflects down here. You must be close."
+price = 1000000000000
 grid_size = Vector2i(8, 8)
 square_type = ExtResource("2_square")
 mixed_square_type = ExtResource("3_rock")

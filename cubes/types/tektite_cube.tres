@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CubeType" format=3]
+
+[ext_resource type="Script" path="res://cubes/cube_type.gd" id="1_type"]
+[ext_resource type="Resource" path="res://cubes/squares/tektite_square.tres" id="2_square"]
+[ext_resource type="Resource" path="res://cubes/squares/rock_square.tres" id="3_rock"]
+
+[resource]
+script = ExtResource("1_type")
+id = &"tektite_cube"
+display_name = "Tektite Cube"
+story_line = "Glass, melted by a fall long ago. The star came down hard."
+price = 1000000000
+grid_size = Vector2i(9, 9)
+square_type = ExtResource("2_square")
+mixed_square_type = ExtResource("3_rock")
+mixed_chance = 0.08

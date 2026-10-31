@@ -114,6 +114,24 @@ func get_squares() -> Array[CubeSquare]:
 	return _squares
 
 
+## Clicks still needed to finish it: the hits left on its unbroken required squares.
+func get_hits_left() -> int:
+	var total := 0
+	for square in _squares:
+		if square.square_type.required and not square.is_broken():
+			total += square.hp
+	return total
+
+
+## Clicks the whole cube took when it was new: its required squares' full hits.
+func get_total_hits() -> int:
+	var total := 0
+	for square in _squares:
+		if square.square_type.required:
+			total += square.max_hp
+	return total
+
+
 ## What all the cube's squares pay together, broken or not.
 func get_total_value() -> int:
 	var total := 0

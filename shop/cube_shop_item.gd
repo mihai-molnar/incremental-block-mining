@@ -10,10 +10,13 @@ func get_title() -> String:
 
 
 ## Squares, clicks per square (after upgrades) and payout, one per line. Cubes with rocks
-## say how many, and their total leaves the rocks out.
+## say how many, and their total leaves the rocks out. The Star Core pays nothing: its
+## last line says what breaking it does instead.
 func get_description() -> String:
 	var count := cube_type.get_square_count()
 	var clicks := Game.get_square_hp(cube_type.square_type, cube_type)
+	if cube_type.is_goal:
+		return "%d squares\n%d click%s each\nBreak it to free the star" % [count, clicks, "" if clicks == 1 else "s"]
 	var each := cube_type.square_type.get_value(cube_type)
 	var squares := "%d squares" % count
 	var total := Currency.format(each * count)
@@ -36,14 +39,42 @@ func create_icon() -> Control:
 	return icon
 
 
+## Cubes show their mastery; the Star Core has none.
 func create_meter() -> Control:
+	if cube_type.is_goal:
+		return null
 	var meter := MasteryMeter.new()
 	meter.cube_type = cube_type
 	return meter
 
 
 func can_auto_buy() -> bool:
-	return Game.get_auto_buy_slots() > 0
+	return not cube_type.is_goal and Game.get_auto_buy_slots() > 0
+
+
+## Only one Star Core can be out at a time, and once the star is free it isn't sold again.
+func can_purchase() -> bool:
+	if cube_type.is_goal and (Game.star_core_out or Game.star_free):
+		return false
+	return super()
+
+
+func is_owned() -> bool:
+	return cube_type.is_goal and Game.star_free
+
+
+func get_owned_label() -> String:
+	return "Freed"
+
+
+func get_block_reason() -> String:
+	if cube_type.is_goal and Game.star_core_out and is_available():
+		return "The Star Core is already out"
+	return ""
+
+
+func is_always_shown() -> bool:
+	return cube_type.is_goal
 
 
 func is_auto_buying() -> bool:

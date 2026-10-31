@@ -137,6 +137,11 @@ func modify_square_hp(_square_type: SquareType, hp: int, _level: int) -> int:
 	return hp
 
 
+## Clicks one of the player's hits takes off a square of a cube of this type.
+func modify_hit_damage(_cube_type: CubeType, damage: int, _level: int) -> int:
+	return damage
+
+
 ## Side, in squares, of the area one click hits.
 func modify_pickaxe_size(size: int, _level: int) -> int:
 	return size

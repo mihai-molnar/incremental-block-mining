@@ -8,6 +8,7 @@
 script = ExtResource("1_type")
 id = &"meteorite"
 display_name = "Meteorite"
+story_line = "The rock is scorched here, as if something burned its way down."
 price = 5000000
 grid_size = Vector2i(9, 9)
 square_type = ExtResource("2_square")

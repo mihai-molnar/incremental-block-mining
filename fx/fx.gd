@@ -83,6 +83,12 @@ func squares_broken(squares: Array[CubeSquare], payout: int, soft := false) -> v
 		sparks.size_max = 1
 		sparks.start()
 	center /= squares.size()
+	# Squares that pay nothing (the Star Core's, rocks) show no popup or coins.
+	if payout <= 0:
+		if not soft:
+			shake(minf(0.2 + 0.04 * (squares.size() - 1), 0.5))
+		Sfx.play(&"break", 0.1, -8.0 if soft else minf(squares.size() - 1, 4.0))
+		return
 	popup_text(center + Vector2(0, -10), "+" + Currency.format(payout))
 	if pouches > 0:
 		coins(center, payout, 8 + 6 * mini(pouches, 2))
@@ -209,6 +215,53 @@ func lucky_caught(at: Vector2, frenzy: Frenzy) -> void:
 	shake(0.6)
 	hitstop(0.06)
 	Sfx.play(&"frenzy", 0.0)
+
+
+## The Star Core breaking: a freeze, a white-out as the core blows apart in a burst of
+## light, then the star swelling where it was and rising off the top of the screen. Await
+## it (~3.5s). `core` is null when it's already gone (the middle of the field then).
+func star_freed(core: Cube) -> void:
+	var at := core.global_position if core else get_viewport_rect().get_center()
+	Sfx.play(&"explode", 0.0)
+	shake(1.0)
+	await hitstop(0.35)
+	flash_screen(1.0)
+	if core:
+		cube_exploded(core)
+		core.hide()
+	Sfx.play(&"lucky", 0.0)
+	var ring := SquareShockwave.new()
+	ring.position = at
+	ring.start_half_size = 20.0
+	ring.end_half_size = 220.0
+	ring.thickness = 8.0
+	ring.duration = 0.8
+	ring.color = Color("ffcd75")
+	add_child(ring)
+	var sparks := _burst(at, LUCKY_COLORS, 90)
+	sparks.speed_min = 120.0
+	sparks.speed_max = 340.0
+	sparks.gravity = 60.0
+	sparks.damping = 2.0
+	sparks.lifetime_min = 0.6
+	sparks.lifetime_max = 1.4
+	sparks.size_min = 1
+	sparks.size_max = 3
+	sparks.emit_extents = Vector2(40, 40)
+	sparks.start()
+	var star := Sprite2D.new()
+	star.texture = PixelSprites.get_texture(&"fallen_star")
+	star.position = at.round()
+	star.scale = Vector2.ONE * 0.25
+	add_child(star)
+	var tween := star.create_tween()
+	tween.tween_property(star, "scale", Vector2.ONE * 2.0, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(0.7)
+	tween.tween_callback(Sfx.play.bind(&"frenzy", 0.0))
+	tween.tween_property(star, "position:y", -60.0, 1.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_method(func(_t: float) -> void: lucky_trail(star.position), 0.0, 1.0, 1.8)
+	await tween.finished
+	star.queue_free()
 
 
 ## The pickaxe out of HP: it shatters at the cursor, and the run is over.

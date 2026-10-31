@@ -26,6 +26,16 @@
 [ext_resource type="Resource" path="res://shop/items/rose_quartz_cube_item.tres" id="35_rose_quartz_cube"]
 [ext_resource type="Resource" path="res://shop/items/magma_cube_item.tres" id="36_magma_cube"]
 [ext_resource type="Resource" path="res://shop/items/void_cube_item.tres" id="37_void_cube"]
+[ext_resource type="Resource" path="res://shop/items/tektite_cube_item.tres" id="110_tektite_cube"]
+[ext_resource type="Resource" path="res://shop/items/iridium_bar_item.tres" id="111_iridium_bar"]
+[ext_resource type="Resource" path="res://shop/items/opal_cube_item.tres" id="112_opal_cube"]
+[ext_resource type="Resource" path="res://shop/items/star_core_item.tres" id="113_star_core"]
+[ext_resource type="Script" path="res://ui/core_meter.gd" id="114_core_meter"]
+[ext_resource type="Resource" path="res://upgrades/perks/starsteel_edge.tres" id="115_starsteel_edge"]
+[ext_resource type="Resource" path="res://achievements/items/starlight.tres" id="116_ach_starlight"]
+[ext_resource type="Script" path="res://ui/victory_screen.gd" id="117_victory_screen"]
+[ext_resource type="Script" path="res://ui/story_card.gd" id="118_story_card"]
+[ext_resource type="Script" path="res://ui/story_toast.gd" id="119_story_toast"]
 [ext_resource type="Resource" path="res://upgrades/items/mining_drone.tres" id="40_drone"]
 [ext_resource type="Resource" path="res://upgrades/items/drone_overclock.tres" id="41_overclock"]
 [ext_resource type="Resource" path="res://upgrades/items/auto_buyer.tres" id="42_auto_buyer"]
@@ -213,6 +223,16 @@ offset_bottom = 134.0
 mouse_filter = 2
 script = ExtResource("57_frenzy_meter")
 
+[node name="CoreMeter" type="Control" parent="Hud/Root" node_paths=PackedStringArray("work_area")]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 4.0
+offset_right = 286.0
+offset_bottom = 30.0
+mouse_filter = 2
+script = ExtResource("114_core_meter")
+work_area = NodePath("../../../WorkArea")
+
 [node name="GoalMeter" type="Control" parent="Hud/Root"]
 layout_mode = 1
 anchors_preset = 2
@@ -232,13 +252,18 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 176.0
-offset_top = -160.0
+offset_top = -202.0
 offset_right = 396.0
 offset_bottom = -36.0
 grow_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 2
 alignment = 2
+
+[node name="StoryToast" type="Control" parent="Hud/Root/Toasts"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("119_story_toast")
 
 [node name="AchievementToast" type="Control" parent="Hud/Root/Toasts"]
 layout_mode = 2
@@ -341,7 +366,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("11_page")
-items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube"), ExtResource("18_jade_cube"), ExtResource("19_obsidian_cube"), ExtResource("20_gold_bar"), ExtResource("30_silver_cube"), ExtResource("31_amethyst_cube"), ExtResource("32_emerald_cube"), ExtResource("33_ruby_bar"), ExtResource("34_meteorite"), ExtResource("35_rose_quartz_cube"), ExtResource("36_magma_cube"), ExtResource("37_void_cube")])
+items = Array[ExtResource("7_shop_item")]([ExtResource("8_blue"), ExtResource("13_yellow_cube"), ExtResource("15_grey_cube"), ExtResource("17_red_cube"), ExtResource("18_jade_cube"), ExtResource("19_obsidian_cube"), ExtResource("20_gold_bar"), ExtResource("30_silver_cube"), ExtResource("31_amethyst_cube"), ExtResource("32_emerald_cube"), ExtResource("33_ruby_bar"), ExtResource("34_meteorite"), ExtResource("35_rose_quartz_cube"), ExtResource("36_magma_cube"), ExtResource("110_tektite_cube"), ExtResource("111_iridium_bar"), ExtResource("112_opal_cube"), ExtResource("37_void_cube"), ExtResource("113_star_core")])
 title = "Shop"
 toggle_action = &"toggle_shop"
 tab_button = NodePath("../../../../../Tabs/ShopTab")
@@ -362,7 +387,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 script = ExtResource("78_achievements_page")
-achievements = Array[ExtResource("79_achievement")]([ExtResource("81_ach_break_1k"), ExtResource("82_ach_break_10k"), ExtResource("83_ach_break_100k"), ExtResource("84_ach_clear_100"), ExtResource("85_ach_clear_1000"), ExtResource("86_ach_clear_void"), ExtResource("87_ach_one_click"), ExtResource("88_ach_one_click_gold"), ExtResource("89_ach_big_click"), ExtResource("90_ach_chain_10"), ExtResource("91_ach_chain_25"), ExtResource("92_ach_run_300"), ExtResource("93_ach_run_1000"), ExtResource("94_ach_run_2500"), ExtResource("95_ach_earn_1m"), ExtResource("96_ach_run_earn_1b"), ExtResource("97_ach_earn_1t"), ExtResource("98_ach_lucky_10"), ExtResource("99_ach_lucky_100"), ExtResource("100_ach_master_1"), ExtResource("101_ach_master_5"), ExtResource("102_ach_master_15"), ExtResource("103_ach_runs_10"), ExtResource("104_ach_runs_50"), ExtResource("105_ach_shards_100"), ExtResource("106_ach_shards_10k")])
+achievements = Array[ExtResource("79_achievement")]([ExtResource("81_ach_break_1k"), ExtResource("82_ach_break_10k"), ExtResource("83_ach_break_100k"), ExtResource("84_ach_clear_100"), ExtResource("85_ach_clear_1000"), ExtResource("86_ach_clear_void"), ExtResource("87_ach_one_click"), ExtResource("88_ach_one_click_gold"), ExtResource("89_ach_big_click"), ExtResource("90_ach_chain_10"), ExtResource("91_ach_chain_25"), ExtResource("92_ach_run_300"), ExtResource("93_ach_run_1000"), ExtResource("94_ach_run_2500"), ExtResource("95_ach_earn_1m"), ExtResource("96_ach_run_earn_1b"), ExtResource("97_ach_earn_1t"), ExtResource("98_ach_lucky_10"), ExtResource("99_ach_lucky_100"), ExtResource("100_ach_master_1"), ExtResource("101_ach_master_5"), ExtResource("102_ach_master_15"), ExtResource("103_ach_runs_10"), ExtResource("104_ach_runs_50"), ExtResource("105_ach_shards_100"), ExtResource("106_ach_shards_10k"), ExtResource("116_ach_starlight")])
 title = "Achievements"
 toggle_action = &"toggle_achievements"
 tab_button = NodePath("../../../../../Tabs/AchievementsTab")
@@ -428,7 +453,20 @@ fx = NodePath("../Fx")
 work_area = NodePath("../WorkArea")
 drones = NodePath("../Drones")
 sidebar = NodePath("../Hud/Root/Sidebar")
-perks = Array[ExtResource("7_shop_item")]([ExtResource("72_sturdy_handle"), ExtResource("66_head_start"), ExtResource("70_diamond_tips"), ExtResource("67_drone_bay"), ExtResource("73_drone_plating"), ExtResource("71_four_leaf"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance")])
+perks = Array[ExtResource("7_shop_item")]([ExtResource("72_sturdy_handle"), ExtResource("66_head_start"), ExtResource("70_diamond_tips"), ExtResource("67_drone_bay"), ExtResource("73_drone_plating"), ExtResource("71_four_leaf"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance"), ExtResource("115_starsteel_edge")])
+
+[node name="Victory" type="CanvasLayer" parent="." node_paths=PackedStringArray("fx", "work_area", "drones", "run_end", "sidebar")]
+layer = 41
+script = ExtResource("117_victory_screen")
+fx = NodePath("../Fx")
+work_area = NodePath("../WorkArea")
+drones = NodePath("../Drones")
+run_end = NodePath("../RunEnd")
+sidebar = NodePath("../Hud/Root/Sidebar")
+
+[node name="Story" type="CanvasLayer" parent="."]
+layer = 42
+script = ExtResource("118_story_card")
 
 [node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
 

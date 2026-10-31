@@ -91,14 +91,15 @@ func set_teaser(on: bool) -> void:
 
 
 func _is_locked_teaser() -> bool:
-	return _teaser and not item.is_available()
+	return (_teaser or item.is_always_shown()) and not item.is_available()
 
 
 func _refresh() -> void:
 	var locked := _is_locked_teaser()
 	visible = item.is_available() or locked
 	_title_label.text = item.get_title()
-	_icon.modulate = LOCKED_TINT if locked else Color.WHITE
+	# An item that's always shown keeps its colors, so the goal glows from the start.
+	_icon.modulate = LOCKED_TINT if locked and not item.is_always_shown() else Color.WHITE
 	_lock_icon.visible = locked
 	_buy_button.visible = not locked
 	if _meter:
