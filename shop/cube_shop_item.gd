@@ -36,6 +36,12 @@ func create_icon() -> Control:
 	return icon
 
 
+func create_meter() -> Control:
+	var meter := MasteryMeter.new()
+	meter.cube_type = cube_type
+	return meter
+
+
 func can_auto_buy() -> bool:
 	return Game.get_auto_buy_slots() > 0
 

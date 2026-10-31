@@ -75,6 +75,17 @@ later tiers climb steeply, so upgrades stay worth saving for all the way down th
 - **Clear bonus:** finishing a cube pays a quarter of its squares' value on top (x1.25),
   shown as a "CLEAR!" banner. Cubes the drones finish get it too.
 
+### Cube mastery
+
+Every square you break on a cube counts toward that cube type's mastery, whether your
+clicks, explosions or drones broke it. Each mastery level makes that cube type's squares,
+and its clear bonus, pay 5% more, up to level 10 (+50%, "Mastered"). Level N takes N(N+1)/2
+cubes' worth of its squares: the first cube you clear of a type gets it to level 1, then 3
+cubes for level 2, 6 for level 3 and 55 for level 10. Mastery is kept from run to run.
+
+Each cube's shop row shows its mastery level, a bar filling toward the next level and its
+bonus. A "MASTERY UP!" toast announces each new level.
+
 ### Lucky Cubes and frenzies
 
 After every 60 to 120 squares you break (a random number each time), a golden Lucky Cube
@@ -110,7 +121,7 @@ pays 10 and 50M pays 100. The bar under the HP bar fills toward the run's next S
 the number next to it, your Shards plus the run's so far, goes up each time it fills.
 
 - Money, upgrades, the cubes on the field, drones and the Auto-Buyer's pick reset.
-- Shards, perks, unlocked cubes and upgrades, and lifetime stats stay.
+- Shards, perks, unlocked cubes and upgrades, cube mastery and lifetime stats stay.
 - Every Shard you've ever earned adds 2% to all earnings, spent or not.
 
 Shards buy perks on the run-end screen, which are kept forever:

@@ -38,10 +38,11 @@ Unpredictable rewards are the strongest hook in the genre.
   - Clear a Gold Bar in one click
 - Needs stat counters in `Game` (squares broken, longest chain, cubes cleared, lifetime earned). Save them too.
 
-### Cube mastery
-- Each cube type levels up from squares broken on it (Blue Lv 7: +35% value), with a progress bar on its shop row.
-- Gives a reason to keep buying cheap cubes.
-- Store the levels by cube id in `Game`. A `modify_square_value` hook would let both mastery and future upgrades scale payouts.
+### Cube mastery (done)
+- Each cube type levels up from squares broken on it, drones' included: +5% pay per level on its squares and clear bonus, up to level 10 (+50%). Level N takes N(N+1)/2 cubes' worth of its squares (1 cube for level 1, 55 for level 10). Its shop row shows the level and a bar; a "MASTERY UP!" toast announces each level.
+- Kept across runs, so each run climbs the early ladder a little faster, and cheap cubes level fastest per HP spent.
+- The count is a lifetime stat per cube (`broken:<id>`), ready for achievements ("Master 5 cubes").
+- Ideas: a perk that speeds mastery, a run-end line showing the levels gained in the run.
 
 ## Phase 4: always show the next goal
 

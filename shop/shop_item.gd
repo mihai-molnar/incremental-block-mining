@@ -97,5 +97,10 @@ func create_icon() -> Control:
 	return Control.new()
 
 
+## Builds a line shown under the item's description (a cube's mastery bar), or null.
+func create_meter() -> Control:
+	return null
+
+
 func _apply() -> void:
 	pass

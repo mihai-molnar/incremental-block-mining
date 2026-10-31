@@ -1,6 +1,7 @@
 class_name ShopItemRow
 extends PanelContainer
 ## One entry in the shop: icon, name, description and a buy button showing the price.
+## Cubes add their mastery bar under the description (ShopItem.create_meter).
 ## Items the auto-buyer can buy get an Auto toggle under the buy button. As its page's
 ## teaser, a locked item shows dimmed, with its unlock goal and a lock instead.
 
@@ -14,6 +15,8 @@ var _icon: Control
 var _lock_icon: TextureRect
 var _title_label: Label
 var _description_label: Label
+## The item's own line under the description (a cube's mastery bar), or null.
+var _meter: Control
 var _buy_button: Button
 var _auto_button: Button
 var _reason_label: Label
@@ -40,6 +43,9 @@ func _ready() -> void:
 	_description_label.theme_type_variation = &"MutedLabel"
 	_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text_box.add_child(_description_label)
+	_meter = item.create_meter()
+	if _meter:
+		text_box.add_child(_meter)
 	_reason_label = Label.new()
 	_reason_label.theme_type_variation = &"WarningLabel"
 	_reason_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -95,6 +101,8 @@ func _refresh() -> void:
 	_icon.modulate = LOCKED_TINT if locked else Color.WHITE
 	_lock_icon.visible = locked
 	_buy_button.visible = not locked
+	if _meter:
+		_meter.visible = not locked
 	if locked:
 		_description_label.text = "%s (%s)" % [item.unlock.get_description(), item.unlock.get_progress_text()]
 		_reason_label.visible = false

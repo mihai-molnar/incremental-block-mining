@@ -59,10 +59,12 @@ var _hovered_squares: Array[CubeSquare] = []
 var _resolving_click := false
 var _clicked_hits: Array[CubeSquare] = []
 var _clicked_breaks: Array[CubeSquare] = []
-## What the squares broken by the click being resolved pay, multiplier squares included.
-var _clicked_value := 0
-## Each cube's value multiplier as the click being resolved first reached it, so breaking
-## a multiplier square doesn't take the bonus off the squares broken alongside it.
+## What the squares broken by the click being resolved pay, multiplier squares and mastery
+## included. Not rounded per square, so mastery's +5% counts on 2-coin squares.
+var _clicked_value := 0.0
+## Each cube's value multiplier (its multiplier squares times its type's mastery) as the
+## click being resolved first reached it, so breaking a multiplier square doesn't take the
+## bonus off the squares broken alongside it.
 var _cube_bonus := {}
 ## Explosive and lightning squares broken since the last blast went off; the next wave
 ## of the chain.
@@ -310,8 +312,13 @@ func _get_bolt_span(blast: Blast, struck: Array[CubeSquare]) -> Rect2:
 func _hit(square: CubeSquare, damage: int) -> void:
 	var cube := square.get_parent() as Cube
 	if not _cube_bonus.has(cube):
-		_cube_bonus[cube] = cube.get_value_multiplier()
+		_cube_bonus[cube] = _get_cube_bonus(cube)
 	cube.hit_square(square, damage)
+
+
+## What a cube's squares pay right now: its multiplier squares' bonus times its mastery.
+func _get_cube_bonus(cube: Cube) -> float:
+	return cube.get_value_multiplier() * Game.get_mastery_multiplier(cube.cube_type)
 
 
 func _take_pending_blasts() -> Array[Blast]:
@@ -409,8 +416,8 @@ func _on_square_hit(_cube: Cube, square: CubeSquare) -> void:
 
 func _on_square_broken(cube: Cube, square: CubeSquare) -> void:
 	_clicked_breaks.append(square)
-	var bonus: float = _cube_bonus.get(cube, cube.get_value_multiplier())
-	_clicked_value += roundi(square.value * bonus)
+	var bonus: float = _cube_bonus[cube] if _cube_bonus.has(cube) else _get_cube_bonus(cube)
+	_clicked_value += square.value * bonus
 	var radius := Game.get_blast_radius(square.square_type)
 	if radius > 0:
 		_pending_blasts.append(Blast.new(square.global_position, radius))
@@ -441,10 +448,20 @@ func _resolve_click(soft := false) -> void:
 		Game.earn(payout)
 		fx.squares_broken(_clicked_breaks, payout, soft)
 		squares_broken.emit(_clicked_breaks.size(), soft)
+		_add_mastery(_clicked_breaks)
 	_clicked_hits = []
 	_clicked_breaks = []
-	_clicked_value = 0
+	_clicked_value = 0.0
 	_cube_bonus.clear()
+
+
+## Counts broken squares toward their cube type's mastery, drones' included.
+func _add_mastery(squares: Array[CubeSquare]) -> void:
+	var counts := {}
+	for square in squares:
+		counts[square.cube_type] = counts.get(square.cube_type, 0) + 1
+	for cube_type: CubeType in counts:
+		Game.add_mastery(cube_type, counts[cube_type])
 
 
 ## A finished cube pays its clear bonus right away; the banner shows with the explosion.
@@ -453,7 +470,7 @@ func _on_cube_completed(cube: Cube) -> void:
 		_end_drag()
 	_set_hovered(null, [])
 	var multiplier := Game.get_clear_bonus()
-	var bonus := Game.get_clear_payout(cube.get_total_value())
+	var bonus := Game.get_clear_payout(cube.get_total_value() * Game.get_mastery_multiplier(cube.cube_type))
 	Game.record_cube_cleared(cube.cube_type)
 	Game.earn(bonus)
 	cube.flash_white()

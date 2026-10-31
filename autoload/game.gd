@@ -14,6 +14,10 @@ signal timed_effect_started(effect: Upgrade)
 signal timed_effect_ended(effect: Upgrade)
 ## A lifetime stat went up.
 signal stats_changed
+## Squares broken on a cube type counted toward its mastery, and its mastery reaching a
+## new level.
+signal mastery_changed(cube_type: CubeType)
+signal mastery_leveled_up(cube_type: CubeType, level: int)
 ## Shop items whose unlock goals were just met.
 signal items_unlocked(items: Array[ShopItem])
 signal shards_changed(shards: int)
@@ -75,6 +79,11 @@ const CRIT_CHANCE := 0.02
 const LUCKY_INTERVAL_MIN := 60
 const LUCKY_INTERVAL_MAX := 120
 const FRENZY_DURATION := 30.0
+## Each mastery level of a cube type makes its squares pay MASTERY_BONUS more, up to
+## MASTERY_MAX_LEVEL. Level N takes N(N+1)/2 cubes' worth of its squares broken, over
+## every run: 1 cube for level 1, 3 for 2, 6 for 3, 55 for 10.
+const MASTERY_BONUS := 0.05
+const MASTERY_MAX_LEVEL := 10
 
 var money: int = STARTING_MONEY
 ## Shards to spend on perks, and every Shard ever earned (which sets the earnings boost).
@@ -334,6 +343,52 @@ func get_cleared_stat(cube_type: CubeType) -> StringName:
 	return StringName("cleared:" + cube_type.id) if cube_type else STAT_CUBES_CLEARED
 
 
+## Counts squares broken on cubes of this type toward its mastery. Lifetime stats keep
+## the count, so mastery carries over from run to run.
+func add_mastery(cube_type: CubeType, squares: int) -> void:
+	if squares <= 0:
+		return
+	var level := get_mastery_level(cube_type)
+	var key := get_mastery_stat(cube_type)
+	_stats[key] = add_capped(get_stat(key), squares)
+	mastery_changed.emit(cube_type)
+	if get_mastery_level(cube_type) > level:
+		mastery_leveled_up.emit(cube_type, get_mastery_level(cube_type))
+
+
+## Stat key for squares broken on cubes of one type.
+func get_mastery_stat(cube_type: CubeType) -> StringName:
+	return StringName("broken:" + cube_type.id)
+
+
+func get_mastery_level(cube_type: CubeType) -> int:
+	var squares := get_stat(get_mastery_stat(cube_type))
+	var level := 0
+	while level < MASTERY_MAX_LEVEL and squares >= get_mastery_threshold(cube_type, level + 1):
+		level += 1
+	return level
+
+
+## Squares broken on cubes of this type that mastery `level` takes, counted from zero.
+func get_mastery_threshold(cube_type: CubeType, level: int) -> int:
+	return roundi(cube_type.get_square_count() * level * (level + 1) / 2.0)
+
+
+## How far (0..1) this cube type's mastery is from its level to the next (1 at the max).
+func get_mastery_progress(cube_type: CubeType) -> float:
+	var level := get_mastery_level(cube_type)
+	if level >= MASTERY_MAX_LEVEL:
+		return 1.0
+	var from := get_mastery_threshold(cube_type, level)
+	var to := get_mastery_threshold(cube_type, level + 1)
+	return clampf(float(get_stat(get_mastery_stat(cube_type)) - from) / (to - from), 0.0, 1.0)
+
+
+## What squares on cubes of this type pay for its mastery: x1, plus MASTERY_BONUS a level.
+func get_mastery_multiplier(cube_type: CubeType) -> float:
+	return 1.0 + get_mastery_level(cube_type) * MASTERY_BONUS
+
+
 ## Called by shop pages for items with an unlock goal. Goals already met, and upgrades
 ## already owned, unlock quietly.
 func register_unlockable(item: ShopItem) -> void:
@@ -537,8 +592,9 @@ func get_clear_bonus() -> float:
 	return maxf(multiplier, 1.0)
 
 
-## The money a finished cube pays on top of its squares, which were worth `cube_value`.
-func get_clear_payout(cube_value: int) -> int:
+## The money a finished cube pays on top of its squares, which were worth `cube_value`
+## (with its mastery).
+func get_clear_payout(cube_value: float) -> int:
 	return roundi(minf(cube_value * (get_clear_bonus() - 1.0) * get_payout_multiplier(), MAX_AMOUNT))
 
 
