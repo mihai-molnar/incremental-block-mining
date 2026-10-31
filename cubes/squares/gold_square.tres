@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"gold"
 display_name = "Gold"
-hp = 20
+hp = 27
 value = 300
 shimmer = true
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

@@ -46,7 +46,7 @@ Unpredictable rewards are the strongest hook in the genre.
 
 - **Locked silhouettes (done as unlock goals):** cubes and upgrades unlock through goals (clear cubes, break squares, earn money), and each list teases its cheapest locked item with the goal and progress.
 - **Next goal:** at the bottom of the field (the top-left column was full, and the income readout needs the room next to the money): the locked item whose goal is furthest along, its goal, a bar and what it unlocks. Unlocks are kept across runs, so once they're all done it shows the achievement closest to earned instead.
-- **Income per minute:** "+1.2K/min" next to the money counter, from earnings over the last minute (or since the run started, over 10s at the least).
+- **Income per minute:** "+1.2K/min" next to the money counter, from earnings over the last minute. Removed after playtesting: not wanted.
 - **Stats page ([T]):** lifetime totals, records and bonuses. Lifetime clicks and time mining are new stats, added up as runs end.
 
 ## The Fallen Star (done)
@@ -58,6 +58,23 @@ Unpredictable rewards are the strongest hook in the genre.
   - With the core at 2000 clicks a square the bot won at run 11. A 1.5x-per-tier Starsteel price made late damage grow only with the log of Shards, so no toughness gave a steady finish (at 24,000 it never won in 40 runs). A flat price fixed that: every run's Shards add damage, and each try gets further.
   - Final numbers, four campaigns: core reached at runs 10-13, star freed at runs 20-25. In the run that first reaches them the bot clears about 3 Tektite, 4 Iridium Bars, 4 Opal and 3-4 Void. Late runs reach the money cap (`Game.MAX_AMOUNT`), as accepted.
 - Ideas: a perk or upgrade that helps drones on the core; showing the best core attempt on the run-end screen; a New Game+.
+
+## Balance notes from playtesting (to fix next)
+
+From the user's save after 6 runs (51 minutes of mining in all). Run 6 lasted 25 minutes:
+721 clicks, 477 cubes cleared, 6.7Qa earned (past the Star Core's 1Qa) and 51,212 Shards,
+against 43 Shards from the five runs before it. It ended out of boredom: the pickaxe wasn't
+going to break. The records show how: 89 one-click clears (22 Opal, 17 Void, 8 Iridium Bars,
+8 Magma, 7 Tektite), a biggest click of 694 squares and a chain of 85 blasts. Explosives and
+lightning chains plus frenzies (Money x7 above all) did it. The feeling of obliterating
+cubes in one click is wanted, but near the end of the game, not by run 5 or 6.
+
+- **Chains clear deep cubes too early.** A blast breaks any square outright, however deep the cube, so a few percent of explosives and lightning wipe out Void Cubes in one click. Options: blasts deal clicks off instead of breaking (like the Star Core's `blast_damage`), growing with Blast Radius tiers or a late perk; a cap on chain links per click; lower or later Explosive and Lightning chances.
+- **Runs stop ending.** Income climbs 4 to 10 times with each cube step and chains make clicks nearly free, so the Whetstone (25 HP, 4x the price each time) and Unbreakable keep the pickaxe going. Options: Whetstone prices that follow the run's earnings, a limit per run, or charging some HP for blast breaks.
+- **One run pays for every perk.** Shards are ∛(earnings ÷ 50), so one huge run pays far more than every run before it. All the perks but Starsteel Edge cost about 11K Shards together (Shard Resonance's 10 tiers are most of it), so one 6.7Qa run covers all of them, or Starsteel Edge's first tier with change to spare. Options: a steeper root or a log, perk prices that climb faster, more Shard sinks before Starsteel.
+- **Frenzies multiply the problem.** Money x7 on top of chains, made longer by Gold Fever. Options: a smaller multiplier, or one that grows with Lucky Charm tiers instead.
+- **The tuning bot is too timid.** It clicks the spot with the most squares and buys the cheapest upgrades, so it neither aims at explosives nor plans around frenzies. It reached the core around runs 10-13; the player was past 1Qa in run 6. Retune with a bot that plays chains, or from playtest saves.
+- **Sharp Pickaxe takes clicks off flat.** Cheap cubes fall to 1 click, and at high tiers a pricier cube can pay less a click than the one below (at Sharp 26 a Gold Bar takes 1 click for 300, Platinum 4 clicks for 900). Clicks now rise with every step up the ladder, so a pricier cube never takes fewer clicks a square, but a percentage cut would keep the ladder's ratios at every tier (see "Sharp Pickaxe fades" below).
 
 ## Tuning notes and smaller ideas
 

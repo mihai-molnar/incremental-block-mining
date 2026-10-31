@@ -1,14 +1,18 @@
 class_name AchievementRow
 extends PanelContainer
 ## One achievement on the achievements page: icon, title, goal and what it adds to all
-## earnings. Until it's earned, the icon is dimmed and the goal shows its progress.
+## earnings. Until it's earned, the icon is dimmed and the goal shows its progress. A NEW
+## tag follows the title while `is_new`.
 
 const EARNED_COLOR := Color("ffcd75")
+const NEW_COLOR := Color("73eff7")
 
 var achievement: Achievement
+var is_new := false
 
 var _icon: Control
 var _title_label: Label
+var _new_label: Label
 var _description_label: Label
 var _bonus_label: Label
 
@@ -26,9 +30,17 @@ func _ready() -> void:
 	text_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	text_box.add_theme_constant_override("separation", 3)
 	row.add_child(text_box)
+	var title_line := HBoxContainer.new()
+	title_line.add_theme_constant_override("separation", 6)
+	text_box.add_child(title_line)
 	_title_label = Label.new()
 	_title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text_box.add_child(_title_label)
+	_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_line.add_child(_title_label)
+	_new_label = Label.new()
+	_new_label.text = "NEW"
+	_new_label.add_theme_color_override("font_color", NEW_COLOR)
+	title_line.add_child(_new_label)
 	_description_label = Label.new()
 	_description_label.theme_type_variation = &"MutedLabel"
 	_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -44,6 +56,7 @@ func refresh() -> void:
 	var earned := achievement.is_earned()
 	_icon.modulate = Color.WHITE if earned else ShopItemRow.LOCKED_TINT
 	_title_label.text = achievement.title
+	_new_label.visible = is_new
 	var goal := achievement.goal
 	_description_label.text = goal.get_description() if earned else "%s (%s)" % [goal.get_description(), goal.get_progress_text()]
 	_bonus_label.text = achievement.get_bonus_text()

@@ -11,6 +11,8 @@ var is_open := false
 var current_page: SidebarPage
 
 var _pages: Array[SidebarPage] = []
+## Where each page was scrolled to when the sidebar last switched away from it.
+var _scroll_by_page := {}
 ## Notification dot on each page's tab button (SidebarPage -> TextureRect).
 var _badges := {}
 var _slide := 0.0
@@ -65,9 +67,18 @@ func close() -> void:
 		_slide_to(false)
 
 
+## How much of the screen's right side the panel covers once it's done sliding.
+func get_covered_width() -> float:
+	return panel_width if is_open else 0.0
+
+
 func _set_page(page: SidebarPage) -> void:
 	if page != current_page:
+		if current_page:
+			_scroll_by_page[current_page] = _page_scroll.scroll_vertical
+		# The scroll range follows the new page's height once the containers re-sort.
 		_page_scroll.scroll_vertical = 0
+		_restore_scroll.call_deferred(page)
 	current_page = page
 	page.on_shown()
 	_title.text = page.title
@@ -75,6 +86,11 @@ func _set_page(page: SidebarPage) -> void:
 		p.visible = p == page
 	_update_tabs()
 	_update_badges()
+
+
+func _restore_scroll(page: SidebarPage) -> void:
+	if page == current_page:
+		_page_scroll.scroll_vertical = _scroll_by_page.get(page, 0)
 
 
 ## Marks the page on screen as seen, then shows a dot on every tab with news.

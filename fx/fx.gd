@@ -522,7 +522,7 @@ func _make_label(text: String, color: Color, small := false) -> Label:
 
 
 ## Centered lines of text that pop in at `at`, drift up for `duration` and fade, kept on
-## screen when `at` is near an edge.
+## screen and clear of the open sidebar when `at` is near an edge.
 func _banner(at: Vector2, labels: Array[Label], duration: float) -> void:
 	var banner := Node2D.new()
 	add_child(banner)
@@ -537,7 +537,8 @@ func _banner(at: Vector2, labels: Array[Label], duration: float) -> void:
 		y += label.size.y
 	var half := size / 2.0 + Vector2(4, 4)
 	var view := get_viewport_rect().size
-	banner.position = Vector2(clampf(at.x, half.x, view.x - half.x), clampf(at.y, half.y + 20.0, view.y - half.y)).round()
+	var right := view.x - (hud.get_covered_width() if hud else 0.0)
+	banner.position = Vector2(clampf(at.x, half.x, right - half.x), clampf(at.y, half.y + 20.0, view.y - half.y)).round()
 	banner.scale = Vector2.ONE * 2.0
 	var tween := banner.create_tween()
 	tween.tween_property(banner, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

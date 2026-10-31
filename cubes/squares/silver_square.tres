@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_square")
 id = &"silver"
-display_name = "Silver"
+display_name = "Platinum"
 hp = 30
 value = 900
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

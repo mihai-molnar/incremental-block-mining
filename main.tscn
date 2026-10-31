@@ -77,7 +77,6 @@
 [ext_resource type="Script" path="res://achievements/achievement.gd" id="79_achievement"]
 [ext_resource type="Script" path="res://ui/achievement_toast.gd" id="80_achievement_toast"]
 [ext_resource type="Script" path="res://ui/goal_meter.gd" id="107_goal_meter"]
-[ext_resource type="Script" path="res://ui/income_meter.gd" id="108_income_meter"]
 [ext_resource type="Script" path="res://ui/stats_page.gd" id="109_stats_page"]
 [ext_resource type="Resource" path="res://achievements/items/break_1k.tres" id="81_ach_break_1k"]
 [ext_resource type="Resource" path="res://achievements/items/break_10k.tres" id="82_ach_break_10k"]
@@ -189,11 +188,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MoneyLabel"
 text = "30"
-
-[node name="IncomeMeter" type="Control" parent="Hud/Root/MoneyBox"]
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("108_income_meter")
 
 [node name="RunMeter" type="Control" parent="Hud/Root"]
 layout_mode = 0

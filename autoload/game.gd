@@ -571,6 +571,13 @@ func get_achievement_count() -> int:
 	return _earned.size()
 
 
+## Earned achievements, in the order they were earned.
+func get_earned_achievements() -> Array[Achievement]:
+	var earned: Array[Achievement] = []
+	earned.assign(_earned.values())
+	return earned
+
+
 ## What earned achievements add to all earnings together (0.1 = +10%).
 func get_achievement_bonus() -> float:
 	var bonus := 0.0
@@ -582,6 +589,10 @@ func get_achievement_bonus() -> float:
 ## Whether achievements were earned since the achievements page was last on screen.
 func has_unseen_achievements() -> bool:
 	return not _unseen_achievements.is_empty()
+
+
+func is_achievement_unseen(achievement: Achievement) -> bool:
+	return achievement in _unseen_achievements
 
 
 func mark_achievements_seen() -> void:
@@ -920,6 +931,7 @@ func save_game() -> void:
 	data["best_run"] = best_run
 	data["unlocked"] = _unlocked.keys()
 	data["achievements"] = _earned.keys()
+	data["unseen_achievements"] = _unseen_achievements.map(func(a: Achievement) -> String: return a.resource_path)
 	saving.emit(data)
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
@@ -1026,6 +1038,11 @@ func _load_game() -> void:
 			var achievement := load_saved_resource(path) as Achievement
 			if achievement:
 				_earned[achievement.resource_path] = achievement
+	if data.get("unseen_achievements") is Array:
+		for path: Variant in data.unseen_achievements:
+			var achievement := load_saved_resource(path) as Achievement
+			if achievement and _earned.has(achievement.resource_path):
+				_unseen_achievements.append(achievement)
 	# Perks are in by now, so a save without the pickaxe starts it at full HP.
 	pickaxe_hp = int(data.get("pickaxe_hp", get_max_pickaxe_hp()))
 	if data.get("pickaxe_shield") is Array and data.pickaxe_shield.size() == 2:

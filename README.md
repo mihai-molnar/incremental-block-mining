@@ -42,9 +42,8 @@ away. Broken squares stay behind as faint outlines until the whole cube is gone.
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
 
-Next to the money counter, "+1.2K/min" shows what you've earned per minute over the last
-minute (or since the run started, if that's sooner). At the bottom of the field, the next
-goal shows with a progress bar: the locked cube or upgrade closest to unlocking, or once
+Each sidebar page remembers how far you scrolled it, so switching pages and back, or
+closing the sidebar, keeps your place. At the bottom of the field, the next goal shows with a progress bar: the locked cube or upgrade closest to unlocking, or once
 everything is unlocked, the achievement closest to earned.
 
 The Stats page ([T]) lists lifetime totals (time mining, runs, clicks, squares, cubes,
@@ -72,8 +71,8 @@ you buy.
 | Jasper Cubes     | Big Pickaxe        | Lucky Strike       | Jade Cube        |
 | Jade Cubes       | Steady Hands       | Clean Sweep        | Obsidian Cube    |
 | Obsidian Cubes   | Lightning Squares  | Gold Bar           |                  |
-| Gold Bars        | Coin Pouches       | Silver Cube        |                  |
-| Silver Cubes     | Prospector         | Hot Streak         | Amethyst Cube    |
+| Gold Bars        | Coin Pouches       | Platinum Cube      |                  |
+| Platinum Cubes   | Prospector         | Hot Streak         | Amethyst Cube    |
 | Amethyst Cubes   | Multiplier Squares | Lucky Charm        | Emerald Cube     |
 | Emerald Cubes    | Gold Fever         | Auto-Buyer         | Ruby Bar         |
 | Ruby Bars        |                    | Meteorite          |                  |
@@ -115,8 +114,10 @@ bonus. A "MASTERY UP!" toast announces each new level.
 
 The Achievements page ([A]) lists 27 milestones, each with its progress. Each one you reach
 adds to all earnings for good, on top of the Shard boost: +2%, or +5% for the hard ones,
-+93% for all of them. An "ACHIEVEMENT!" toast announces it and badges the tab. They're kept
-from run to run, and goals you'd already met before achievements existed count right away.
++93% for all of them. An "ACHIEVEMENT!" toast announces it and badges the tab. The ones
+you've earned are listed first, newest on top, and new ones are tagged NEW until you've seen
+the page. They're kept from run to run, and goals you'd already met before achievements
+existed count right away.
 
 "With one click" counts the chain reaction the click sets off, but not drones' hits. A cube
 cleared with one click has to be untouched when the click lands. Run goals count your best
@@ -227,26 +228,27 @@ Qa (quadrillions) and Qi (quintillions).
 | Jasper   |   150 |     6x6 |                 8 |              10 |
 | Jade     |   400 |     6x6 |                12 |              25 |
 | Obsidian |  1200 |     8x8 |                24 |              50 |
-| Gold Bar |  3000 |     8x3 |                20 |             300 |
-| Silver   |   12K |     6x6 |                30 |             900 |
+| Gold Bar |  3000 |     8x3 |                27 |             300 |
+| Platinum |   12K |     6x6 |                30 |             900 |
 | Amethyst |   50K |     7x7 |                36 |           3,000 |
 | Emerald  |  200K |     8x8 |                44 |           9,500 |
-| Ruby Bar |    1M |     8x3 |                40 |            140K |
+| Ruby Bar |    1M |     8x3 |                52 |            140K |
 | Meteorite |   5M |     9x9 |                60 |            220K |
 | Rose Quartz | 25M |    8x8 |                70 |           1.45M |
 | Magma    |  150M |    10x6 |                85 |            9.6M |
 | Tektite  |    1B |     9x9 |               110 |             52M |
-| Iridium Bar | 10B |    8x3 |               105 |            1.7B |
+| Iridium Bar | 10B |    8x3 |               118 |            1.7B |
 | Opal     |  100B |     8x8 |               125 |            6.8B |
 | Void     |    1T |     8x8 |               150 |             68B |
 
-From Silver on, each square has an 8% chance to be rock, except in the three Bars. Rocks
-take twice the clicks and pay nothing, but the cube is done without them: they crumble when
-its last other square breaks, and drones leave them alone. Prospector turns them into ore
-worth 3x a square.
+Clicks per square rise with every step up the ladder, so a pricier cube never breaks
+faster: a Bar is small and rich, not easy. From Platinum on, each square has an 8% chance
+to be rock, except in the three Bars. Rocks take twice the clicks and pay nothing, but the
+cube is done without them: they crumble when its last other square breaks, and drones leave
+them alone. Prospector turns them into ore worth 3x a square.
 
 The first seven cubes pay back between 1.6x and 2.7x their price in squares, or 2x to 3.3x
-with the clear bonus. From Silver to Magma, each cube costs 4 to 7 times the one before and
+with the clear bonus. From Platinum to Magma, each cube costs 4 to 7 times the one before and
 pays back a little more; past Magma, each costs 10 times the one before (Tektite 1B, Iridium
 Bar 10B, Opal 100B, Void 1T) and pays back about 4x, counting rocks as worthless, so money
 keeps multiplying into the trillions. Combos pay more on top of that. Jade fits a maxed Big

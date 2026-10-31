@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"iridium"
 display_name = "Iridium"
-hp = 105
+hp = 118
 value = 1700000000
 shimmer = true
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

@@ -17,6 +17,7 @@ var _bump_tween: Tween
 @onready var _money_label: Label = %MoneyLabel
 @onready var _break_button: Button = %BreakButton
 @onready var _move_button: Button = %MoveButton
+@onready var _sidebar: Sidebar = $Root/Sidebar
 
 
 func _ready() -> void:
@@ -38,6 +39,11 @@ func _ready() -> void:
 ## Screen position flying coins should head to.
 func get_coin_target() -> Vector2:
 	return _coin_icon.get_global_rect().get_center()
+
+
+## How much of the screen's right side the sidebar covers.
+func get_covered_width() -> float:
+	return _sidebar.get_covered_width()
 
 
 func on_coin_arrived(value: int) -> void:
