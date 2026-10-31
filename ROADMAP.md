@@ -42,12 +42,12 @@ Unpredictable rewards are the strongest hook in the genre.
 - The count is a lifetime stat per cube (`broken:<id>`), ready for achievements ("Master 5 cubes").
 - Ideas: a perk that speeds mastery, a run-end line showing the levels gained in the run.
 
-## Phase 4: always show the next goal
+## Phase 4: always show the next goal (done)
 
 - **Locked silhouettes (done as unlock goals):** cubes and upgrades unlock through goals (clear cubes, break squares, earn money), and each list teases its cheapest locked item with the goal and progress.
-- **Progress bar:** under the money counter, filling toward the next unlock.
-- **Income per minute:** shown in the HUD, averaged over the last minute of `money_changed` deltas.
-- **Stats page:** a sidebar page with squares broken, longest chain, lifetime earnings and time played.
+- **Next goal:** at the bottom of the field (the top-left column was full, and the income readout needs the room next to the money): the locked item whose goal is furthest along, its goal, a bar and what it unlocks. Unlocks are kept across runs, so once they're all done it shows the achievement closest to earned instead.
+- **Income per minute:** "+1.2K/min" next to the money counter, from earnings over the last minute (or since the run started, over 10s at the least).
+- **Stats page ([T]):** lifetime totals, records and bonuses. Lifetime clicks and time mining are new stats, added up as runs end.
 
 ## Tuning notes and smaller ideas
 

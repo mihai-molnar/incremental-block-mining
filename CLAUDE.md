@@ -127,6 +127,8 @@ Mining Drone (`DroneUpgrade`) and Whetstone (`RepairUpgrade`) are bought again a
 
 **Combo (`world/combo.gd`).** A node under `Main` holding the hit count and time left; it emits `changed` on each hit and when it drops. `ComboMeter` (under `Hud/Root`) draws it below the money counter.
 
+**HUD goals and stats.** `GoalMeter` (bottom of the field) shows `Game.get_next_unlock()` (the locked item whose goal is furthest along, then the cheapest), or `get_next_achievement()` once nothing's locked, checking every 0.25s. `IncomeMeter` (in `MoneyBox`) buckets positive `money_changed` deltas per second over the last minute. `StatsPage` ([T]) builds its rows in code and refreshes while on screen; lifetime clicks and time are `STAT_CLICKS`/`STAT_SECONDS`, added in `end_run`, plus the current run's (`get_lifetime_clicks`, `get_time_mining`).
+
 **Fx (`fx/fx.gd`).** All "juice" goes through this node as named recipes (`squares_broken`, `critical_hits`, `cube_cleared`, `lucky_caught`, `cube_exploded`, `explosion`, ...): particles, debris chunks, shockwave, camera trauma shake, hitstop via `Engine.time_scale`, and flying coins. The HUD money counter only catches up as coins arrive, through `Hud.on_coin_arrived`.
 
 **Sidebar UI.** `Sidebar` holds `SidebarPage` children. Each page names its `tab_button` and `toggle_action`.

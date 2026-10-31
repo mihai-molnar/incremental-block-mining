@@ -27,11 +27,24 @@ away. Broken squares stay behind as faint outlines until the whole cube is gone.
 | S     | Open or close the shop                          |
 | U     | Open or close upgrades                          |
 | A     | Open or close achievements                      |
+| T     | Open or close stats                             |
 | Esc   | Pause menu                                      |
 | =     | Dev cheat: +100K money (debug builds only)      |
 | -     | Dev cheat: send a Lucky Cube now (debug builds only) |
 
 A red dot on the Upgrades tab means a new upgrade (or its next tier) has become affordable.
+
+Next to the money counter, "+1.2K/min" shows what you've earned per minute over the last
+minute (or since the run started, if that's sooner). At the bottom of the field, the next
+goal shows with a progress bar: the locked cube or upgrade closest to unlocking, or once
+everything is unlocked, the achievement closest to earned.
+
+The Stats page ([T]) lists lifetime totals (time mining, runs, clicks, squares, cubes,
+money, Shards, Lucky Cubes), records (the best run's clicks, time, cubes and money, the
+biggest click, the longest chain, one-click clears) and bonuses (the Shard and achievement
+boosts, achievements earned, cubes mastered). Time mining counts only time in runs, not
+pauses or the run-end screen. Lifetime clicks and time count from the version that added
+the page.
 
 ### Unlocking cubes and upgrades
 

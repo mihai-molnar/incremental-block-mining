@@ -66,6 +66,9 @@
 [ext_resource type="Script" path="res://ui/achievements_page.gd" id="78_achievements_page"]
 [ext_resource type="Script" path="res://achievements/achievement.gd" id="79_achievement"]
 [ext_resource type="Script" path="res://ui/achievement_toast.gd" id="80_achievement_toast"]
+[ext_resource type="Script" path="res://ui/goal_meter.gd" id="107_goal_meter"]
+[ext_resource type="Script" path="res://ui/income_meter.gd" id="108_income_meter"]
+[ext_resource type="Script" path="res://ui/stats_page.gd" id="109_stats_page"]
 [ext_resource type="Resource" path="res://achievements/items/break_1k.tres" id="81_ach_break_1k"]
 [ext_resource type="Resource" path="res://achievements/items/break_10k.tres" id="82_ach_break_10k"]
 [ext_resource type="Resource" path="res://achievements/items/break_100k.tres" id="83_ach_break_100k"]
@@ -177,6 +180,11 @@ layout_mode = 2
 theme_type_variation = &"MoneyLabel"
 text = "30"
 
+[node name="IncomeMeter" type="Control" parent="Hud/Root/MoneyBox"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("108_income_meter")
+
 [node name="RunMeter" type="Control" parent="Hud/Root"]
 layout_mode = 0
 offset_left = 8.0
@@ -204,6 +212,19 @@ offset_right = 160.0
 offset_bottom = 134.0
 mouse_filter = 2
 script = ExtResource("57_frenzy_meter")
+
+[node name="GoalMeter" type="Control" parent="Hud/Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 180.0
+offset_top = -33.0
+offset_right = 392.0
+offset_bottom = -5.0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("107_goal_meter")
 
 [node name="Toasts" type="VBoxContainer" parent="Hud/Root"]
 layout_mode = 1
@@ -346,12 +367,21 @@ title = "Achievements"
 toggle_action = &"toggle_achievements"
 tab_button = NodePath("../../../../../Tabs/AchievementsTab")
 
+[node name="StatsPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("tab_button")]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+script = ExtResource("109_stats_page")
+title = "Stats"
+toggle_action = &"toggle_stats"
+tab_button = NodePath("../../../../../Tabs/StatsTab")
+
 [node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
 layout_mode = 0
 offset_left = -108.0
 offset_top = 6.0
 offset_right = -6.0
-offset_bottom = 72.0
+offset_bottom = 94.0
 mouse_filter = 2
 theme_override_constants/separation = 4
 
@@ -372,6 +402,12 @@ layout_mode = 2
 focus_mode = 0
 toggle_mode = true
 text = "[A] Achievements"
+
+[node name="StatsTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[T] Stats"
 
 [node name="ScreenFx" type="CanvasLayer" parent="."]
 layer = 2

@@ -47,6 +47,10 @@ const STAT_SQUARES_BROKEN := &"squares_broken"
 const STAT_CUBES_CLEARED := &"cubes_cleared"
 const STAT_MONEY_EARNED := &"money_earned"
 const STAT_RUNS := &"runs"
+## Clicks and whole seconds of finished runs. Add the current run's for lifetime totals
+## (get_lifetime_clicks, get_time_mining).
+const STAT_CLICKS := &"clicks"
+const STAT_SECONDS := &"seconds"
 ## Records of the player's clicks (drones' don't count): the most explosive and lightning
 ## squares one click set off, chain included, and the most squares it broke. Cubes cleared
 ## by one click are kept under get_one_click_stat(cube_type).
@@ -287,6 +291,8 @@ func end_run() -> int:
 	shards += gained
 	total_shards += gained
 	_stats[STAT_RUNS] = get_stat(STAT_RUNS) + 1
+	_stats[STAT_CLICKS] = get_stat(STAT_CLICKS) + run_clicks
+	_stats[STAT_SECONDS] = get_stat(STAT_SECONDS) + floori(run_time)
 	var summary := {
 		"seconds": floori(run_time), "clicks": run_clicks, "cubes": run_cubes,
 		"earned": run_earned, "shards": gained,
@@ -381,6 +387,16 @@ func record_one_click_clear(cube_type: CubeType) -> void:
 ## Stat key for cubes of one type cleared with one click, or of every type when null.
 func get_one_click_stat(cube_type: CubeType) -> StringName:
 	return StringName("one_click:" + cube_type.id) if cube_type else STAT_ONE_CLICK_CLEARS
+
+
+## Clicks that hit a square, over every run, this one included.
+func get_lifetime_clicks() -> int:
+	return get_stat(STAT_CLICKS) + run_clicks
+
+
+## Seconds spent in runs (paused time and run-end screens don't count), this one included.
+func get_time_mining() -> int:
+	return get_stat(STAT_SECONDS) + floori(run_time)
 
 
 ## The best a run has done for a RUN_SUMMARY key ("clicks"...), the current run included.
@@ -478,6 +494,33 @@ func _check_unlocks() -> void:
 			fresh.append(item)
 	if not fresh.is_empty():
 		items_unlocked.emit(fresh)
+
+
+## The locked shop item closest to unlocking: its goal furthest along (then the cheapest),
+## among those whose other requirements are met. Null once there's none.
+func get_next_unlock() -> ShopItem:
+	var best: ShopItem = null
+	for item in _unlockables:
+		if is_unlocked(item) or not item.meets_requirements():
+			continue
+		if best == null or _goal_ratio(item.unlock) > _goal_ratio(best.unlock) \
+				or (_goal_ratio(item.unlock) == _goal_ratio(best.unlock) and item.get_price() < best.get_price()):
+			best = item
+	return best
+
+
+## The achievement not yet earned whose goal is furthest along, or null.
+func get_next_achievement() -> Achievement:
+	var best: Achievement = null
+	for achievement in _achievements:
+		if not has_achievement(achievement) and (best == null or _goal_ratio(achievement.goal) > _goal_ratio(best.goal)):
+			best = achievement
+	return best
+
+
+## How far along a goal is, 0..1.
+func _goal_ratio(goal: Goal) -> float:
+	return clampf(float(goal.get_value()) / maxi(goal.amount, 1), 0.0, 1.0)
 
 
 ## Called by the achievements page. Goals already met earn quietly.

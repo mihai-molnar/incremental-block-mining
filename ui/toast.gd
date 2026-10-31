@@ -66,11 +66,17 @@ func _draw() -> void:
 	_draw_centered(NAME_FONT, title_baseline + 24.0, _get_hint(), 8, HINT_COLOR)
 
 
-## Up to MAX_NAMES names, then how many more, so a burst of news stays on screen.
+## Up to MAX_NAMES names, then how many more, so a burst of news stays on screen. Long
+## names make room by showing fewer.
 func _get_names_text() -> String:
-	if _names.size() <= MAX_NAMES:
-		return ", ".join(_names)
-	return "%s and %d more" % [", ".join(_names.slice(0, MAX_NAMES)), _names.size() - MAX_NAMES]
+	var text := ""
+	for shown in range(mini(_names.size(), MAX_NAMES), 0, -1):
+		text = ", ".join(_names.slice(0, shown))
+		if shown < _names.size():
+			text = "%s and %d more" % [text, _names.size() - shown]
+		if NAME_FONT.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x <= size.x:
+			break
+	return text
 
 
 ## Text centered across the toast, with a drop shadow.
