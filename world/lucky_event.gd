@@ -60,6 +60,7 @@ func _catch() -> void:
 	_cube.queue_free()
 	_cube = null
 	_squares_left = Game.roll_lucky_interval()
+	Game.add_stat(Game.STAT_LUCKY_CAUGHT, 1)
 	var frenzy := _pick_frenzy()
 	if frenzy == null:
 		return

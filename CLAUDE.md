@@ -64,7 +64,7 @@ perl -e 'alarm 60; exec @ARGV' "$G" --headless --path . -s /path/to/check.gd -- 
 - To add a new kind of upgrade, subclass `Upgrade` and override a hook. If no existing hook fits, add one to `Upgrade` plus a matching fold in `Game`.
 
 **Unlock goals.** Pacing rule: every goal is "clear N of one cube type", staggered so each clear unlocks at most one thing, and an upgrade's first tier costs about one or two of the cube that unlocks it. Money and squares goals cross in bursts once income takes off, so they're kept for achievements, not unlocks.
-A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the item's `.tres`) stays unlisted until its goal is met: `Goal.Stat` is `SQUARES_BROKEN`, `CUBES_CLEARED` (optionally of one `cube_type`) or `MONEY_EARNED`.
+A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the item's `.tres`) stays unlisted until its goal is met. Unlocks use `Goal.Stat` `SQUARES_BROKEN`, `CUBES_CLEARED` (optionally of one `cube_type`) or `MONEY_EARNED`; achievements use the rest too.
 - `Game` keeps lifetime stats (`add_stat`, `record_cube_cleared`, `get_stat`; `earn` counts money) and saves them with the resource paths of unlocked items. `WorkArea` counts squares broken in `_resolve_click` and cubes cleared in `_on_cube_completed`.
 - Pages call `on_listed`, which registers the item with `Game.register_unlockable`. Goals already met (and upgrades already owned) unlock quietly; later ones emit `items_unlocked`, which `UnlockToast` shows.
 - `ShopItem.is_available()` is `is_unlocked() and meets_requirements()` (`Upgrade.requires` is a requirement). Owned upgrades are always available.
@@ -77,7 +77,7 @@ A `ShopItem` with `unlock` set (a `Goal`, `shop/goal.gd`, stored inline in the i
 - The pause menu's End run calls `Game.break_pickaxe()`, which ends the run the same way.
 - Perks are `Upgrade`s with `costs_shards`: `_pay` spends `Game.shards`, they skip the soft-lock guard, they show a shard next to the price, and `end_run` keeps their levels.
 - A perk that boosts a regular upgrade is a `FreeTiersUpgrade` (hook `get_free_tiers_target`): each of its levels is a free tier of `target`. `Game.get_upgrade_level` counts free tiers (so the target's row, description and effect show them), while `get_bought_level`, which prices, caps (`is_maxed`) and saving use, doesn't. Don't make a perk a second copy of the upgrade it boosts: the shop row would ignore it.
-- `get_payout_multiplier` starts from `1 + get_shard_boost()` (every Shard ever earned times `get_shard_bonus()`), so the boost reaches clicks, drones and the clear bonus.
+- `get_payout_multiplier` starts from `1 + get_shard_boost()` (every Shard ever earned times `get_shard_bonus()`) plus achievements' bonus, so the boost reaches clicks, drones and the clear bonus.
 - `RunMeter` (under `Hud/Root`) draws the HP bar, the shield's bar on top of it while `pickaxe_shield` > 0, and the Shard bar (`get_shard_progress()` toward the next) with the Shards owned plus what the run pays so far. The cursor's pickaxe cracks under half HP.
 
 **Upgrade tiers.** `max_level` 0 means unlimited. The price of the next tier is `price × price_growth^bought` (free tiers from perks don't count), rounded to two significant digits from 100 up (`Upgrade._round_price`). Each `.tres` sets its own `price_growth` (default 1.5). Tiered upgrades show the tier in the description ("Tier 2: ..."), never an "x/y" counter. `SquareChanceUpgrade.chance_per_tier` makes the chance grow per tier. An upgrade with `requires` set stays out of the shop until that upgrade is owned.
@@ -86,7 +86,7 @@ Mining Drone (`DroneUpgrade`) and Whetstone (`RepairUpgrade`) are bought again a
 **Soft-lock guard.** `Game.would_soft_lock(cost)` returns true when `money - cost + field_value` would be below the cheapest cube's price. `Upgrade.can_purchase` refuses those purchases, and the shop row shows "Keep N for a cube". Cubes register themselves for this check via `CubeShopItem.on_listed`.
 
 **Saving (`Game.save_game`, `user://save.json`).**
-- JSON with money, upgrade levels, the auto-buyer's cube, Shards, the pickaxe's HP and shield, `run_over`, the run so far, `last_run`, `best_run`, `saved_at`, the field's cubes and the drones' HP. Resources are stored by `resource_path`, so renaming a `.tres` drops it from old saves (loading skips paths that no longer exist).
+- JSON with money, upgrade levels, the auto-buyer's cube, Shards, the pickaxe's HP and shield, `run_over`, the run so far, `last_run`, `best_run`, `saved_at`, lifetime stats (mastery's included), unlocked items, earned achievements, the field's cubes and the drones' HP. Resources are stored by `resource_path`, so renaming a `.tres` drops it from old saves (loading skips paths that no longer exist).
 - Saves on a 30s timer, on `NOTIFICATION_WM_CLOSE_REQUEST` and `NOTIFICATION_APPLICATION_FOCUS_OUT`, and from the pause menu's Quit.
 - `Game` saves its own state, then emits `saving(data)` so other nodes add theirs. `WorkArea` adds the cubes (`Cube.get_save_data`: each square's clicks left and its type when it isn't the cube's default), and `DroneSwarm` the drones.
 - On load, a node takes its part back once with `Game.take_saved(key)`. `WorkArea._restore_cubes` rebuilds cubes with `Cube.load_save_data`, which marks them landed so their squares don't convert again.
@@ -116,7 +116,14 @@ Mining Drone (`DroneUpgrade`) and Whetstone (`RepairUpgrade`) are bought again a
 **Cube mastery.** `Game.add_mastery(cube_type, squares)` counts squares broken on a cube type in the lifetime stat `broken:<id>` (`get_mastery_stat`), so it's saved and kept across runs. `WorkArea._resolve_click` reports every break, drones' and chains' included.
 - `get_mastery_level` reads the level off `get_mastery_threshold` (N(N+1)/2 cubes' worth of squares for level N, up to `MASTERY_MAX_LEVEL`). `get_mastery_multiplier` (+`MASTERY_BONUS` a level) multiplies the cube's value in `WorkArea._get_cube_bonus` and its clear payout. Square values themselves (`CubeSquare.value`, `field_value`, the shop's "Pays N each") stay unmastered.
 - A click's `_clicked_value` adds up unrounded, so +5% still counts on 2-coin squares.
-- `MasteryMeter` (built by `ShopItem.create_meter`) draws it on cube rows. `MasteryToast` sits above `UnlockToast` (both extend `Toast`) and announces `mastery_leveled_up`.
+- `MasteryMeter` (built by `ShopItem.create_meter`) draws it on cube rows. `MasteryToast` announces `mastery_leveled_up`.
+
+**Achievements.** An `Achievement` (`achievements/achievement.gd`, instances in `achievements/items/`) has a `Goal` and a `bonus` added to all earnings once earned: `get_payout_multiplier` starts from `1 + get_shard_boost() + get_achievement_bonus()`.
+- They're listed in the `achievements` array of the `AchievementsPage` (under `Pages`, after the shop so mastery goals see every cube), which registers them with `Game.register_achievement`. Goals already met earn quietly; later ones emit `achievements_earned`, which `AchievementToast` shows and the page's tab badges until it's on screen.
+- `Game._check_achievements` runs on `add_stat`, `record_max`, mastery level-ups, `use_pickaxe` (run clicks) and `end_run`. Earned ones are saved by resource path under `achievements`.
+- `Goal.Stat` covers lifetime stats, best-run records (`Game.get_best_run_value`, the current run included), `CUBES_MASTERED`, `SHARDS_EARNED` and the click records. New kinds go at the end of the enum, since resources store the number.
+- Click records: `WorkArea` makes a `Strike` per click or drone hit and hands it down the chain links. Non-soft strikes report `Game.record_click(squares, blasts)` (`STAT_BIGGEST_CLICK`, `STAT_LONGEST_CHAIN`). `_cube_strikes` remembers the one strike that has hit each untouched cube, so a cube it clears counts as cleared with one click (`record_one_click_clear`).
+- Toasts (`Toast` subclasses: achievement, mastery, unlock) sit in the `Hud/Root/Toasts` VBox, which stacks the visible ones from the bottom.
 
 **Combo (`world/combo.gd`).** A node under `Main` holding the hit count and time left; it emits `changed` on each hit and when it drops. `ComboMeter` (under `Hud/Root`) draws it below the money counter.
 

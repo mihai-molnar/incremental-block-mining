@@ -1,8 +1,7 @@
 class_name MasteryToast
 extends Toast
 ## "MASTERY UP!" with the cube types whose mastery just reached a new level, and what
-## their squares pay now. Shows above the unlock toast, since a cube's first clear often
-## brings both; level-ups close together share one.
+## their squares pay now. Level-ups close together share one.
 
 const TITLE_COLOR := Color("a7f070")
 ## The chime, pitched up so it doesn't sound like an unlock.

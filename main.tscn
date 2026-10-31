@@ -63,6 +63,35 @@
 [ext_resource type="Resource" path="res://upgrades/frenzies/unbreakable_frenzy.tres" id="75_unbreakable_frenzy"]
 [ext_resource type="Script" path="res://ui/run_meter.gd" id="76_run_meter"]
 [ext_resource type="Script" path="res://ui/mastery_toast.gd" id="77_mastery_toast"]
+[ext_resource type="Script" path="res://ui/achievements_page.gd" id="78_achievements_page"]
+[ext_resource type="Script" path="res://achievements/achievement.gd" id="79_achievement"]
+[ext_resource type="Script" path="res://ui/achievement_toast.gd" id="80_achievement_toast"]
+[ext_resource type="Resource" path="res://achievements/items/break_1k.tres" id="81_ach_break_1k"]
+[ext_resource type="Resource" path="res://achievements/items/break_10k.tres" id="82_ach_break_10k"]
+[ext_resource type="Resource" path="res://achievements/items/break_100k.tres" id="83_ach_break_100k"]
+[ext_resource type="Resource" path="res://achievements/items/clear_100.tres" id="84_ach_clear_100"]
+[ext_resource type="Resource" path="res://achievements/items/clear_1000.tres" id="85_ach_clear_1000"]
+[ext_resource type="Resource" path="res://achievements/items/clear_void.tres" id="86_ach_clear_void"]
+[ext_resource type="Resource" path="res://achievements/items/one_click.tres" id="87_ach_one_click"]
+[ext_resource type="Resource" path="res://achievements/items/one_click_gold.tres" id="88_ach_one_click_gold"]
+[ext_resource type="Resource" path="res://achievements/items/big_click.tres" id="89_ach_big_click"]
+[ext_resource type="Resource" path="res://achievements/items/chain_10.tres" id="90_ach_chain_10"]
+[ext_resource type="Resource" path="res://achievements/items/chain_25.tres" id="91_ach_chain_25"]
+[ext_resource type="Resource" path="res://achievements/items/run_300.tres" id="92_ach_run_300"]
+[ext_resource type="Resource" path="res://achievements/items/run_1000.tres" id="93_ach_run_1000"]
+[ext_resource type="Resource" path="res://achievements/items/run_2500.tres" id="94_ach_run_2500"]
+[ext_resource type="Resource" path="res://achievements/items/earn_1m.tres" id="95_ach_earn_1m"]
+[ext_resource type="Resource" path="res://achievements/items/run_earn_1b.tres" id="96_ach_run_earn_1b"]
+[ext_resource type="Resource" path="res://achievements/items/earn_1t.tres" id="97_ach_earn_1t"]
+[ext_resource type="Resource" path="res://achievements/items/lucky_10.tres" id="98_ach_lucky_10"]
+[ext_resource type="Resource" path="res://achievements/items/lucky_100.tres" id="99_ach_lucky_100"]
+[ext_resource type="Resource" path="res://achievements/items/master_1.tres" id="100_ach_master_1"]
+[ext_resource type="Resource" path="res://achievements/items/master_5.tres" id="101_ach_master_5"]
+[ext_resource type="Resource" path="res://achievements/items/master_15.tres" id="102_ach_master_15"]
+[ext_resource type="Resource" path="res://achievements/items/runs_10.tres" id="103_ach_runs_10"]
+[ext_resource type="Resource" path="res://achievements/items/runs_50.tres" id="104_ach_runs_50"]
+[ext_resource type="Resource" path="res://achievements/items/shards_100.tres" id="105_ach_shards_100"]
+[ext_resource type="Resource" path="res://achievements/items/shards_10k.tres" id="106_ach_shards_10k"]
 [ext_resource type="Script" path="res://shop/shop_item.gd" id="7_shop_item"]
 [ext_resource type="Resource" path="res://shop/items/blue_cube_item.tres" id="8_blue"]
 [ext_resource type="Script" path="res://ui/pixel_cursor.gd" id="9_cursor"]
@@ -176,31 +205,34 @@ offset_bottom = 134.0
 mouse_filter = 2
 script = ExtResource("57_frenzy_meter")
 
-[node name="UnlockToast" type="Control" parent="Hud/Root"]
+[node name="Toasts" type="VBoxContainer" parent="Hud/Root"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 176.0
-offset_top = -76.0
+offset_top = -160.0
 offset_right = 396.0
 offset_bottom = -36.0
 grow_vertical = 0
 mouse_filter = 2
-script = ExtResource("64_unlock_toast")
+theme_override_constants/separation = 2
+alignment = 2
 
-[node name="MasteryToast" type="Control" parent="Hud/Root"]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 176.0
-offset_top = -118.0
-offset_right = 396.0
-offset_bottom = -78.0
-grow_vertical = 0
+[node name="AchievementToast" type="Control" parent="Hud/Root/Toasts"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("80_achievement_toast")
+
+[node name="MasteryToast" type="Control" parent="Hud/Root/Toasts"]
+layout_mode = 2
 mouse_filter = 2
 script = ExtResource("77_mastery_toast")
+
+[node name="UnlockToast" type="Control" parent="Hud/Root/Toasts"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("64_unlock_toast")
 
 [node name="ModeBar" type="HBoxContainer" parent="Hud/Root"]
 layout_mode = 1
@@ -304,12 +336,22 @@ toggle_action = &"toggle_upgrades"
 notify_when_affordable = true
 tab_button = NodePath("../../../../../Tabs/UpgradesTab")
 
+[node name="AchievementsPage" type="VBoxContainer" parent="Hud/Root/Sidebar/Panel/VBox/PageScroll/Pages" node_paths=PackedStringArray("tab_button")]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+script = ExtResource("78_achievements_page")
+achievements = Array[ExtResource("79_achievement")]([ExtResource("81_ach_break_1k"), ExtResource("82_ach_break_10k"), ExtResource("83_ach_break_100k"), ExtResource("84_ach_clear_100"), ExtResource("85_ach_clear_1000"), ExtResource("86_ach_clear_void"), ExtResource("87_ach_one_click"), ExtResource("88_ach_one_click_gold"), ExtResource("89_ach_big_click"), ExtResource("90_ach_chain_10"), ExtResource("91_ach_chain_25"), ExtResource("92_ach_run_300"), ExtResource("93_ach_run_1000"), ExtResource("94_ach_run_2500"), ExtResource("95_ach_earn_1m"), ExtResource("96_ach_run_earn_1b"), ExtResource("97_ach_earn_1t"), ExtResource("98_ach_lucky_10"), ExtResource("99_ach_lucky_100"), ExtResource("100_ach_master_1"), ExtResource("101_ach_master_5"), ExtResource("102_ach_master_15"), ExtResource("103_ach_runs_10"), ExtResource("104_ach_runs_50"), ExtResource("105_ach_shards_100"), ExtResource("106_ach_shards_10k")])
+title = "Achievements"
+toggle_action = &"toggle_achievements"
+tab_button = NodePath("../../../../../Tabs/AchievementsTab")
+
 [node name="Tabs" type="VBoxContainer" parent="Hud/Root/Sidebar"]
 layout_mode = 0
-offset_left = -98.0
+offset_left = -108.0
 offset_top = 6.0
 offset_right = -6.0
-offset_bottom = 50.0
+offset_bottom = 72.0
 mouse_filter = 2
 theme_override_constants/separation = 4
 
@@ -324,6 +366,12 @@ layout_mode = 2
 focus_mode = 0
 toggle_mode = true
 text = "[U] Upgrades"
+
+[node name="AchievementsTab" type="Button" parent="Hud/Root/Sidebar/Tabs"]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "[A] Achievements"
 
 [node name="ScreenFx" type="CanvasLayer" parent="."]
 layer = 2

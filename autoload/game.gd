@@ -20,6 +20,8 @@ signal mastery_changed(cube_type: CubeType)
 signal mastery_leveled_up(cube_type: CubeType, level: int)
 ## Shop items whose unlock goals were just met.
 signal items_unlocked(items: Array[ShopItem])
+## Achievements whose goals were just met.
+signal achievements_earned(achievements: Array[Achievement])
 signal shards_changed(shards: int)
 ## The pickaxe's HP or its shield changed.
 signal pickaxe_changed(hp: int)
@@ -45,6 +47,13 @@ const STAT_SQUARES_BROKEN := &"squares_broken"
 const STAT_CUBES_CLEARED := &"cubes_cleared"
 const STAT_MONEY_EARNED := &"money_earned"
 const STAT_RUNS := &"runs"
+## Records of the player's clicks (drones' don't count): the most explosive and lightning
+## squares one click set off, chain included, and the most squares it broke. Cubes cleared
+## by one click are kept under get_one_click_stat(cube_type).
+const STAT_LONGEST_CHAIN := &"longest_chain"
+const STAT_BIGGEST_CLICK := &"biggest_click"
+const STAT_ONE_CLICK_CLEARS := &"one_click_clears"
+const STAT_LUCKY_CAUGHT := &"lucky_caught"
 ## The pickaxe's HP before perks. Every click that hits a square costs 1 of it (or of its
 ## shield, while it has one), and the run ends when it's gone.
 const PICKAXE_HP := 100
@@ -134,6 +143,11 @@ var _stats := {}
 ## Saves from before goals start counting from zero; owned upgrades stay listed anyway.
 var _unlockables: Array[ShopItem] = []
 var _unlocked := {}
+## Achievements the achievements page listed, and the earned ones by resource path
+## (String -> Achievement). Ones earned since the page was last on screen aren't saved.
+var _achievements: Array[Achievement] = []
+var _earned := {}
+var _unseen_achievements: Array[Achievement] = []
 ## The save file as loaded. Nodes take their own part of it with take_saved().
 var _loaded_save := {}
 
@@ -211,6 +225,7 @@ func use_pickaxe() -> void:
 	if not is_run_active():
 		return
 	run_clicks += 1
+	_check_achievements()
 	if pickaxe_shield > 0:
 		pickaxe_shield -= 1
 		pickaxe_changed.emit(pickaxe_hp)
@@ -297,6 +312,7 @@ func end_run() -> int:
 	field_value = 0
 	auto_buy_cube = null
 	_loaded_save = {}
+	_check_achievements()
 	shards_changed.emit(shards)
 	run_ended.emit()
 	save_game()
@@ -329,6 +345,17 @@ func add_stat(key: StringName, amount: int) -> void:
 	_stats[key] = add_capped(get_stat(key), amount)
 	stats_changed.emit()
 	_check_unlocks()
+	_check_achievements()
+
+
+## Raises a record stat (the longest chain...) to `value`, if that beats it.
+func record_max(key: StringName, value: int) -> void:
+	if value <= get_stat(key):
+		return
+	_stats[key] = value
+	stats_changed.emit()
+	_check_unlocks()
+	_check_achievements()
 
 
 ## Counts a finished cube, in total and for its type.
@@ -336,6 +363,39 @@ func record_cube_cleared(cube_type: CubeType) -> void:
 	_stats[get_cleared_stat(cube_type)] = get_stat(get_cleared_stat(cube_type)) + 1
 	run_cubes += 1
 	add_stat(STAT_CUBES_CLEARED, 1)
+
+
+## Records one of the player's clicks so far, chain reaction included: the squares it
+## broke and the explosive and lightning squares it set off.
+func record_click(squares: int, blasts: int) -> void:
+	record_max(STAT_BIGGEST_CLICK, squares)
+	record_max(STAT_LONGEST_CHAIN, blasts)
+
+
+## Counts a cube one of the player's clicks cleared from untouched, chain included.
+func record_one_click_clear(cube_type: CubeType) -> void:
+	_stats[get_one_click_stat(cube_type)] = get_stat(get_one_click_stat(cube_type)) + 1
+	add_stat(STAT_ONE_CLICK_CLEARS, 1)
+
+
+## Stat key for cubes of one type cleared with one click, or of every type when null.
+func get_one_click_stat(cube_type: CubeType) -> StringName:
+	return StringName("one_click:" + cube_type.id) if cube_type else STAT_ONE_CLICK_CLEARS
+
+
+## The best a run has done for a RUN_SUMMARY key ("clicks"...), the current run included.
+func get_best_run_value(key: String) -> int:
+	var current := 0
+	match key:
+		"seconds":
+			current = floori(run_time)
+		"clicks":
+			current = run_clicks
+		"cubes":
+			current = run_cubes
+		"earned":
+			current = run_earned
+	return maxi(best_run.get(key, 0), current)
 
 
 ## Stat key for cubes cleared of one type, or of every type when null.
@@ -354,6 +414,7 @@ func add_mastery(cube_type: CubeType, squares: int) -> void:
 	mastery_changed.emit(cube_type)
 	if get_mastery_level(cube_type) > level:
 		mastery_leveled_up.emit(cube_type, get_mastery_level(cube_type))
+		_check_achievements()
 
 
 ## Stat key for squares broken on cubes of one type.
@@ -389,6 +450,12 @@ func get_mastery_multiplier(cube_type: CubeType) -> float:
 	return 1.0 + get_mastery_level(cube_type) * MASTERY_BONUS
 
 
+## How many of the cube types the shop sells are at the top mastery level.
+func get_mastered_count() -> int:
+	return _cubes_for_sale.filter(func(cube_type: CubeType) -> bool:
+		return get_mastery_level(cube_type) >= MASTERY_MAX_LEVEL).size()
+
+
 ## Called by shop pages for items with an unlock goal. Goals already met, and upgrades
 ## already owned, unlock quietly.
 func register_unlockable(item: ShopItem) -> void:
@@ -411,6 +478,51 @@ func _check_unlocks() -> void:
 			fresh.append(item)
 	if not fresh.is_empty():
 		items_unlocked.emit(fresh)
+
+
+## Called by the achievements page. Goals already met earn quietly.
+func register_achievement(achievement: Achievement) -> void:
+	if achievement in _achievements:
+		return
+	_achievements.append(achievement)
+	if achievement.goal.is_met():
+		_earned[achievement.resource_path] = achievement
+
+
+func has_achievement(achievement: Achievement) -> bool:
+	return _earned.has(achievement.resource_path)
+
+
+func get_achievement_count() -> int:
+	return _earned.size()
+
+
+## What earned achievements add to all earnings together (0.1 = +10%).
+func get_achievement_bonus() -> float:
+	var bonus := 0.0
+	for achievement: Achievement in _earned.values():
+		bonus += achievement.bonus
+	return bonus
+
+
+## Whether achievements were earned since the achievements page was last on screen.
+func has_unseen_achievements() -> bool:
+	return not _unseen_achievements.is_empty()
+
+
+func mark_achievements_seen() -> void:
+	_unseen_achievements.clear()
+
+
+func _check_achievements() -> void:
+	var fresh: Array[Achievement] = []
+	for achievement in _achievements:
+		if not has_achievement(achievement) and achievement.goal.is_met():
+			_earned[achievement.resource_path] = achievement
+			fresh.append(achievement)
+	if not fresh.is_empty():
+		_unseen_achievements.append_array(fresh)
+		achievements_earned.emit(fresh)
 
 
 ## Called by the shop when a cube is bought; the work area listens and spawns it.
@@ -622,10 +734,10 @@ func get_crit_chance() -> float:
 	return clampf(chance, 0.0, 1.0)
 
 
-## What every payout from squares is multiplied by: the Shard boost, then a money frenzy's
-## x7 and the like.
+## What every payout from squares is multiplied by: the Shard boost and achievements'
+## bonus, then a money frenzy's x7 and the like.
 func get_payout_multiplier() -> float:
-	var multiplier := 1.0 + get_shard_boost()
+	var multiplier := 1.0 + get_shard_boost() + get_achievement_bonus()
 	for modifier: Upgrade in _modifiers:
 		multiplier = modifier.modify_payout_multiplier(multiplier, _modifiers[modifier])
 	return maxf(multiplier, 0.0)
@@ -705,6 +817,7 @@ func save_game() -> void:
 	data["last_run"] = last_run
 	data["best_run"] = best_run
 	data["unlocked"] = _unlocked.keys()
+	data["achievements"] = _earned.keys()
 	saving.emit(data)
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
@@ -749,6 +862,8 @@ func reset_progress() -> void:
 	_upgrade_levels.clear()
 	_stats.clear()
 	_unlocked.clear()
+	_earned.clear()
+	_unseen_achievements.clear()
 	_timed_effects.clear()
 	_refresh_modifiers()
 	_loaded_save = {}
@@ -791,6 +906,11 @@ func _load_game() -> void:
 	if data.get("unlocked") is Array:
 		for path: Variant in data.unlocked:
 			_unlocked[str(path)] = true
+	if data.get("achievements") is Array:
+		for path: Variant in data.achievements:
+			var achievement := load_saved_resource(path) as Achievement
+			if achievement:
+				_earned[achievement.resource_path] = achievement
 	# Perks are in by now, so a save without the pickaxe starts it at full HP.
 	pickaxe_hp = int(data.get("pickaxe_hp", get_max_pickaxe_hp()))
 	if data.get("pickaxe_shield") is Array and data.pickaxe_shield.size() == 2:

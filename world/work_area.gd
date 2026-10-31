@@ -39,6 +39,19 @@ class Blast:
 		area = cube_area
 
 
+## One click, or drone hit, with the chain reaction it sets off: what it has broken and
+## set off so far, for the records Game keeps of the player's clicks.
+class Strike:
+	## A drone's hit.
+	var soft: bool
+	var squares := 0
+	## Explosive and lightning squares that went off.
+	var blasts := 0
+
+	func _init(is_soft: bool) -> void:
+		soft = is_soft
+
+
 @export var fx: Fx
 @export var combo: Combo
 ## Region where cubes can be placed.
@@ -69,6 +82,12 @@ var _cube_bonus := {}
 ## Explosive and lightning squares broken since the last blast went off; the next wave
 ## of the chain.
 var _pending_blasts: Array[Blast] = []
+## The click being resolved, or the one whose chain reaction this link belongs to.
+var _strike: Strike
+## The strike that first hit each cube, while it's the only one that has: a cube one
+## strike clears from untouched was cleared in one click. Null once another strike hits
+## it, or when the first one found it already damaged.
+var _cube_strikes := {}
 ## What rounding took off earlier payouts, added to the next one, so small multipliers
 ## (a x1.1 combo, a +10% Shard boost) still count on 2-coin squares.
 var _payout_carry := 0.0
@@ -129,6 +148,7 @@ func clear_field() -> void:
 	_set_hovered(null, [])
 	for cube in get_cubes():
 		cube.queue_free()
+	_cube_strikes.clear()
 	_update_field_value()
 
 
@@ -261,6 +281,7 @@ func _break_at(point: Vector2) -> void:
 func _hit_squares(targets: Array[CubeSquare], soft: bool) -> void:
 	var crit_chance := 0.0 if soft else Game.get_crit_chance()
 	var crits: Array[CubeSquare] = []
+	_strike = Strike.new(soft)
 	_resolving_click = true
 	for square in targets:
 		var damage := 1
@@ -273,20 +294,23 @@ func _hit_squares(targets: Array[CubeSquare], soft: bool) -> void:
 	_resolving_click = false
 	if not crits.is_empty():
 		fx.critical_hits(crits)
-	_resolve_click(soft)
+	_resolve_click()
 
 
 ## One link of a chain reaction: explosives caught in the previous blasts go off and pay
-## out together. Any explosives they catch are the next link. Chains a drone set off stay soft.
-func _chain_blasts(blasts: Array[Blast], soft: bool) -> void:
+## out together. Any explosives they catch are the next link. It belongs to the strike
+## that started the chain, so chains a drone set off stay soft.
+func _chain_blasts(blasts: Array[Blast], strike: Strike) -> void:
+	_strike = strike
 	_resolving_click = true
 	_detonate(blasts)
 	_resolving_click = false
-	_resolve_click(soft)
+	_resolve_click()
 
 
 ## Breaks every square each blast reaches, whatever clicks it had left.
 func _detonate(blasts: Array[Blast]) -> void:
+	_strike.blasts += blasts.size()
 	for blast in blasts:
 		var struck: Array[CubeSquare] = []
 		if blast.lines:
@@ -308,11 +332,16 @@ func _get_bolt_span(blast: Blast, struck: Array[CubeSquare]) -> Rect2:
 
 
 ## Hits a square as part of the click being resolved. The click's first hit on each cube
-## notes the cube's value multiplier for every square the click breaks there.
+## notes the cube's value multiplier for every square the click breaks there, and whether
+## the click could be clearing it in one.
 func _hit(square: CubeSquare, damage: int) -> void:
 	var cube := square.get_parent() as Cube
 	if not _cube_bonus.has(cube):
 		_cube_bonus[cube] = _get_cube_bonus(cube)
+	if not _cube_strikes.has(cube):
+		_cube_strikes[cube] = _strike if cube.is_untouched() else null
+	elif _cube_strikes[cube] != _strike:
+		_cube_strikes[cube] = null
 	cube.hit_square(square, damage)
 
 
@@ -411,6 +440,7 @@ func _on_square_hit(_cube: Cube, square: CubeSquare) -> void:
 	if not square.is_broken():
 		_clicked_hits.append(square)
 	if not _resolving_click:
+		_strike = Strike.new(false)
 		_resolve_click()
 
 
@@ -425,17 +455,19 @@ func _on_square_broken(cube: Cube, square: CubeSquare) -> void:
 		var area := Rect2(cube.global_position - cube.get_size() / 2.0, cube.get_size())
 		_pending_blasts.append(Blast.new(square.global_position, 0, true, area))
 	if not _resolving_click:
+		_strike = Strike.new(false)
 		_resolve_click()
 
 
 ## Pays out and plays the effects for everything the last click hit and broke, then
 ## lines up any explosives it broke as the next link of a chain reaction. Payouts get
-## Game.get_payout_multiplier() (Shards, a money frenzy), and the player's clicks the
-## combo too.
-func _resolve_click(soft := false) -> void:
+## Game.get_payout_multiplier() (Shards, achievements, a money frenzy), and the player's
+## clicks the combo too. The player's clicks also update Game's click records.
+func _resolve_click() -> void:
+	var soft := _strike.soft
 	if not _pending_blasts.is_empty():
 		var timer := get_tree().create_timer(CHAIN_DELAY, false)
-		timer.timeout.connect(_chain_blasts.bind(_take_pending_blasts(), soft))
+		timer.timeout.connect(_chain_blasts.bind(_take_pending_blasts(), _strike))
 	if not _clicked_hits.is_empty():
 		fx.squares_hit(_clicked_hits, soft)
 	if not _clicked_breaks.is_empty():
@@ -449,6 +481,9 @@ func _resolve_click(soft := false) -> void:
 		fx.squares_broken(_clicked_breaks, payout, soft)
 		squares_broken.emit(_clicked_breaks.size(), soft)
 		_add_mastery(_clicked_breaks)
+		_strike.squares += _clicked_breaks.size()
+	if not soft:
+		Game.record_click(_strike.squares, _strike.blasts)
 	_clicked_hits = []
 	_clicked_breaks = []
 	_clicked_value = 0.0
@@ -469,6 +504,10 @@ func _on_cube_completed(cube: Cube) -> void:
 	if cube == _dragged:
 		_end_drag()
 	_set_hovered(null, [])
+	var strike: Strike = _cube_strikes.get(cube)
+	_cube_strikes.erase(cube)
+	if strike and not strike.soft:
+		Game.record_one_click_clear(cube.cube_type)
 	var multiplier := Game.get_clear_bonus()
 	var bonus := Game.get_clear_payout(cube.get_total_value() * Game.get_mastery_multiplier(cube.cube_type))
 	Game.record_cube_cleared(cube.cube_type)

@@ -2,7 +2,8 @@ class_name Toast
 extends Control
 ## A title over a line of names and a hint, popping in over the field and fading after a
 ## few seconds. Subclasses fill in `_names` and the text; news arriving while one is up
-## joins it.
+## joins it. Toasts sit in a container that stacks the ones showing from the bottom up,
+## so a hidden toast takes no room.
 
 const TITLE_FONT := preload("res://assets/fonts/Silkscreen-Bold.ttf")
 const NAME_FONT := preload("res://assets/fonts/Silkscreen-Regular.ttf")
@@ -11,6 +12,7 @@ const HINT_COLOR := Color("94b0c2")
 const SHADOW_COLOR := Color("0f1020")
 const SHOW_TIME := 3.5
 const MAX_NAMES := 3
+const HEIGHT := 40
 
 var _names: Array[String] = []
 var _tween: Tween
@@ -18,12 +20,15 @@ var _tween: Tween
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	modulate.a = 0.0
+	custom_minimum_size.y = HEIGHT
+	visible = false
+	# The container sizes it once it shows; it pops from its middle.
+	resized.connect(func() -> void: pivot_offset = size / 2.0)
 
 
 ## Whether it's on screen, fading included. News that comes after it's gone starts afresh.
 func is_showing() -> bool:
-	return modulate.a > 0.0
+	return visible
 
 
 func _get_title() -> String:
@@ -44,13 +49,14 @@ func _pop(pitch := 1.0) -> void:
 	Sfx.play(&"unlock", 0.0, 0.0, pitch)
 	if _tween:
 		_tween.kill()
+	visible = true
 	modulate.a = 1.0
-	pivot_offset = size / 2.0
 	scale = Vector2.ONE * 1.3
 	_tween = create_tween()
 	_tween.tween_property(self, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tween.tween_interval(SHOW_TIME)
 	_tween.tween_property(self, "modulate:a", 0.0, 0.4)
+	_tween.tween_callback(hide)
 
 
 func _draw() -> void:

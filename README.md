@@ -26,6 +26,7 @@ away. Broken squares stay behind as faint outlines until the whole cube is gone.
 | M     | Move mode: drag cubes around the field          |
 | S     | Open or close the shop                          |
 | U     | Open or close upgrades                          |
+| A     | Open or close achievements                      |
 | Esc   | Pause menu                                      |
 | =     | Dev cheat: +100K money (debug builds only)      |
 | -     | Dev cheat: send a Lucky Cube now (debug builds only) |
@@ -86,6 +87,46 @@ cubes for level 2, 6 for level 3 and 55 for level 10. Mastery is kept from run t
 Each cube's shop row shows its mastery level, a bar filling toward the next level and its
 bonus. A "MASTERY UP!" toast announces each new level.
 
+### Achievements
+
+The Achievements page ([A]) lists 26 milestones, each with its progress. Each one you reach
+adds to all earnings for good, on top of the Shard boost: +2%, or +5% for the hard ones,
++88% for all of them. An "ACHIEVEMENT!" toast announces it and badges the tab. They're kept
+from run to run, and goals you'd already met before achievements existed count right away.
+
+"With one click" counts the chain reaction the click sets off, but not drones' hits. A cube
+cleared with one click has to be untouched when the click lands. Run goals count your best
+run so far, the one you're in included.
+
+| Achievement | Goal | Earnings |
+|-------------|------|---------:|
+| Rubble | Break 1000 squares | +2% |
+| Landslide | Break 10K squares | +2% |
+| Strip Mine | Break 100K squares | +5% |
+| Demolition Crew | Clear 100 cubes | +2% |
+| Wrecking Ball | Clear 1000 cubes | +5% |
+| Into the Void | Clear 1 Void Cube | +5% |
+| One and Done | Clear 1 cube with one click | +2% |
+| Midas Touch | Clear 1 Gold Bar with one click | +5% |
+| Wide Swing | Break 100 squares with one click | +2% |
+| Chain Reaction | Set off 10 explosive or lightning squares with one click | +2% |
+| Fireworks | Set off 25 explosive or lightning squares with one click | +5% |
+| Second Wind | Make a run last 300 clicks | +2% |
+| Iron Grip | Make a run last 1000 clicks | +2% |
+| Marathon | Make a run last 2500 clicks | +5% |
+| Millionaire | Earn 1M in total | +2% |
+| Motherlode | Earn 1B in one run | +2% |
+| Tycoon | Earn 1T in total | +5% |
+| Lucky Streak | Catch 10 Lucky Cubes | +2% |
+| Charmed Life | Catch 100 Lucky Cubes | +5% |
+| Specialist | Master 1 cube (mastery 10) | +2% |
+| Connoisseur | Master 5 cubes (mastery 10) | +5% |
+| Grandmaster | Master 15 cubes (mastery 10) | +5% |
+| Seasoned Miner | Finish 10 runs | +2% |
+| Lifer | Finish 50 runs | +5% |
+| Shard Collector | Earn 100 Shards | +2% |
+| Crystal Hoard | Earn 10K Shards | +5% |
+
 ### Lucky Cubes and frenzies
 
 After every 60 to 120 squares you break (a random number each time), a golden Lucky Cube
@@ -121,7 +162,7 @@ pays 10 and 50M pays 100. The bar under the HP bar fills toward the run's next S
 the number next to it, your Shards plus the run's so far, goes up each time it fills.
 
 - Money, upgrades, the cubes on the field, drones and the Auto-Buyer's pick reset.
-- Shards, perks, unlocked cubes and upgrades, cube mastery and lifetime stats stay.
+- Shards, perks, unlocked cubes and upgrades, cube mastery, achievements and lifetime stats stay.
 - Every Shard you've ever earned adds 2% to all earnings, spent or not.
 
 Shards buy perks on the run-end screen, which are kept forever:

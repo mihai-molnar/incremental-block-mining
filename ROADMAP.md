@@ -31,12 +31,10 @@ Unpredictable rewards are the strongest hook in the genre.
 - Tuned with a bot that plays runs (scratch harness): square-root Shards and a Whetstone at 1.5x per repair fed each other into runs of quadrillions by run 4. With cube-root Shards, x4 repairs, a 2% boost and a smaller Head Start, runs grow from 150 to about 850 clicks over 13 runs. Earnings still jump once runs reach the Bars (each cube tier pays ~5x the last), but HP caps how much that lengthens a run. With Lucky Cubes counted in squares, the bot reaches the Void Cube at run 14 and ~2,000-click runs by run 18; late runs earn ~10^17, so money and stats stop at `Game.MAX_AMOUNT` instead of overflowing.
 - Ideas for more perks: keep a Big Pickaxe tier, a permanent combo cap bonus, a cheaper first Whetstone.
 
-### Achievements
-- Milestones that each give a small permanent bonus:
-  - Break 1,000 squares: +2% value
-  - Set off a 10-explosive chain
-  - Clear a Gold Bar in one click
-- Needs stat counters in `Game` (squares broken, longest chain, cubes cleared, lifetime earned). Save them too.
+### Achievements (done)
+- 26 milestones on their own sidebar page ([A]), each adding +2% (or +5% for hard ones) to all earnings for good, +88% in all: squares broken, cubes cleared, the Void Cube, one-click clears (any cube, a Gold Bar), squares and blasts in one click, run length in clicks, money, Lucky Cubes, mastered cubes, runs and Shards.
+- New records in `Game`: longest chain and biggest click (the player's clicks, chains included), one-click clears per cube, Lucky Cubes caught.
+- Ideas: achievements for combos, crits or drones; varied rewards (pickaxe HP, a crit chance) instead of earnings only; showing the ones a run earned on the run-end screen.
 
 ### Cube mastery (done)
 - Each cube type levels up from squares broken on it, drones' included: +5% pay per level on its squares and clear bonus, up to level 10 (+50%). Level N takes N(N+1)/2 cubes' worth of its squares (1 cube for level 1, 55 for level 10). Its shop row shows the level and a bar; a "MASTERY UP!" toast announces each level.

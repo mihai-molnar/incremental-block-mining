@@ -64,6 +64,14 @@ func is_complete() -> bool:
 	return _remaining == 0
 
 
+## Whether none of its squares has taken a hit yet.
+func is_untouched() -> bool:
+	for square in _squares:
+		if square.hp < square.max_hp:
+			return false
+	return true
+
+
 ## Recounts the required squares left, after squares changed type.
 func recount() -> void:
 	_remaining = _squares.filter(func(square: CubeSquare) -> bool:
