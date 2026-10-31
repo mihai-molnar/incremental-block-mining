@@ -69,10 +69,11 @@ const PICKAXE_HP := 100
 const DRONE_HP := 60
 const MAX_DRONES := 10
 ## A run pays the cube root of (money earned in it / SHARD_EARNINGS) Shards, rounded down,
-## when it ends: 50 pays 1, 400 pays 2, 50K pays 10. Every Shard ever earned adds
-## SHARD_BONUS to all earnings, spent or not.
+## when it ends: 50 pays 1, 400 pays 2, 50K pays 10. The Shards ever earned, spent or not,
+## add SHARD_BONUS to all earnings each time they double: 1 adds it once, 3 twice, 7 three
+## times. Doublings, not Shards, so the boost can't run away as late runs pay thousands.
 const SHARD_EARNINGS := 50.0
-const SHARD_BONUS := 0.02
+const SHARD_BONUS := 0.25
 ## What a run's summary keeps, and what counts as a record (all but the Shards).
 const RUN_SUMMARY: Array[String] = ["seconds", "clicks", "cubes", "earned", "shards"]
 const RUN_RECORDS: Array[String] = ["seconds", "clicks", "cubes", "earned"]
@@ -90,6 +91,9 @@ const COMBO_CAP := 2.0
 const COMBO_WINDOW := 1.0
 ## Chance that one of the player's hits breaks a square outright.
 const CRIT_CHANCE := 0.02
+## Clicks one blast (an explosion or a lightning strike) takes off each square it reaches,
+## before perks. Squares with fewer clicks left break.
+const BLAST_DAMAGE := 5
 ## A Lucky Cube drifts by after the player breaks LUCKY_INTERVAL_MIN to LUCKY_INTERVAL_MAX
 ## squares (a random number each time, so it can't be timed or waited out); catching it
 ## starts a frenzy that lasts FRENZY_DURATION seconds.
@@ -678,6 +682,17 @@ func get_bought_level(upgrade: Upgrade) -> int:
 	return _upgrade_levels.get(upgrade, 0)
 
 
+## How many tiers of `upgrade` can be bought (0 = no limit): its max_level, raised by
+## perks like Tempered Steel.
+func get_max_level(upgrade: Upgrade) -> int:
+	var cap := upgrade.max_level
+	if cap == 0:
+		return 0
+	for modifier: Upgrade in _modifiers:
+		cap = modifier.modify_max_level(upgrade, cap, _modifiers[modifier])
+	return maxi(cap, 1)
+
+
 func has_upgrade(upgrade: Upgrade) -> bool:
 	return get_upgrade_level(upgrade) > 0
 
@@ -739,6 +754,14 @@ func get_pickaxe_size() -> int:
 	for modifier: Upgrade in _modifiers:
 		size = modifier.modify_pickaxe_size(size, _modifiers[modifier])
 	return maxi(size, 1)
+
+
+## Clicks one blast takes off each square it reaches (Blasting Powder adds to it).
+func get_blast_damage() -> int:
+	var damage := BLAST_DAMAGE
+	for modifier: Upgrade in _modifiers:
+		damage = modifier.modify_blast_damage(damage, _modifiers[modifier])
+	return maxi(damage, 1)
 
 
 ## How many squares out a square of this type blows up when it breaks (0 = it doesn't).
@@ -867,7 +890,7 @@ func get_frenzy_duration() -> float:
 	return maxf(seconds, 1.0)
 
 
-## How much each Shard ever earned adds to earnings (0.05 = 5%).
+## What each doubling of the Shards ever earned adds to earnings (0.25 = 25%).
 func get_shard_bonus() -> float:
 	var bonus := SHARD_BONUS
 	for modifier: Upgrade in _modifiers:
@@ -875,9 +898,10 @@ func get_shard_bonus() -> float:
 	return maxf(bonus, 0.0)
 
 
-## What every Shard ever earned adds to earnings together (0.5 = +50%).
+## What the Shards ever earned add to earnings together (0.5 = +50%): the bonus once per
+## doubling, log2(1 + Shards) times.
 func get_shard_boost() -> float:
-	return total_shards * get_shard_bonus()
+	return log(1.0 + total_shards) / log(2.0) * get_shard_bonus()
 
 
 ## Money a new run starts with.

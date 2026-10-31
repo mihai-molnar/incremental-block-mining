@@ -24,9 +24,11 @@ func get_level() -> int:
 	return Game.get_upgrade_level(self)
 
 
-## Free tiers don't count toward the cap, so a perk adds tiers past it.
+## Free tiers don't count toward the cap, so a perk adds tiers past it. Perks can raise
+## the cap too (Game.get_max_level).
 func is_maxed() -> bool:
-	return max_level > 0 and Game.get_bought_level(self) >= max_level
+	var cap := Game.get_max_level(self)
+	return cap > 0 and Game.get_bought_level(self) >= cap
 
 
 ## Whether it can be bought more than once.
@@ -127,6 +129,11 @@ func get_free_tiers_target() -> Upgrade:
 	return null
 
 
+## How many tiers of `upgrade` can be bought. Game only asks for upgrades with a limit.
+func modify_max_level(_upgrade: Upgrade, max_tiers: int, _level: int) -> int:
+	return max_tiers
+
+
 ## Called for every square of a newly landed cube. Returns the type the square should be.
 func modify_square_type(_cube_type: CubeType, current: SquareType, _level: int) -> SquareType:
 	return current
@@ -150,6 +157,11 @@ func modify_pickaxe_size(size: int, _level: int) -> int:
 ## How many squares out an explosive square's blast reaches.
 func modify_blast_radius(radius: int, _level: int) -> int:
 	return radius
+
+
+## Clicks a blast takes off each square it reaches.
+func modify_blast_damage(damage: int, _level: int) -> int:
+	return damage
 
 
 ## The pickaxe's HP at the start of a run.

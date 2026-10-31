@@ -481,6 +481,20 @@ const SPRITES := {
 		"KGGGGGGGGGGGGK",
 		".KKKKKKKKKKKK.",
 	],
+	&"anvil": [
+		".........Y.O..",
+		"..........Y...",
+		"....KKKKKKKKKK",
+		"KKKKLWWLLLLLLK",
+		"KLLLLLLLLLLLGK",
+		".KKGLLLLLLLGGK",
+		"...KKGGGGGGKKK",
+		".....KGGGGK...",
+		".....KGGGGK...",
+		"....KGGGGGGK..",
+		"...KGGGGGGGGK.",
+		"...KKKKKKKKKK.",
+	],
 }
 
 static var _cache := {}

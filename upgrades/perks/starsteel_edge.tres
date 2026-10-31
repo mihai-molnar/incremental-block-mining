@@ -12,7 +12,7 @@ cube_type = ExtResource("goal_cube")
 [resource]
 script = ExtResource("1_upgrade")
 title = "Starsteel Edge"
-price = 50000
+price = 10000
 price_growth = 1.0
 max_level = 0
 costs_shards = true

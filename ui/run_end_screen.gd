@@ -200,9 +200,9 @@ func _refresh() -> void:
 
 func _refresh_shards() -> void:
 	_shards_label.text = "%d Shard%s" % [Game.shards, "" if Game.shards == 1 else "s"]
-	_boost_label.text = "All earnings +%d%%: %s%% for each of the %d Shard%s of starlight you've dug up" % [
+	_boost_label.text = "All earnings +%d%%: +%s%% each time the Shards of starlight you've dug up double (%d so far)" % [
 		roundi(Game.get_shard_boost() * 100.0), Upgrade.format_number(Game.get_shard_bonus() * 100.0),
-		Game.total_shards, "" if Game.total_shards == 1 else "s"]
+		Game.total_shards]
 
 
 func _format(key: String, value: int) -> String:

@@ -318,10 +318,11 @@ func _chain_blasts(blasts: Array[Blast], strike: Strike) -> void:
 	_resolve_click()
 
 
-## Breaks every square each blast reaches, whatever clicks it had left. Squares with a
-## `blast_damage` (the Star Core's) only lose that many clicks.
+## Takes Game.get_blast_damage() clicks off every square each blast reaches, so blasts
+## that overlap add up. Squares with a `blast_damage` (the Star Core's) lose that many.
 func _detonate(blasts: Array[Blast]) -> void:
 	_strike.blasts += blasts.size()
+	var damage := Game.get_blast_damage()
 	for blast in blasts:
 		var struck: Array[CubeSquare] = []
 		if blast.lines:
@@ -332,7 +333,7 @@ func _detonate(blasts: Array[Blast]) -> void:
 			fx.explosion(blast.at, blast.radius)
 		for square in struck:
 			var chip := square.square_type.blast_damage
-			_hit(square, chip if chip > 0 else square.hp)
+			_hit(square, chip if chip > 0 else damage)
 
 
 ## How far a lightning blast's bolts reach: across its cube and every square they struck.

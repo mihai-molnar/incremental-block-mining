@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"tektite"
 display_name = "Tektite"
-hp = 110
+hp = 130
 value = 52000000
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
 shadow_color = Color(0.101961, 0.109804, 0.172549, 1)

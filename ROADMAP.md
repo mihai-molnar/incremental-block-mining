@@ -53,32 +53,44 @@ Unpredictable rewards are the strongest hook in the genre.
 
 - A light story: a star fell and lies under every layer of stone. A new game opens on a story card; the first purchase of each deep cube shows a line; breaking the Star Core frees the star (victory effects, an ending screen, the Starlight achievement), then play goes on.
 - The color cubes became materials (Lapis, Sandstone, Slate, Jasper; ids unchanged). Tektite (1B), Iridium Bar (10B) and Opal (100B) went in between Magma and Void, which moved to 1T.
-- The Star Core (1Qa, 12x12, 25,000 clicks a square) unlocks after 3 Void Cubes. Blasts only chip it, a crit deals 10 hits, nothing converts on it, it pays nothing. Starsteel Edge (a perk, 50K Shards every tier) adds a click per tier to hits on it.
+- The Star Core (1Qa, 12x12, 25,000 clicks a square, 12,000 since the balance pass) unlocks after 3 Void Cubes. Blasts only chip it, a crit deals 10 hits, nothing converts on it, it pays nothing. Starsteel Edge (a perk, 50K Shards every tier, 10K since the balance pass) adds a click per tier to hits on it.
 - Toughness is the gate, money the lesser one (the user's call). Tuned with a bot that plays runs (rewrite it from the plan in `docs/superpowers/plans/2026-10-31-fallen-star-ending.md`, Task 7):
   - With the core at 2000 clicks a square the bot won at run 11. A 1.5x-per-tier Starsteel price made late damage grow only with the log of Shards, so no toughness gave a steady finish (at 24,000 it never won in 40 runs). A flat price fixed that: every run's Shards add damage, and each try gets further.
-  - Final numbers, four campaigns: core reached at runs 10-13, star freed at runs 20-25. In the run that first reaches them the bot clears about 3 Tektite, 4 Iridium Bars, 4 Opal and 3-4 Void. Late runs reach the money cap (`Game.MAX_AMOUNT`), as accepted.
+  - Final numbers, four campaigns (superseded by the balance pass below, whose bot plays much better): core reached at runs 10-13, star freed at runs 20-25. In the run that first reaches them the bot clears about 3 Tektite, 4 Iridium Bars, 4 Opal and 3-4 Void. Late runs reach the money cap (`Game.MAX_AMOUNT`), as accepted.
 - Ideas: a perk or upgrade that helps drones on the core; showing the best core attempt on the run-end screen; a New Game+.
 
-## Balance notes from playtesting (to fix next)
+## Balance pass (done)
 
-From the user's save after 6 runs (51 minutes of mining in all). Run 6 lasted 25 minutes:
-721 clicks, 477 cubes cleared, 6.7Qa earned (past the Star Core's 1Qa) and 51,212 Shards,
-against 43 Shards from the five runs before it. It ended out of boredom: the pickaxe wasn't
-going to break. The records show how: 89 one-click clears (22 Opal, 17 Void, 8 Iridium Bars,
-8 Magma, 7 Tektite), a biggest click of 694 squares and a chain of 85 blasts. Explosives and
-lightning chains plus frenzies (Money x7 above all) did it. The feeling of obliterating
-cubes in one click is wanted, but near the end of the game, not by run 5 or 6.
+The user's save after 6 runs (51 minutes of mining in all): run 6 lasted 25 minutes, 721
+clicks, 477 cubes cleared, 6.7Qa earned (past the Star Core's 1Qa) and 51,212 Shards against
+43 from the five runs before it, and it ended out of boredom with the pickaxe nowhere near
+breaking. 89 one-click clears (22 Opal, 17 Void), a 694-square click and an 85-blast chain.
+The user wants the feeling of obliterating cubes in one click, but near the end of the game.
 
-- **Chains clear deep cubes too early.** A blast breaks any square outright, however deep the cube, so a few percent of explosives and lightning wipe out Void Cubes in one click. Options: blasts deal clicks off instead of breaking (like the Star Core's `blast_damage`), growing with Blast Radius tiers or a late perk; a cap on chain links per click; lower or later Explosive and Lightning chances.
-- **Runs stop ending.** Income climbs 4 to 10 times with each cube step and chains make clicks nearly free, so the Whetstone (25 HP, 4x the price each time) and Unbreakable keep the pickaxe going. Options: Whetstone prices that follow the run's earnings, a limit per run, or charging some HP for blast breaks.
-- **One run pays for every perk.** Shards are ∛(earnings ÷ 50), so one huge run pays far more than every run before it. All the perks but Starsteel Edge cost about 11K Shards together (Shard Resonance's 10 tiers are most of it), so one 6.7Qa run covers all of them, or Starsteel Edge's first tier with change to spare. Options: a steeper root or a log, perk prices that climb faster, more Shard sinks before Starsteel.
-- **Frenzies multiply the problem.** Money x7 on top of chains, made longer by Gold Fever. Options: a smaller multiplier, or one that grows with Lucky Charm tiers instead.
-- **The tuning bot is too timid.** It clicks the spot with the most squares and buys the cheapest upgrades, so it neither aims at explosives nor plans around frenzies. It reached the core around runs 10-13; the player was past 1Qa in run 6. Retune with a bot that plays chains, or from playtest saves.
-- **Sharp Pickaxe takes clicks off flat.** Cheap cubes fall to 1 click, and at high tiers a pricier cube can pay less a click than the one below (at Sharp 26 a Gold Bar takes 1 click for 300, Platinum 4 clicks for 900). Clicks now rise with every step up the ladder, so a pricier cube never takes fewer clicks a square, but a percentage cut would keep the ladder's ratios at every tier (see "Sharp Pickaxe fades" below).
+- **A stronger tuning bot reproduced it.** It aims at explosives and lightning first, leaves a new cube alone until its special squares have popped up, catches 90% of Lucky Cubes, clicks 4 times a second and ends a run past 30 game-minutes. With the old numbers it sat on Slate for runs 1-7, then reached 1.5e16 in run 8 and the Star Core by run 9-11. The Fallen Star's bot never aimed at explosives, so its pacing was too optimistic.
+- **What drove it**, from switching one part of play off at a time and from variants:
+  - **The Shard boost**, 2% per Shard: 4,700 Shards made earnings x95 and 100K made them x2,000, so each big run paid for a bigger one.
+  - **Sharp Pickaxe**, unlimited at x1.6 a tier: 47 tiers by run 5 and about 70 later, taking 70 clicks off every square, so Meteorite and everything below it broke in one click.
+  - **Payout multipliers** (combo up to x4, the clear bonus up to x3.25, Money x7, the Shard boost, diamonds): one cleared cube paid for a cube two tiers up, so money never held a run back. Weakening Clean Sweep, Hot Streak and Money x7, or spreading upgrade prices across the ladder, barely changed reach. Neither did capping Whetstones, or blast damage alone.
+  - **Toughness** did: once the deep cubes took more clicks, reach followed HP and damage, about a tier per run.
+- **Changes:**
+  - Blasts take 5 clicks off each square they reach (overlaps add up) instead of breaking it. The new Blasting Powder perk adds 1 per tier (5 Shards, x1.35), so chains wear down deep cubes early and obliterate them late.
+  - The Shard boost is +25% per doubling of the Shards ever earned; Shard Resonance adds 2.5% per doubling per tier.
+  - Sharp Pickaxe stops at 20 tiers (Diamond Tips still adds 5 free ones). The Tempered Steel perk raises the limit to 30, then 40 (500 and 5,000 Shards, listed once a Meteorite is cleared), so the pickaxe keeps growing across runs instead of within one.
+  - Deep cubes take more clicks: Amethyst 38, Emerald 47, Ruby Bar 56, Meteorite 68, Rose Quartz 82, Magma 100, Tektite 130, Iridium Bar 140, Opal 155, Void 185 (was 36 to 150).
+  - The Star Core takes 12,000 clicks a square (was 25,000) and Starsteel Edge costs 10K Shards a tier (was 50K): core runs now pay about 30K Shards, not 100-250K.
+- **Results**, six 28-run bot campaigns: about a tier a run from run 3-4 (Gold or Amethyst by run 4-5, Ruby 5-6, Magma 7-9, Opal 10-12), Void at run 10-14, the core bought a run later, the star freed at runs 21-23 with the core at 12,000 (22-25 at 15,000). One-click clears of mid cubes come back around run 10 as Blasting Powder grows (46 in one Tektite run). Runs end: about 5-6 game-minutes and 1,200-1,400 clicks for the bot in the late game.
+- **With Tempered Steel**, seven more campaigns (four buying perks cheapest first, three buying it as soon as it's listed): tier 1 at runs 7-11, tier 2 at runs 10-15, Void at runs 12-15 and the star freed at runs 19-23, about the same as without it. At 40 tiers (+5 from Diamond Tips) Meteorite squares take 23 clicks instead of 43, but Void squares still take 140 instead of 160: one click per tier matters little against the deepest cubes.
+- **Still open:**
+  - Runs 1-3 stay on Sandstone and Slate before the climb starts.
+  - Every campaign sits on Magma for 2-5 runs before Tektite (3 Magma clears unlock it, and its squares take 130 clicks). Part of that is the bot, which only buys a cube it can clear with 80% of the HP it has left.
+  - Frenzies are unchanged: they make money, and money isn't what holds a run back any more.
+  - The bot clicks 4 times a second; a person is slower, so runs take them longer in time, though not in clicks.
+- **The tuning bot** (throwaway, in a session scratchpad; rewrite it from this): a `SceneTree` script run headless with `--fixed-fps 60` and `--save=<scratch>`. Every 15 frames it clicks where `get_squares_in_reach` scores best (an explosive or lightning square it breaks 1000, a square it breaks 10, a hit 1), skipping cubes seen less than 80 frames ago. Every 30 frames it buys the Star Core if it can, a Whetstone under 20% HP, cubes up to 2 unfinished (the priciest it can afford and clear with 80% of its HP), then the cheapest upgrade that leaves money for that cube. It catches 90% of Lucky Cubes after 45 frames. Between runs it buys perks cheapest first; once Starsteel Edge is listed, small perks first, then Starsteel Edge or Sturdy Handle, whichever adds more core damage per Shard. A copy of the project per variant, with `.tres` values edited, runs several campaigns at once.
 
 ## Tuning notes and smaller ideas
 
-- **Sharp Pickaxe fades:** -1 click per tier matters less as cube clicks grow (Void squares take 100). Options: make it a percentage, or add a "Heavy Pickaxe" that adds damage per hit.
+- **Sharp Pickaxe:** it stops at 20 tiers, 30 or 40 with Tempered Steel (see the balance pass). If the deepest cubes should fall faster late, add Tempered Steel tiers (`max_level` in its `.tres`), or add a late-game upgrade with a percentage cut or a "Heavy Pickaxe" that adds damage per hit.
 - **Drone pacing:** drones hit 1.5 times a second for 1 damage each, so big cubes take them a while. Watch whether they feel useful in the mid game. Possible levers: base rate, a Drone Drill upgrade (+1 damage per tier), a smarter-targeting upgrade (explosives first).
 - **Endless cubes:** past the Void Cube, generate cube tiers on the fly (price `1B × 6^N`, a palette rotated from the existing ones) so the ladder never runs out.
 - **Several auto-buy picks:** let each Auto-Buyer tier pick its own cube instead of one cube for every slot.

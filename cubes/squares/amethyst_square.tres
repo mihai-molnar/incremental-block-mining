@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"amethyst"
 display_name = "Amethyst"
-hp = 36
+hp = 38
 value = 3000
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
 shadow_color = Color(0.364706, 0.152941, 0.364706, 1)

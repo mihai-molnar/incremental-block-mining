@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"star_core"
 display_name = "Star"
-hp = 25000
+hp = 12000
 value = 0
 shimmer = true
 blast_damage = 1

@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"ruby"
 display_name = "Ruby"
-hp = 52
+hp = 56
 value = 140000
 shimmer = true
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

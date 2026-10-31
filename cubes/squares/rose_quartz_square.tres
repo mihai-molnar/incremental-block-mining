@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"rose_quartz"
 display_name = "Rose Quartz"
-hp = 70
+hp = 82
 value = 1450000
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
 shadow_color = Color(0.694118, 0.243137, 0.32549, 1)

@@ -32,6 +32,8 @@
 [ext_resource type="Resource" path="res://shop/items/star_core_item.tres" id="113_star_core"]
 [ext_resource type="Script" path="res://ui/core_meter.gd" id="114_core_meter"]
 [ext_resource type="Resource" path="res://upgrades/perks/starsteel_edge.tres" id="115_starsteel_edge"]
+[ext_resource type="Resource" path="res://upgrades/perks/blasting_powder.tres" id="120_blasting_powder"]
+[ext_resource type="Resource" path="res://upgrades/perks/tempered_steel.tres" id="121_tempered_steel"]
 [ext_resource type="Resource" path="res://achievements/items/starlight.tres" id="116_ach_starlight"]
 [ext_resource type="Script" path="res://ui/victory_screen.gd" id="117_victory_screen"]
 [ext_resource type="Script" path="res://ui/story_card.gd" id="118_story_card"]
@@ -447,7 +449,7 @@ fx = NodePath("../Fx")
 work_area = NodePath("../WorkArea")
 drones = NodePath("../Drones")
 sidebar = NodePath("../Hud/Root/Sidebar")
-perks = Array[ExtResource("7_shop_item")]([ExtResource("72_sturdy_handle"), ExtResource("66_head_start"), ExtResource("70_diamond_tips"), ExtResource("67_drone_bay"), ExtResource("73_drone_plating"), ExtResource("71_four_leaf"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance"), ExtResource("115_starsteel_edge")])
+perks = Array[ExtResource("7_shop_item")]([ExtResource("72_sturdy_handle"), ExtResource("66_head_start"), ExtResource("70_diamond_tips"), ExtResource("67_drone_bay"), ExtResource("73_drone_plating"), ExtResource("71_four_leaf"), ExtResource("68_standing_order"), ExtResource("69_shard_resonance"), ExtResource("120_blasting_powder"), ExtResource("121_tempered_steel"), ExtResource("115_starsteel_edge")])
 
 [node name="Victory" type="CanvasLayer" parent="." node_paths=PackedStringArray("fx", "work_area", "drones", "run_end", "sidebar")]
 layer = 41

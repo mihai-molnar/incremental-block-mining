@@ -51,9 +51,9 @@ func _describe_square() -> String:
 	elif not is_equal_approx(square_type.hp_multiplier, 1.0):
 		parts.append("%sx clicks" % format_number(square_type.hp_multiplier))
 	if square_type.is_explosive():
-		parts.append("blows up its neighbors")
+		parts.append("blasts %d clicks off the squares around it" % Game.get_blast_damage())
 	if square_type.strikes_lines:
-		parts.append("breaks its row and column")
+		parts.append("strikes %d clicks off its row and column" % Game.get_blast_damage())
 	if square_type.cube_value_bonus > 0.0:
 		parts.append("its cube pays %sx until it breaks" % format_number(1.0 + square_type.cube_value_bonus))
 	return ", ".join(parts)

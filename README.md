@@ -189,7 +189,9 @@ the number next to it, your Shards plus the run's so far, goes up each time it f
 
 - Money, upgrades, the cubes on the field, drones and the Auto-Buyer's pick reset.
 - Shards, perks, unlocked cubes and upgrades, cube mastery, achievements and lifetime stats stay.
-- Every Shard you've ever earned adds 2% to all earnings, spent or not.
+- The Shards you've ever earned, spent or not, boost all earnings: +25% for the first, then
+  +25% more each time they double (3 Shards: +50%, 7: +75%, 1,023: +250%). Doublings, not
+  Shards, so a huge run can't snowball into the next.
 
 Shards buy perks on the run-end screen, which are kept forever:
 
@@ -202,8 +204,10 @@ Shards buy perks on the run-end screen, which are kept forever:
 | Drone Plating    | 3, ×2 per tier     | Drones last 20 more hits per tier (5 tiers)               |
 | Four-Leaf Clover | 4, ×3 per tier     | Lucky Cubes come 10% sooner per tier, on top of Lucky Charm (3 tiers) |
 | Standing Order   | 8                  | Runs start with a free Auto-Buyer tier                    |
-| Shard Resonance  | 5, ×2.2 per tier   | Each Shard adds 0.5% more, up to 7% per Shard (10 tiers, the last costs 6,000) |
-| Starsteel Edge   | 50K, every tier    | Your hits take 1 more click off Star Core squares per tier (no tier limit); listed once the Star Core unlocks, no longer sold once the star is free |
+| Shard Resonance  | 5, ×2.2 per tier   | Shards add 2.5% more per doubling, up to 50% per doubling (10 tiers, the last costs 6,000) |
+| Blasting Powder  | 5, ×1.35 per tier  | Blasts take 1 more click off each square per tier (no tier limit); listed once you've cleared a Slate Cube |
+| Tempered Steel   | 500, then 5,000    | Sharp Pickaxe goes up to 30 tiers, then 40 (2 tiers); listed once you've cleared a Meteorite |
+| Starsteel Edge   | 10K, every tier    | Your hits take 1 more click off Star Core squares per tier (no tier limit); listed once the Star Core unlocks, no longer sold once the star is free |
 
 ### Saving
 
@@ -230,38 +234,42 @@ Qa (quadrillions) and Qi (quintillions).
 | Obsidian |  1200 |     8x8 |                24 |              50 |
 | Gold Bar |  3000 |     8x3 |                27 |             300 |
 | Platinum |   12K |     6x6 |                30 |             900 |
-| Amethyst |   50K |     7x7 |                36 |           3,000 |
-| Emerald  |  200K |     8x8 |                44 |           9,500 |
-| Ruby Bar |    1M |     8x3 |                52 |            140K |
-| Meteorite |   5M |     9x9 |                60 |            220K |
-| Rose Quartz | 25M |    8x8 |                70 |           1.45M |
-| Magma    |  150M |    10x6 |                85 |            9.6M |
-| Tektite  |    1B |     9x9 |               110 |             52M |
-| Iridium Bar | 10B |    8x3 |               118 |            1.7B |
-| Opal     |  100B |     8x8 |               125 |            6.8B |
-| Void     |    1T |     8x8 |               150 |             68B |
+| Amethyst |   50K |     7x7 |                38 |           3,000 |
+| Emerald  |  200K |     8x8 |                47 |           9,500 |
+| Ruby Bar |    1M |     8x3 |                56 |            140K |
+| Meteorite |   5M |     9x9 |                68 |            220K |
+| Rose Quartz | 25M |    8x8 |                82 |           1.45M |
+| Magma    |  150M |    10x6 |               100 |            9.6M |
+| Tektite  |    1B |     9x9 |               130 |             52M |
+| Iridium Bar | 10B |    8x3 |               140 |            1.7B |
+| Opal     |  100B |     8x8 |               155 |            6.8B |
+| Void     |    1T |     8x8 |               185 |             68B |
 
 Clicks per square rise with every step up the ladder, so a pricier cube never breaks
-faster: a Bar is small and rich, not easy. From Platinum on, each square has an 8% chance
-to be rock, except in the three Bars. Rocks take twice the clicks and pay nothing, but the
-cube is done without them: they crumble when its last other square breaks, and drones leave
-them alone. Prospector turns them into ore worth 3x a square.
+faster: a Bar is small and rich, not easy. Past Rose Quartz they climb steeply, and Sharp
+Pickaxe stops at 20 tiers until the Tempered Steel perk raises it to 30, then 40, so the deep
+cubes stay tough until perks catch up: reaching Void takes a good number of runs.
+
+From Platinum on, each square has an 8% chance to be rock, except in the three Bars. Rocks
+take twice the clicks and pay nothing, but the cube is done without them: they crumble when
+its last other square breaks, and drones leave them alone. Prospector turns them into ore
+worth 3x a square.
 
 The first seven cubes pay back between 1.6x and 2.7x their price in squares, or 2x to 3.3x
 with the clear bonus. From Platinum to Magma, each cube costs 4 to 7 times the one before and
 pays back a little more; past Magma, each costs 10 times the one before (Tektite 1B, Iridium
 Bar 10B, Opal 100B, Void 1T) and pays back about 4x, counting rocks as worthless, so money
 keeps multiplying into the trillions. Combos pay more on top of that. Jade fits a maxed Big
-Pickaxe in one hit, Obsidian is big and tough enough that explosives pay off most there, and
+Pickaxe in one hit, explosives clear the cheap cubes outright and wear down the deep ones, and
 the shimmering Gold Bar, Ruby Bar and Iridium Bar are the jackpots.
 
 ### The Star Core
 
 The shop's last row, shown from your first run, is the Star Core: where the dig ends. It
 unlocks after you clear 3 Void Cubes and costs 1Qa. It's a 12x12 cube whose squares take
-25000 clicks each (3.6M in all), and it doesn't fall to shortcuts:
+12000 clicks each (1.73M in all), and it doesn't fall to shortcuts:
 
-- Explosions and lightning that reach it take 1 click off its squares instead of breaking them.
+- Explosions and lightning that reach it take only 1 click off its squares, whatever Blasting Powder adds.
 - A crit on it deals 10 hits' worth instead of breaking a square outright.
 - No special squares turn up on it: no diamonds, explosives, multipliers or rocks.
 - Drones can hit it, 1 click a hit. Your own hits take more with the Starsteel Edge perk.
@@ -271,10 +279,11 @@ Only one can be out at a time, and the Auto-Buyer can't buy it. While it's out, 
 top of the field shows the clicks it still needs. If your pickaxe breaks first, it collapses
 with the rest of the mine, and the money is gone.
 
-The price is the easy part: by the time the core unlocks, a run earns far more than 1Qa. What
-breaks it is a build. Each Starsteel Edge tier costs the same 50K Shards, so every run's
-Shards turn into more damage, and each try gets further than the last. In tuning, a bot that
-plays well reached the core around run 10-13 and freed the star around run 20-25.
+The price is the easy part: by the time the core unlocks, a run earns about 1Qa. What breaks
+it is a build. Each Starsteel Edge tier costs the same 10K Shards, so every run's Shards turn
+into more damage, and each try gets further than the last. In tuning, a bot that plays well
+reached Void around run 12-14, bought the core right after and freed the star around run
+21-23.
 
 ### Freeing the star
 
@@ -294,7 +303,7 @@ significant digits.
 | Upgrade         | Price                     | Effect                                                         |
 |-----------------|---------------------------|----------------------------------------------------------------|
 | Diamond Squares | 60                        | Each square has a 15% chance to turn into a diamond, which pays 5x and takes 3x the clicks |
-| Sharp Pickaxe   | 100, ×1.6 per tier        | Each tier makes squares take 1 click less (never below 1); no tier limit |
+| Sharp Pickaxe   | 100, ×1.6 per tier        | Each tier makes squares take 1 click less (never below 1), up to 20 tiers, 30 or 40 with Tempered Steel (Diamond Tips adds free ones past that) |
 | Lucky Strike    | 300, ×2.5 per tier        | Each tier adds 2% crit chance, up to 20% (9 tiers)             |
 | Big Pickaxe     | 250 / 2,500 / 25,000      | One click hits 2x2, then 4x4, then 6x6 squares (3 tiers)       |
 | Explosive Squares | 75, ×2.5 per tier       | Each square has a 1% chance per tier to turn explosive, up to 10% (10 tiers) |
@@ -325,16 +334,18 @@ Once you own the Auto-Buyer, every cube in the shop gets an **Auto** toggle. Tur
 one cube and the auto-buyer buys that cube whenever the field has fewer unfinished cubes than
 its tier keeps there.
 
-An explosive square breaks in one click and blows up every square around it, paying for all
-of them, however many clicks they had left. Explosives caught in a blast go off a moment
-later, so they chain. Blasts also reach squares on other cubes that touch, so drag cubes
-together before you set one off.
+An explosive square breaks in one click, and its blast takes 5 clicks off every square around
+it (more with the Blasting Powder perk). Squares with that many clicks left or fewer break
+and pay. Blasts that overlap add up, and explosives caught in a blast go off a moment later,
+so they chain: cheap cubes go up in one click, while deep ones only wear down until Blasting
+Powder catches up with them. Blasts also reach squares on other cubes that touch, so drag
+cubes together before you set one off.
 
 The other special squares:
 
 | Square     | Clicks | Pays | What it does |
 |------------|-------:|-----:|--------------|
-| Lightning  | 1      | 1x   | Breaks every square in its row and column, on its cube and on any cube lined up with it. Explosives and lightning it hits go off next, like a chain |
+| Lightning  | 1      | 1x   | A blast along its row and column: takes 5 clicks off every square there, on its cube and on any cube lined up with it. Explosives and lightning it breaks go off next, like a chain |
 | Coin Pouch | 1x     | 4x   | Bursts in a fountain of coins |
 | Multiplier | 1x     | 1x   | While it's unbroken, every square on its cube pays 2x (a green frame marks the cube). Break it last; drones do |
 | Ore        | 1x     | 3x   | What Prospector turns rocks into |

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TierCapUpgrade" format=3]
+
+[ext_resource type="Script" path="res://upgrades/tier_cap_upgrade.gd" id="1_upgrade"]
+[ext_resource type="Resource" path="res://upgrades/items/sharp_pickaxe.tres" id="2_target"]
+[ext_resource type="Script" path="res://shop/goal.gd" id="goal_script"]
+[ext_resource type="Resource" path="res://cubes/types/meteorite.tres" id="goal_cube"]
+
+[sub_resource type="Resource" id="Resource_unlock"]
+script = ExtResource("goal_script")
+amount = 1
+cube_type = ExtResource("goal_cube")
+
+[resource]
+script = ExtResource("1_upgrade")
+target = ExtResource("2_target")
+tiers_per_level = 10
+title = "Tempered Steel"
+price = 500
+price_growth = 10.0
+max_level = 2
+costs_shards = true
+unlock = SubResource("Resource_unlock")

@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"opal"
 display_name = "Opal"
-hp = 125
+hp = 155
 value = 6800000000
 shimmer = true
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

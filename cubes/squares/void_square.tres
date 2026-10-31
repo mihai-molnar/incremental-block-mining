@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"void"
 display_name = "Void"
-hp = 150
+hp = 185
 value = 68000000000
 shimmer = true
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)

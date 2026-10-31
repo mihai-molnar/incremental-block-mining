@@ -6,7 +6,7 @@
 script = ExtResource("1_square")
 id = &"meteorite"
 display_name = "Meteorite"
-hp = 60
+hp = 68
 value = 220000
 outline_color = Color(0.0588235, 0.0627451, 0.12549, 1)
 shadow_color = Color(0.239216, 0.168627, 0.180392, 1)
